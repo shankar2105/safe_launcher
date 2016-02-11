@@ -180,6 +180,7 @@ export var modifyFileContent = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   let params = req.params;
   let reqBody = req.body.toString('base64');
+  let query = req.query;
   if (!params.hasOwnProperty('filePath') || !params.filePath) {
     return res.status(400).send('Invalid request. filePath missing');
   }
@@ -194,7 +195,7 @@ export var modifyFileContent = function(req, res) {
   if (!reqBody) {
     return res.status(400).send('Invalid request. content missing or should be valid');
   }
-  params.offset = params.offset || null;
+  query.offset = query.offset || 0;
   let onResponse = function(err) {
     if (!err) {
       return res.status(202).send('Accepted');
@@ -203,6 +204,6 @@ export var modifyFileContent = function(req, res) {
   };
   let hasSafeDriveAccess = sessionInfo.permissions.indexOf('SAFE_DRIVE_ACCESS') !== -1;
   let appDirKey = sessionInfo.appDirKey;
-  req.app.get('api').nfs.modifyFileContent(reqBody, params.offset, params.filePath, params.isPathShared,
+  req.app.get('api').nfs.modifyFileContent(reqBody, query.offset, params.filePath, params.isPathShared,
     appDirKey, hasSafeDriveAccess, onResponse);
 };

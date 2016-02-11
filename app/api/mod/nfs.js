@@ -135,15 +135,13 @@ export default class NFS {
           filePath: filePath,
           newValues: {
             content: {
-              bytes: contentBytes
+              bytes: contentBytes,
+              offset: offset
             }
           },
           isPathShared: isPathShared
         }
       };
-      if (offset) {
-        payload.params.newValues.content.offset = offset;
-      }
       this.send(payload, callback);
     }
 }
