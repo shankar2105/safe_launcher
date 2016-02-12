@@ -9,6 +9,11 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
   params.isPathShared = params.isPathShared || false;
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    return res.status(400).send('Invalid request. isPathShared invalid');
+  }
   let responseHandler = new ResponseHandler(res, sessionInfo);
   if (isDelete) {
     req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared,

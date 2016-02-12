@@ -54,7 +54,7 @@ export default class RESTServer {
     let eventEmitter = this.app.get('eventEmitter');
 
     app.use(function(req, res, next){
-      if (req.is('text/*')) {
+      if (req.headers.authorization) {
         req.body = '';
         req.setEncoding('utf8');
         req.on('data', function(chunk){ req.body += chunk });
