@@ -2,7 +2,7 @@
  * Authentication test
  */
 var should = require('should');
-var utils = require('./utils');
+var utils = require('./utils').utils;
 import * as api from '../app/api/safe';
 
 describe('Authentication', function() {
