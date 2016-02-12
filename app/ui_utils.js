@@ -37,6 +37,11 @@ export default class UIUtils {
     this.restServer.start();
   }
 
+  // start REST Server
+  startStop() {
+    this.restServer.stop();
+  }
+
   // handle server error
   onServerError(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.ERROR, callback);

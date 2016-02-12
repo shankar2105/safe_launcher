@@ -13,6 +13,12 @@ describe('Authorisation', function() {
     utils.startServer();
   });
 
+  after(function() {
+    // utils.msl.startStop();
+    // utils.msl = null;
+    // utils.restServer = null;
+  });
+
   describe('Authorise', function() {
     it('Should be able to authorize successfully', function(done) {
       utils.msl.onAuthRequest(function(data) {

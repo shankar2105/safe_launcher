@@ -1,41 +1,94 @@
 var should = require('should');
 var utils = require('./utils').utils;
 var request = require('request');
-import { remote } from 'electron';
-import * as api from '../app/api/safe';
-import RESTServer from '../app/server/boot';
-import UIUtils from '../app/ui_utils';
 
 describe('NFS Directory', function() {
-  // var data = {
-  //   dirPath: '/safe_home',
-  //   isPrivate: false,
-  //   userMetadata: '',
-  //   isVersioned: false,
-  //   isPathShared: false
-  // };
-  // var serverUrl = 'http://localhost:3000/nfs/directory';
-  // var authData = null;
-  // var restServer = null;
-  // var msl = null;
+  var asycKeys = null;
+  var token = null;
+  var secretKeys = null;
+  var server = 'http://localhost:3000/v1/';
+  var masterData = {
+    dirPath: '/safe_home',
+    isPrivate: false,
+    userMetadata: '',
+    isVersioned: false,
+    isPathShared: false
+  };
+
   before(function(done) {
-    // restServer = new RESTServer(api);
-    // msl = new UIUtils(api, utils.electronRemote, restServer);
-    // msl.startServer();
-    // msl.onAuthRequest(function(data) {
-    //   msl.authResponse(data, true);
-    // });
-    // utils.authorize(request, function(err, res, body) {
-    //   restServer.removeAllEventListener(restServer.EVENT_TYPE.AUTH_REQUEST);
-    //   authData = body;
-    //   done();
-    // });
+    asycKeys = utils.genAsycKeys();
+    var publicKey = utils.byteToBuffer(asycKeys.publicKey);
+    var nonce = utils.byteToBuffer(asycKeys.nonce);
+    // utils.startServer();
+    utils.msl.onAuthRequest(function(data) {
+      utils.msl.authResponse(data, true);
+    });
+    utils.authorise(publicKey, nonce, function(err, res, body) {
+      if (err) {
+         throw err
+      }
+      utils.restServer.removeAllEventListener(utils.restServer.EVENT_TYPE.AUTH_REQUEST);
+      token = body.token;
+      var encryptedKey = utils.stringToBytes(body.encryptedKey);
+      var publicKey = utils.stringToBytes(body.publicKey);
+      secretKeys = utils.prepareSymKeys(encryptedKey, publicKey, asycKeys.nonce, asycKeys.privateKey);
+      done();
+    });
   });
-  // it('Should be able to create new directory', function(done) {
-  //   // var payload = {
-  //   //   url: serverUrl,
-  //   //
-  //   // };
-  //   should(true).be.ok();
-  // });
+
+  after(function() {
+    // utils.msl.startStop();
+    // utils.msl = null;
+    // utils.restServer = null;
+  });
+
+  describe('Create directory', function() {
+    it('Should be able to create new directory', function(done) {
+      var data = masterData;
+      data = JSON.stringify(data);
+      var enc = utils.encryptSec(data, secretKeys.symNonce, secretKeys.symKey);
+      var encStr = utils.byteToBuffer(enc);
+      var onResponse = function(err, res, body) {
+        if (err) {
+          return console.log(err);
+        }
+        should(err).be.null;
+        should(res.statusCode).be.eql(202);
+        done();
+      };
+      utils.createDirectory(token, encStr, onResponse);
+    });
+    it('Should throw 400 - dirPath missing', function(done) {
+      var data = masterData;
+      data.dirPath = "";
+      data = JSON.stringify(data);
+      var enc = utils.encryptSec(data, secretKeys.symNonce, secretKeys.symKey);
+      var encStr = utils.byteToBuffer(enc);
+      var onResponse = function(err, res, body) {
+        if (err) {
+          return console.log(err);
+        }
+        should(err).not.be.null;
+        should(res.statusCode).be.eql(400);
+        done();
+      };
+      utils.createDirectory(token, encStr, onResponse);
+    });
+    it('Should throw 400 - isVersioned should be boolean', function(done) {
+      var data = masterData;
+      data.isVersioned = "true";
+      data = JSON.stringify(data);
+      var enc = utils.encryptSec(data, secretKeys.symNonce, secretKeys.symKey);
+      var encStr = utils.byteToBuffer(enc);
+      var onResponse = function(err, res, body) {
+        if (err) {
+          return console.log(err);
+        }
+        should(err).not.be.null;
+        should(res.statusCode).be.eql(400);
+        done();
+      };
+      utils.createDirectory(token, encStr, onResponse);
+    });
+  });
 });

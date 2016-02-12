@@ -8,6 +8,7 @@ import UIUtils from '../app/ui_utils';
 var Utils = function() {
   this.msl = null;
   this.restServer = null;
+  this.server = 'http://localhost:3000/v1/';
 };
 
 // register
@@ -15,8 +16,32 @@ Utils.prototype.register = function (api, pin, keyword, password, callback) {
   api.auth.register(String(pin), keyword, password, callback);
 };
 
+Utils.prototype.login = function(api, pin, keyword, password, callback) {
+  api.auth.login(String(pin), keyword, password, callback);
+};
+
 Utils.prototype.byteToBuffer = function (bytes) {
   return new Buffer(bytes).toString('base64');
+};
+
+Utils.prototype.stringToBytes = function (str) {
+  return new Uint8Array(new Buffer(str, 'base64'));
+};
+
+Utils.prototype.decrypt = function (cipher, nonce, pubKey, priKey) {
+  return sodium.crypto_box_open_easy(cipher, nonce, pubKey, priKey);
+};
+
+Utils.prototype.prepareSymKeys = function(secretKey, launcherPubKey, assymNonce, privateKey) {
+  var keys = {};
+  var cipher = this.decrypt(secretKey, assymNonce, launcherPubKey, privateKey);
+  keys.symKey = cipher.slice(0, sodium.crypto_secretbox_KEYBYTES);
+  keys.symNonce = cipher.slice(sodium.crypto_secretbox_KEYBYTES);
+  return keys;
+};
+
+Utils.prototype.encryptSec = function (secretKey, nonce, pubKey) {
+  return sodium.crypto_secretbox_easy(secretKey, nonce, pubKey);
 };
 
 // start server
@@ -74,8 +99,17 @@ Utils.prototype.revoke = function (token, callback) {
   request.del(req, callback);
 };
 
-Utils.prototype.login = function(api, pin, keyword, password, callback) {
-  api.auth.login(String(pin), keyword, password, callback);
+Utils.prototype.createDirectory = function (token, encStr, callback) {
+  var payload = {
+    url: this.server + 'nfs/directory',
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    },
+    body: encStr
+  };
+  request(payload, callback);
 };
 
 Utils.prototype.electronRemote = {
