@@ -6,11 +6,28 @@ var utils = require('./utils').utils;
 describe('Authorisation', function() {
   var asycKeys = null;
 
-  before(function() {
+  before(function(done) {
     asycKeys = utils.genAsycKeys();
     asycKeys.publicKey = utils.byteToBuffer(asycKeys.publicKey);
     asycKeys.nonce = utils.byteToBuffer(asycKeys.nonce);
     utils.startServer();
+    var pin = utils.genRandomString(4);
+    var keyword = utils.genRandomString(6);
+    var password = utils.genRandomString(6);
+    var regCallback = function(err) {
+      if (err) {
+        throw err;
+        return;
+      }
+      utils.login(pin, keyword, password, function(err) {
+        if (err) {
+          throw err;
+          return;
+        }
+        done();
+      });
+    };
+    utils.register(pin, keyword, password, regCallback);
   });
 
   after(function() {

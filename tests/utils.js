@@ -12,11 +12,11 @@ var Utils = function() {
 };
 
 // register
-Utils.prototype.register = function (api, pin, keyword, password, callback) {
+Utils.prototype.register = function (pin, keyword, password, callback) {
   api.auth.register(String(pin), keyword, password, callback);
 };
 
-Utils.prototype.login = function(api, pin, keyword, password, callback) {
+Utils.prototype.login = function(pin, keyword, password, callback) {
   api.auth.login(String(pin), keyword, password, callback);
 };
 
@@ -30,6 +30,10 @@ Utils.prototype.stringToBytes = function (str) {
 
 Utils.prototype.decrypt = function (cipher, nonce, pubKey, priKey) {
   return sodium.crypto_box_open_easy(cipher, nonce, pubKey, priKey);
+};
+
+Utils.prototype.decryptSec = function (secretKey, nonce, pubKey) {
+  return sodium.crypto_secretbox_open_easy(secretKey, nonce, pubKey);
 };
 
 Utils.prototype.prepareSymKeys = function(secretKey, launcherPubKey, assymNonce, privateKey) {
@@ -99,7 +103,7 @@ Utils.prototype.revoke = function (token, callback) {
   request.del(req, callback);
 };
 
-Utils.prototype.createDirectory = function (token, encStr, callback) {
+Utils.prototype.createDir = function (token, encStr, callback) {
   var payload = {
     url: this.server + 'nfs/directory',
     method: 'POST',
@@ -112,6 +116,42 @@ Utils.prototype.createDirectory = function (token, encStr, callback) {
   request(payload, callback);
 };
 
+Utils.prototype.getDir = function (urlEncodedDirPath, isPathShared, token, callback) {
+  isPathShared = isPathShared || false;
+  var payload = {
+    url: this.server + 'nfs/directory/' + urlEncodedDirPath + '/' + isPathShared,
+    method: 'GET',
+    headers: {
+      'Authorization': 'bearer ' + token,
+      'Content-Type': 'text/plain'
+    }
+  };
+  request(payload, callback);
+};
+Utils.prototype.deleteDir = function (dirPath, isPathShared, token, callback) {
+  isPathShared = isPathShared || false;
+  var payload = {
+    url: this.server + 'nfs/directory' + dirPath + '/' + isPathShared,
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    }
+  };
+  request(payload, callback);
+};
+Utils.prototype.updateDir = function (dirPath, isPathShared, data, token, callback) {
+  var payload = {
+    url: this.server + 'nfs/directory' + dirPath + '/' + isPathShared,
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    },
+    body: data
+  };
+  request(payload, callback);
+};
 Utils.prototype.electronRemote = {
   getCurrentWindow: function() {
     return this;
