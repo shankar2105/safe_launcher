@@ -1,6 +1,5 @@
 var should = require('should');
 var utils = require('./utils').utils;
-var request = require('request');
 
 describe('NFS Directory', function() {
   var asycKeys = null;
@@ -10,14 +9,16 @@ describe('NFS Directory', function() {
   var dirPath = '/safe_home';
 
   before(function(done) {
+    var pin = utils.genRandomString(4);
+    var keyword = utils.genRandomString(6);
+    var password = utils.genRandomString(6);
     asycKeys = utils.genAsycKeys();
     var publicKey = utils.byteToBuffer(asycKeys.publicKey);
     var nonce = utils.byteToBuffer(asycKeys.nonce);
-    // utils.startServer();
     utils.msl.onAuthRequest(function(data) {
       utils.msl.authResponse(data, true);
     });
-    utils.authorise(publicKey, nonce, function(err, res, body) {
+    var authoriseCallaback = function(err, res, body) {
       if (err) {
          throw err
       }
@@ -27,34 +28,24 @@ describe('NFS Directory', function() {
       var publicKey = utils.stringToBytes(body.publicKey);
       secretKeys = utils.prepareSymKeys(encryptedKey, publicKey, asycKeys.nonce, asycKeys.privateKey);
       done();
-    });
-  });
-
-  after(function() {
-    // utils.msl.startStop();
-    // utils.msl = null;
-    // utils.restServer = null;
-  });
-
-  beforeEach(function(done) {
-    var pin = utils.genRandomString(4);
-    var keyword = utils.genRandomString(6);
-    var password = utils.genRandomString(6);
+    };
+    var loginCallback = function(err) {
+      if (err) {
+        throw err;
+        return;
+      }
+      utils.authorise(publicKey, nonce, authoriseCallaback);
+    };
     var regCallback = function(err) {
       if (err) {
         throw err;
         return;
       }
-      utils.login(pin, keyword, password, function(err) {
-        if (err) {
-          throw err;
-          return;
-        }
-        done();
-      });
+      utils.login(pin, keyword, password, loginCallback);
     };
     utils.register(pin, keyword, password, regCallback);
   });
+
   afterEach(function(done) {
     utils.deleteDir(dirPath, token, function(err) {
       if (err) {
@@ -98,7 +89,8 @@ describe('NFS Directory', function() {
       var encStr = prepareData(dirPath);
       var onResponse = function(err, res, body) {
         if (err) {
-          return console.log(err);
+          throw err;
+          return;
         }
         should(err).be.null;
         should(res.statusCode).be.eql(202);
@@ -110,7 +102,8 @@ describe('NFS Directory', function() {
       var encStr = prepareData("");
       var onResponse = function(err, res, body) {
         if (err) {
-          return console.log(err);
+          throw err;
+          return;
         }
         should(err).not.be.null;
         should(res.statusCode).be.eql(400);
@@ -122,7 +115,8 @@ describe('NFS Directory', function() {
       var encStr = prepareData(dirPath, "true");
       var onResponse = function(err, res, body) {
         if (err) {
-          return console.log(err);
+          throw err;
+          return;
         }
         should(err).not.be.null;
         should(res.statusCode).be.eql(400);
@@ -143,7 +137,8 @@ describe('NFS Directory', function() {
         }
         var onResponse = function(err, res, body) {
           if (err) {
-            return console.log(err);
+            throw err;
+            return;
           }
           should(err).be.null;
           should(res.statusCode).be.eql(200);
@@ -163,7 +158,8 @@ describe('NFS Directory', function() {
         }
         var onResponse = function(err, res, body) {
           if (err) {
-            return console.log(err);
+            throw err;
+            return;
           }
           should(err).not.be.null;
           should(res.statusCode).be.eql(400);
@@ -184,7 +180,8 @@ describe('NFS Directory', function() {
         }
         var onResponse = function(err, res, body) {
           if (err) {
-            return console.log(err);
+            throw err;
+            return;
           }
           should(err).be.null;
           should(res.statusCode).be.eql(200);
@@ -203,7 +200,8 @@ describe('NFS Directory', function() {
         }
         var onResponse = function(err, res, body) {
           if (err) {
-            return console.log(err);
+            throw err;
+            return;
           }
           should(err).not.be.null;
           should(res.statusCode).be.eql(400);
@@ -224,7 +222,8 @@ describe('NFS Directory', function() {
         }
         var onResponse = function(err, res, body) {
           if (err) {
-            return console.log(err);
+            throw err;
+            return;
           }
           should(err).be.null;
           should(res.statusCode).be.eql(200);
@@ -243,7 +242,8 @@ describe('NFS Directory', function() {
         }
         var onResponse = function(err, res, body) {
           if (err) {
-            return console.log(err);
+            throw err;
+            return;
           }
           should(err).not.be.null;
           should(res.statusCode).be.eql(400);

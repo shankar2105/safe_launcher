@@ -128,6 +128,7 @@ Utils.prototype.getDir = function (urlEncodedDirPath, isPathShared, token, callb
   };
   request(payload, callback);
 };
+
 Utils.prototype.deleteDir = function (dirPath, isPathShared, token, callback) {
   isPathShared = isPathShared || false;
   var payload = {
@@ -140,6 +141,7 @@ Utils.prototype.deleteDir = function (dirPath, isPathShared, token, callback) {
   };
   request(payload, callback);
 };
+
 Utils.prototype.updateDir = function (dirPath, isPathShared, data, token, callback) {
   var payload = {
     url: this.server + 'nfs/directory' + dirPath + '/' + isPathShared,
@@ -152,6 +154,71 @@ Utils.prototype.updateDir = function (dirPath, isPathShared, data, token, callba
   };
   request(payload, callback);
 };
+
+Utils.prototype.createFile = function (data, token, callback) {
+  var payload = {
+    url: this.server + '/nfs/file',
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    },
+    body: data
+  };
+  request(payload, callback);
+};
+
+Utils.prototype.getFile = function (filePath, isPathShared, token, callback) {
+  var payload = {
+    url: this.server + '/nfs/file' + filePath + '/' + isPathShared,
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    }
+  };
+  request(payload, callback);
+};
+
+Utils.prototype.modifyFileMeta = function (filePath, isPathShared, data, token, callback) {
+  var payload = {
+    url: this.server + '/nfs/file/metadata' + filePath + '/' + isPathShared,
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    },
+    body: data
+  };
+  request(payload, callback);
+};
+
+Utils.prototype.modifyFile = function (filePath, isPathShared, data, token, callback) {
+  var payload = {
+    url: this.server + '/nfs/file' + filePath + '/' + isPathShared,
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    },
+    body: data
+  };
+  request(payload, callback);
+};
+
+Utils.deleteFile = function(filePath, isPathShared, token, callback) {
+  isPathShared = isPathShared || "";
+  var payload = {
+    url: this.server + '/nfs/file' + filePath + '/' + isPathShared,
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'text/plain'
+    }
+  };
+  request(payload, callback);
+};
+
 Utils.prototype.electronRemote = {
   getCurrentWindow: function() {
     return this;

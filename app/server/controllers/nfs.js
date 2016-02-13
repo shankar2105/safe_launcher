@@ -118,7 +118,9 @@ export var modifyFileMeta = function(req, res) {
     return res.status(400).send('Invalid request. filePath is not valid');
   }
   params.isPathShared = params.isPathShared || false;
-  reqBody.metadata = reqBody.metadata || null;
+  if (!reqBody.metadata) {
+    return res.status(400).send('Invalid request. metadata invalid');
+  }
   reqBody.name = reqBody.name || null;
   let responseHandler = new ResponseHandler(res, sessionInfo);;
   req.app.get('api').nfs.modifyFileMeta(reqBody.name, reqBody.metadata, params.filePath, params.isPathShared,
