@@ -50,7 +50,7 @@ describe('NFS Directory', function() {
     var urlDirPath = encodeURIComponent(dirPath);
     utils.deleteDir(urlDirPath, false, token, function(err, res, body) {
       if (err) {
-        throw err;
+        // throw err;
       }
       done();
     })

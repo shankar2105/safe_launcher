@@ -169,8 +169,9 @@ Utils.prototype.createFile = function (data, token, callback) {
 };
 
 Utils.prototype.getFile = function (filePath, isPathShared, token, callback) {
+  isPathShared = isPathShared || false;
   var payload = {
-    url: this.server + '/nfs/file' + filePath + '/' + isPathShared,
+    url: this.server + 'nfs/file/' + filePath + '/' + isPathShared,
     method: 'GET',
     headers: {
       'Authorization': 'Bearer ' + token,
@@ -182,7 +183,7 @@ Utils.prototype.getFile = function (filePath, isPathShared, token, callback) {
 
 Utils.prototype.modifyFileMeta = function (filePath, isPathShared, data, token, callback) {
   var payload = {
-    url: this.server + '/nfs/file/metadata' + filePath + '/' + isPathShared,
+    url: this.server + 'nfs/file/metadata/' + filePath + '/' + isPathShared,
     method: 'PUT',
     headers: {
       'Authorization': 'Bearer ' + token,
@@ -195,7 +196,7 @@ Utils.prototype.modifyFileMeta = function (filePath, isPathShared, data, token, 
 
 Utils.prototype.modifyFile = function (filePath, isPathShared, data, token, callback) {
   var payload = {
-    url: this.server + '/nfs/file' + filePath + '/' + isPathShared,
+    url: this.server + 'nfs/file/' + filePath + '/' + isPathShared,
     method: 'PUT',
     headers: {
       'Authorization': 'Bearer ' + token,
@@ -206,10 +207,10 @@ Utils.prototype.modifyFile = function (filePath, isPathShared, data, token, call
   request(payload, callback);
 };
 
-Utils.deleteFile = function(filePath, isPathShared, token, callback) {
-  isPathShared = isPathShared || "";
+Utils.prototype.deleteFile = function(filePath, isPathShared, token, callback) {
+  isPathShared = isPathShared || false;
   var payload = {
-    url: this.server + '/nfs/file' + filePath + '/' + isPathShared,
+    url: this.server + 'nfs/file/' + filePath + '/' + isPathShared,
     method: 'DELETE',
     headers: {
       'Authorization': 'Bearer ' + token,

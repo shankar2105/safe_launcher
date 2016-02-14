@@ -64,12 +64,12 @@ export var modifyDirectory = function(req, res) {
   if (!params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
+  params.isPathShared = params.isPathShared || false;
   try {
     params.isPathShared = JSON.parse(params.isPathShared);
   } catch (e) {
     return res.status(400).send('Invalid request. isPathShared invalid');
   }
-  params.isPathShared = params.isPathShared || false;
   reqBody.name = reqBody.name || null;
   reqBody.metadata = reqBody.metadata || null;
 
@@ -107,6 +107,11 @@ export var deleteFile = function(req, res) {
     return res.status(400).send('Invalid request. filePath is not valid');
   }
   params.isPathShared = params.isPathShared || false;
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    return res.status(400).send('Invalid request. isPathShared invalid');
+  }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
   req.app.get('api').nfs.deleteFile(params.filePath, params.isPathShared, sessionInfo.appDirKey,
     sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
@@ -123,6 +128,11 @@ export var modifyFileMeta = function(req, res) {
     return res.status(400).send('Invalid request. filePath is not valid');
   }
   params.isPathShared = params.isPathShared || false;
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    return res.status(400).send('Invalid request. isPathShared invalid');
+  }
   if (!reqBody.metadata) {
     return res.status(400).send('Invalid request. metadata invalid');
   }
@@ -142,6 +152,11 @@ export var getFile = function(req, res, next) {
     return res.status(400).send('Invalid request. filePath is not valid');
   }
   params.isPathShared = params.isPathShared || false;
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    return res.status(400).send('Invalid request. isPathShared invalid');
+  }
   let offset = req.query.offset || 0;
   let length = req.query.length || 0;
   let responseHandler = new ResponseHandler(res, sessionInfo);
@@ -162,6 +177,11 @@ export var modifyFileContent = function(req, res) {
     return res.status(400).send('Invalid request. filePath is not valid');
   }
   params.isPathShared = params.isPathShared || false;
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    return res.status(400).send('Invalid request. isPathShared invalid');
+  }
   if (!reqBody) {
     return res.status(400).send('Invalid request. content missing or should be valid');
   }
