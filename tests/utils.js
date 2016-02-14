@@ -132,7 +132,7 @@ Utils.prototype.getDir = function (urlEncodedDirPath, isPathShared, token, callb
 Utils.prototype.deleteDir = function (dirPath, isPathShared, token, callback) {
   isPathShared = isPathShared || false;
   var payload = {
-    url: this.server + 'nfs/directory' + dirPath + '/' + isPathShared,
+    url: this.server + 'nfs/directory/' + dirPath + '/' + isPathShared,
     method: 'DELETE',
     headers: {
       'Authorization': 'Bearer ' + token,
@@ -144,7 +144,7 @@ Utils.prototype.deleteDir = function (dirPath, isPathShared, token, callback) {
 
 Utils.prototype.updateDir = function (dirPath, isPathShared, data, token, callback) {
   var payload = {
-    url: this.server + 'nfs/directory' + dirPath + '/' + isPathShared,
+    url: this.server + 'nfs/directory/' + dirPath + '/' + isPathShared,
     method: 'PUT',
     headers: {
       'Authorization': 'Bearer ' + token,

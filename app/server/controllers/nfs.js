@@ -64,6 +64,11 @@ export var modifyDirectory = function(req, res) {
   if (!params.dirPath) {
     return res.status(400).send('Invalid request. dirPath missing');
   }
+  try {
+    params.isPathShared = JSON.parse(params.isPathShared);
+  } catch (e) {
+    return res.status(400).send('Invalid request. isPathShared invalid');
+  }
   params.isPathShared = params.isPathShared || false;
   reqBody.name = reqBody.name || null;
   reqBody.metadata = reqBody.metadata || null;

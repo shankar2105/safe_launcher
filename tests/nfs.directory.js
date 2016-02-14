@@ -47,7 +47,8 @@ describe('NFS Directory', function() {
   });
 
   afterEach(function(done) {
-    utils.deleteDir(dirPath, token, function(err) {
+    var urlDirPath = encodeURIComponent(dirPath);
+    utils.deleteDir(urlDirPath, false, token, function(err, res, body) {
       if (err) {
         throw err;
       }
@@ -171,50 +172,10 @@ describe('NFS Directory', function() {
     });
   });
 
-  describe('Delete Directory', function() {
-    it('Should be able to delete directory', function(done) {
-      var createDirCallback = function(err, res, body) {
-        if (err) {
-          throw err;
-          return;
-        }
-        var onResponse = function(err, res, body) {
-          if (err) {
-            throw err;
-            return;
-          }
-          should(err).be.null;
-          should(res.statusCode).be.eql(200);
-          done();
-        };
-        utils.deleteDir(dirPath, false, token, onResponse);
-      };
-      utils.createDir(token, encStr, createDirCallback);
-    });
-    it('Should throw 400 - isPathShared params invalid', function(done) {
-      var encStr = prepareData(dirPath);
-      var createDirCallback = function(err, res, body) {
-        if (err) {
-          throw err;
-          return;
-        }
-        var onResponse = function(err, res, body) {
-          if (err) {
-            throw err;
-            return;
-          }
-          should(err).not.be.null;
-          should(res.statusCode).be.eql(400);
-          done();
-        };
-        utils.deleteDir(dirPath, "isPathShared", token, onResponse);
-      };
-      utils.createDir(token, encStr, createDirCallback);
-    });
-  });
-
   describe('Update Directory', function() {
     it('Should be able to update directory', function(done) {
+      var encStr = prepareData(dirPath);
+      var urlDirPath = encodeURIComponent(dirPath);
       var createDirCallback = function(err, res, body) {
         if (err) {
           throw err;
@@ -226,15 +187,17 @@ describe('NFS Directory', function() {
             return;
           }
           should(err).be.null;
-          should(res.statusCode).be.eql(200);
+          should(res.statusCode).be.eql(202);
           done();
         };
         var data = prepareUpdateData('/safe_pictures');
-        utils.updateDir(dirPath, false, data, token, onResponse);
+        utils.updateDir(urlDirPath, false, data, token, onResponse);
       };
       utils.createDir(token, encStr, createDirCallback);
     });
     it('Should throw 400 error - Invalid request', function(done) {
+      var encStr = prepareData(dirPath);
+      var urlEncodedDirPath = encodeURIComponent(dirPath);
       var createDirCallback = function(err, res, body) {
         if (err) {
           throw err;
@@ -250,7 +213,52 @@ describe('NFS Directory', function() {
           done();
         };
         var data = prepareUpdateData();
-        utils.updateDir(dirPath, false, data, token, onResponse);
+        utils.updateDir(urlEncodedDirPath, false, data, token, onResponse);
+      };
+      utils.createDir(token, encStr, createDirCallback);
+    });
+  });
+
+  describe('Delete Directory', function() {
+    it('Should be able to delete directory', function(done) {
+      var encStr = prepareData(dirPath);
+      var urlEncodedDirPath = encodeURIComponent(dirPath);
+      var createDirCallback = function(err, res, body) {
+        if (err) {
+          throw err;
+          return;
+        }
+        var onResponse = function(err, res, body) {
+          if (err) {
+            throw err;
+            return;
+          }
+          should(err).be.null;
+          should(res.statusCode).be.eql(202);
+          done();
+        };
+        utils.deleteDir(urlEncodedDirPath, false, token, onResponse);
+      };
+      utils.createDir(token, encStr, createDirCallback);
+    });
+    it('Should throw 400 - isPathShared params invalid', function(done) {
+      var encStr = prepareData(dirPath);
+      var urlEncodedDirPath = encodeURIComponent(dirPath);
+      var createDirCallback = function(err, res, body) {
+        if (err) {
+          throw err;
+          return;
+        }
+        var onResponse = function(err, res, body) {
+          if (err) {
+            throw err;
+            return;
+          }
+          should(err).not.be.null;
+          should(res.statusCode).be.eql(400);
+          done();
+        };
+        utils.deleteDir(urlEncodedDirPath, "isPathShared", token, onResponse);
       };
       utils.createDir(token, encStr, createDirCallback);
     });
