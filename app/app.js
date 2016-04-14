@@ -11,7 +11,7 @@ import childProcess from 'child_process';
 import { formatResponse } from './server/utils';
 
 let restServer = new RESTServer(api, env.serverPort);
-let proxyServer = {
+let proxyServer = { // proxyServer as es6 class
   process: null,
   start: function(proxyListener) {
     if (this.process) {
@@ -59,6 +59,7 @@ window.NETWORK_STATE = {
 window.msl = new UIUtils(api, remote, restServer, proxyServer);
 
 var onFfiProcessTerminated = function(title, msg) {
+  // TODO change from window prompt to app prompt
   require('remote').dialog.showMessageBox({
     type: 'error',
     buttons: [ 'Ok' ],

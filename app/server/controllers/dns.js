@@ -8,7 +8,7 @@ var registerOrAddService = function(req, res, isRegister) {
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
   let reqBody = JSON.parse(req.body.toString());
-  if (!reqBody.longName) {
+  if (!reqBody.longName) { // change logic to iteration
     return responseHandler.onResponse('Invalid request. longName can not be empty');
   }
   if (!reqBody.serviceName) {
@@ -28,9 +28,9 @@ var registerOrAddService = function(req, res, isRegister) {
 };
 
 export var getHomeDirectory = function(req, res) {
-  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
+  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null; // if not sessionInfo send 404 error
   let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
-  let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
+  let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false; // change sessionInfo.hasSafeDriveAccess() to sessionInfo.permissions.hasSafeDriveAccess()
   let longName = req.params.longName;
   let serviceName = req.params.serviceName;
   let responseHandler = new ResponseHandler(res, sessionInfo);
@@ -39,15 +39,15 @@ export var getHomeDirectory = function(req, res) {
 };
 
 export var getFile = function(req, res) {
-  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null;
+  let sessionInfo = req.headers['sessionId'] ? sessionManager.get(res.headers['sessionId']) : null; // if not sessionInfo send 404 error
   let appDirKey = sessionInfo ? sessionInfo.appDirKey : null;
   var reqParams = req.params;
   let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
-  let longName = reqParams.longName;
+  let longName = reqParams.longName; // required to store in a variable ?
   let serviceName = reqParams.serviceName;
   let filePath = reqParams.filePath;
   let responseHandler = new ResponseHandler(res, sessionInfo, true);
-  if (!(longName && serviceName && filePath)) {
+  if (!(longName && serviceName && filePath)) { // maintain consistent validation logic
     return responseHandler.onResponse('Invalid request. Required parameters are not found');
   }
   let offset = req.query.offset || 0;

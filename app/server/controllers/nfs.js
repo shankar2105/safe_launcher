@@ -8,12 +8,12 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
   }
   let params = req.params;
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!params.hasOwnProperty('dirPath') || !params.dirPath || !(typeof params.dirPath === 'string')) {
+  if (!params.hasOwnProperty('dirPath') || !params.dirPath || !(typeof params.dirPath === 'string')) { // validating dirPath twice
     return responseHandler.onResponse('Invalid request. dirPath missing');
   }
-  params.isPathShared = params.isPathShared || false;
+  params.isPathShared = params.isPathShared || false; // remove this line. check line 16
   try {
-    params.isPathShared = JSON.parse(params.isPathShared);
+    params.isPathShared = JSON.parse(params.isPathShared); // change to JSON.parse(params.isPathShared || false)
   } catch (e) {
     return res.status(400).send('Invalid request. isPathShared invalid');
   }
@@ -22,7 +22,7 @@ let deleteOrGetDirectory = function(req, res, isDelete) {
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
     req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared,
-      sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+      sessionInfo.permissions.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
 }
 
@@ -91,7 +91,7 @@ export var modifyDirectory = function(req, res) {
   if (!params.dirPath) {
     return responseHandler.onResponse('Invalid request. dirPath missing');
   }
-  params.isPathShared = JSON.parse(params.isPathShared) || false;
+  params.isPathShared = JSON.parse(params.isPathShared) || false; // will throw error if params.isPathShared is other than "true" or "false"
   reqBody.name = reqBody.name || null;
   reqBody.metadata = reqBody.metadata || null;
 

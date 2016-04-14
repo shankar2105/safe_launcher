@@ -13,7 +13,7 @@ export default class SessionInfo {
     this.appDirKey = appDirKey;
   }
 
-  hasSafeDriveAccess() {
+  hasSafeDriveAccess() { // not required
     return this.permissions.hasSafeDriveAccess();
   }
 

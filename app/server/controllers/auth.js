@@ -8,7 +8,7 @@ import SessionInfo from '../model/session_info';
 import Permission from '../model/permission';
 import {
   getSessionIdFromRequest
-} from '../utils'
+} from '../utils';
 
 export let CreateSession = function(data) {
   let req = data.request;
@@ -56,7 +56,7 @@ export var authorise = function(req, res) {
       authReq.app.version && authReq.publicKey && authReq.nonce)) {
     return res.status(400).send('Fields are missing');
   }
-  if (!authReq.hasOwnProperty('permissions')) {
+  if (!authReq.hasOwnProperty('permissions')) { // TODO add to above code
     return res.status(400).send('permissions are missing');
   }
   let permissions = new Permission(authReq.permissions);

@@ -1,3 +1,8 @@
+
+var startRestServer = function() {
+
+};
+
 // generate random string
 var genRandomString = function(len) {
   var text = " ";

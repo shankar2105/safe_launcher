@@ -57,7 +57,7 @@ export default class RESTServer {
     app.use(function(req, res, next) {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-      res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT");
+      res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT, HEAD");
       next();
     });
 
@@ -82,20 +82,21 @@ export default class RESTServer {
       res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
     });
     app.use('/', router_0_4);
-    app.use('/0.4', router_0_4);
+    app.use('/0.4', router_0_4); // combine in a array
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
       var err = new Error('Not Found');
       err.status = 404;
-      next(err);
+      next(err); // if 404 send request
     });
 
     // no stacktraces leaked to user
-    app.use(function(err, req, res, next) {
+    app.use(function(err, req, res, next) { // not required
       res.status(err.status || 500);
       res.send('Server Error');
     });
+
     app.set('port', this.port);
     this.server = http.createServer(app);
     this.server.listen(this.port);
@@ -105,7 +106,7 @@ export default class RESTServer {
   }
 
   stop() {
-    if (!server) {
+    if (!server) { // this.server
       return;
     }
     server.close();
@@ -126,7 +127,7 @@ export default class RESTServer {
 
   authApproved(data) {
     var app = data.payload.app;
-    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data));
+    this.app.get('api').auth.getAppDirectoryKey(app.id, app.name, app.vendor, new CreateSession(data)); // CreateSession send only required fields
   }
 
   authRejected(payload) {
