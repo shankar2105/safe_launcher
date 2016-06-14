@@ -97,3 +97,4 @@ deploy:
   on:
     condition: |
       (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
+    all_branches: true
