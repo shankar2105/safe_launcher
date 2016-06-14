@@ -6,7 +6,7 @@ environment:
   nodejs_version: "6.2"
   global:
     GH_TOKEN:
-      secure: Y+2qAj6Y4/7d+Fvv4/5TF8FU6fPOqlFio6mH+8P2dnH2bX+Dj6AVpAt/D0ODqPoJ
+      secure: pz4UQNCdP57gDQMZIDnNGD3ZF2IVjA7S1qQgLgKA9DCGq/42YZS9Ys8FM/FmCtU/
     Features: "use-mock-routing"
     PROJECT_NAME: safe_launcher
     RUST_BACKTRACE: 1
