@@ -94,7 +94,6 @@ deploy:
   tag_name: "${PROJECT_VERSION}"
   draft: true
   on:
-    branch: master
     condition: |
       (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
     all_branches: true
