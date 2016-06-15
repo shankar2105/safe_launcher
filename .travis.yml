@@ -64,11 +64,11 @@ script:
   # - npm test
 
 before_deploy:
-  - cd $TRAVIS_BUILD_DIR
-  - cd safe_core
-  - cargo build --release
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
+  # - cd $TRAVIS_BUILD_DIR
+  # - cd safe_core
+  # - cargo build --release
+  # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
   - git config --global user.name shankar2105
   - git config --global user.email shankar21mail@gmail.com
@@ -84,15 +84,15 @@ before_deploy:
   - ls release_config/safe_launcher
   - ls app_dist
   - ls app_dist/$PACKAGE_NAME
-  - ls app_dist/$PACKAGE_NAME/safe_launcher.app
-  - ls app_dist/$PACKAGE_NAME/safe_launcher.app/Contents
-  - ls app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks
-  - ls app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app
-  - ls app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents
-  - ls app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS
+  - ls app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app
+  - ls app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents
+  - ls app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents/Frameworks
+  - ls app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents/Frameworks/safe_launcher\ Helper.app
+  - ls app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents
+  - ls app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp -r release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
   - mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher\ Helper.crust.config
-  - mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/
+  - mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher-v$PROJECT_VERSION.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/
   # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher\ Helper.crust.config; fi
   # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/; fi
   - pushd ./app_dist
