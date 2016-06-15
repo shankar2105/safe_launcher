@@ -77,8 +77,8 @@ before_deploy:
   - npm run package
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp -r release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/safe_launcher.crust.config "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/log.toml "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/log.toml"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/safe_launcher.crust.config "app_dist/${PACKAGE_NAME}/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/log.toml "app_dist/${PACKAGE_NAME}/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/log.toml"; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
