@@ -3,7 +3,7 @@ platform:
 image: Visual Studio 2013
 os: unstable
 environment:
-  nodejs_version: "6.2"
+  nodejs_version: "5.5.0"
   global:
     GH_TOKEN:
       secure: pz4UQNCdP57gDQMZIDnNGD3ZF2IVjA7S1qQgLgKA9DCGq/42YZS9Ys8FM/FmCtU/
