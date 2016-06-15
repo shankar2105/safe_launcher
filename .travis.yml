@@ -19,10 +19,6 @@ language: generic
 python:
   - '2.7'
 
-branches:
-  only:
-    - master
-
 osx_image: xcode7.2
 
 sudo: required
@@ -67,12 +63,10 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g gulp-electron-mocha; fi
   - npm test
 
-after_success:
+before_deploy:
   - cd $TRAVIS_BUILD_DIR
   - cd safe_core
   - cargo build --release
-
-before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
@@ -97,6 +91,6 @@ deploy:
   tag_name: "${PROJECT_VERSION}"
   draft: true
   on:
-    branch: master
+    all_branches: true
     condition: |
       (-n "$PROJECT_VERSION") && (-n "$PLATFORM")
