@@ -6,10 +6,10 @@ env:
 
 matrix:
   include:
-  - os: linux
-    env: |
-      PLATFORM=linux-x64
-      PLATFORM_NAME=linux
+  # - os: linux
+  #   env: |
+  #     PLATFORM=linux-x64
+  #     PLATFORM_NAME=linux
   - os: osx
     env: |
       PLATFORM=osx-x64
@@ -61,7 +61,7 @@ script:
   - npm install
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g electron-prebuilt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g gulp-electron-mocha; fi
-  - npm test
+  # - npm test
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
@@ -77,8 +77,9 @@ before_deploy:
   - npm run package
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp -r release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/safe_launcher.crust.config "app_dist/${PACKAGE_NAME}/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/log.toml "app_dist/${PACKAGE_NAME}/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/log.toml"; fi
+  - ls "app_dist/${PACKAGE_NAME}/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS"
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/safe_launcher.crust.config "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/safe_launcher Helper.crust.config"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r release_config/safe_launcher/log.toml "app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher Helper.app/Contents/MacOS/log.toml"; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
