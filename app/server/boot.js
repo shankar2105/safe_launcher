@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'path';
 import http from 'http';
 import express from 'express';
 import EventEmitter from 'events';

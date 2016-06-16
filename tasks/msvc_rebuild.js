@@ -6,7 +6,6 @@ var childProcess = require('child_process');
 var path = require('path');
 var os = require('os');
 var electronVersion = require(path.resolve('./node_modules/electron-prebuilt/package.json')).version;
-var shell = require('gulp-shell');
 var exec = require('gulp-exec');
 
 gulp.task('msvc_rebuild', function() {
@@ -23,7 +22,6 @@ gulp.task('msvc_rebuild', function() {
   	stderr: true, // default = true, false means don't write stderr
   	stdout: true // default = true, false means don't write stdout
   }
-  console.log(process.argv);
   var rootFolder = gutil.env.env === 'test' ? 'testApp' : 'app';
   var packages = ['ref', 'ffi'];
   var targetPath = path.resolve(rootFolder, 'node_modules');
