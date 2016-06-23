@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
 import { router_0_4 } from './routes/version_0_4';
 import { CreateSession } from './controllers/auth';
-import { setSession } from './utils';
+import { setSessionHeaderAndParseBody } from './utils';
 
 class ServerEventEmitter extends EventEmitter {};
 
@@ -62,11 +62,11 @@ export default class RESTServer {
       next();
     });
 
-    app.use(setSession);
-
     app.use(bodyParser.json({strict: false}));
 
     app.use(bodyParser.raw({ type: '*/*' }));
+
+    app.use(setSessionHeaderAndParseBody);
 
     app.use(bodyParser.urlencoded({
       extended: false

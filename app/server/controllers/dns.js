@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import { ResponseHandler, parseReqBody } from '../utils';
+import { ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
 
 var registerOrAddService = function(req, res, isRegister) {
@@ -8,7 +8,7 @@ var registerOrAddService = function(req, res, isRegister) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  let reqBody = parseReqBody(req.body);
+  let reqBody = req.body;
   if (!reqBody.longName) {
     return responseHandler.onResponse('Invalid request. longName can not be empty');
   }
@@ -49,7 +49,7 @@ export var getFile = function(req, res) {
   let hasSafeDriveAccess = sessionInfo ? sessionInfo.hasSafeDriveAccess() : false;
   let longName = reqParams.longName;
   let serviceName = reqParams.serviceName;
-  let filePath = reqParams.filePath;
+  let filePath = reqParams['0'];
   let responseHandler = new ResponseHandler(res, sessionInfo, true);
   if (!(longName && serviceName && filePath)) {
     return responseHandler.onResponse('Invalid request. Required parameters are not found');

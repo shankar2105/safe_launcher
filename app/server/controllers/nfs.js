@@ -1,7 +1,17 @@
 import sessionManager from '../session_manager';
-import { ResponseHandler, parseReqBody } from '../utils';
+import { ResponseHandler } from '../utils';
 import fs from 'fs';
 import { log } from './../../logger/log';
+
+const ROOT_PATH = {
+  app: false,
+  drive: true
+};
+
+const FILE_OR_DIR_ACTION = {
+  copy: true,
+  move: false
+};
 
 class FileUploader {
 
@@ -13,10 +23,7 @@ class FileUploader {
   }
 
   upload() {
-    let reqBody = parseReqBody(this.req.body);
-    if (!reqBody) {
-      return responseHandler.onResponse('Invalid request body');
-    }
+    let reqBody = this.req.body;
     let fileContent = fs.readFileSync(reqBody.localFilePath).toString('base64');
     log.debug('NFS - FileUploader - Invoking modifying file content');
     this.req.app.get('api').nfs.modifyFileContent(fileContent, 0, reqBody.filePath, reqBody.isPathShared,
@@ -25,30 +32,24 @@ class FileUploader {
 
 }
 
-
 let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let params = req.params;
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!params.hasOwnProperty('dirPath') || !params.dirPath || !(typeof params.dirPath === 'string')) {
-    return responseHandler.onResponse('Invalid request. dirPath missing');
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  params.isPathShared = params.isPathShared || false;
-  try {
-    params.isPathShared = JSON.parse(params.isPathShared);
-  } catch (e) {
-    return res.status(400).send('Invalid request. isPathShared invalid');
-  }
+  let dirPath = req.params['0'];
   if (isDelete) {
     log.debug('NFS - Invoking Delete directory request');
-    req.app.get('api').nfs.deleteDirectory(params.dirPath, params.isPathShared,
+    req.app.get('api').nfs.deleteDirectory(dirPath, rootPath,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
     log.debug('NFS  - Invoking Get directory request');
-    req.app.get('api').nfs.getDirectory(params.dirPath, params.isPathShared,
+    req.app.get('api').nfs.getDirectory(dirPath, rootPath,
       sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
 }
@@ -58,23 +59,33 @@ let move = function(req, res, isFile) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let reqBody = parseReqBody(req.body);
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request body');
-  }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!(reqBody.srcPath && reqBody.hasOwnProperty('isSrcPathShared') && reqBody.destPath && reqBody.hasOwnProperty('isDestPathShared'))) {
+  let reqBody = req.body;
+  if (!(reqBody.srcPath && reqBody.hasOwnProperty('isSrcPathShared') &&
+    reqBody.destPath && reqBody.hasOwnProperty('isDestPathShared'))) {
     return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
   }
-  reqBody.retainSource = reqBody.retainSource ? true : false;
+  let srcRootPath = ROOT_PATH[reqBody.srcRootPath.toLowerCase()];
+  if (typeof srcRootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'srcRootPath\' mismatch');
+  }
+  let destRootPath = ROOT_PATH[reqBody.destRootPath.toLowerCase()];
+  if (typeof destRootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'destRootPath\' mismatch');
+  }
+  reqBody.action = reqBody.action || 'MOVE';
+  let action = FILE_OR_DIR_ACTION[reqBody.action.toLowerCase()];
+  if (typeof action === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'action\' mismatch');
+  }
   if (isFile) {
     log.debug('NFS - Invoking move file request');
-    req.app.get('api').nfs.moveFile(reqBody.srcPath, reqBody.isSrcPathShared, reqBody.destPath, reqBody.isDestPathShared,
-      reqBody.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+    req.app.get('api').nfs.moveFile(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
+      action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   } else {
     log.debug('NFS - Invoking move directory request');
-    req.app.get('api').nfs.moveDir(reqBody.srcPath, reqBody.isSrcPathShared, reqBody.destPath, reqBody.isDestPathShared,
-      reqBody.retainSource, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+    req.app.get('api').nfs.moveDir(reqBody.srcPath, srcRootPath, reqBody.destPath, destRootPath,
+      action, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
   }
 }
 
@@ -83,28 +94,25 @@ export var createDirectory = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let reqBody = parseReqBody(req.body);
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request body');
-  }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  if (!reqBody.hasOwnProperty('dirPath') || !reqBody.dirPath) {
-    return responseHandler.onResponse('Invalid request. dirPath missing');
+  let reqBody = req.body;
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  if (!reqBody.hasOwnProperty('isPrivate')) {
-    reqBody.isPrivate = false;
-  }
-  reqBody.isPathShared = reqBody.isPathShared || false;
-  reqBody.isVersioned = reqBody.isVersioned || false;
+  let dirPath = req.params['0'];
   reqBody.metadata = reqBody.metadata || '';
-
-  if (typeof reqBody.isVersioned !== 'boolean') {
-    return responseHandler.onResponse('Invalid request. isVersioned should be a boolean value');
+  reqBody.isPrivate = reqBody.isPrivate || false;
+  if (typeof reqBody.metadata !== 'string') {
+    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+  }
+  if (typeof reqBody.isPrivate !== 'boolean') {
+    return responseHandler.onResponse('Invalid request. \'isPrivate\' should be a boolean value');
   }
   let appDirKey = sessionInfo.appDirKey;
   log.debug('NFS - Invoking create directory request');
-  req.app.get('api').nfs.createDirectory(reqBody.dirPath, reqBody.isPrivate, reqBody.isVersioned,
-    reqBody.metadata, reqBody.isPathShared, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,
+  req.app.get('api').nfs.createDirectory(dirPath, reqBody.isPrivate, false,
+    reqBody.metadata, rootPath, sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey,
     responseHandler.onResponse);
 }
 
@@ -122,26 +130,32 @@ export var modifyDirectory = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  let reqBody = parseReqBody(req.body);
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request body');
+  let reqBody = req.body;
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  let params = req.params;
-  if (!params.dirPath) {
-    return responseHandler.onResponse('Invalid request. dirPath missing');
-  }
-  params.isPathShared = JSON.parse(params.isPathShared) || false;
-  reqBody.name = reqBody.name || null;
-  reqBody.metadata = reqBody.metadata || null;
+  let dirPath = req.params['0'];
+  reqBody.name = reqBody.name || '';
+  reqBody.metadata = reqBody.metadata || '';
 
   if (!reqBody.name && !reqBody.metadata) {
     return responseHandler.onResponse('Invalid request. Name or metadata should be present in the request');
   }
+  if (typeof reqBody.metadata !== 'string') {
+    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+  }
+  if (typeof reqBody.name !== 'string') {
+    return responseHandler.onResponse('Invalid request. \'name\' should be a string value');
+  }
   log.debug('NFS - Invoking modify directory request');
-  req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, params.dirPath, params.isPathShared,
+  req.app.get('api').nfs.modifyDirectory(reqBody.name, reqBody.metadata, dirPath, rootPath,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
 
+export var moveDirectory = function(req, res) {
+  move(req, res, false);
+}
 
 export var createFile = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -149,17 +163,18 @@ export var createFile = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  let reqBody = parseReqBody(req.body);
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request body');
+  let reqBody = req.body;
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  if (!reqBody.filePath) {
-    return responseHandler.onResponse('Invalid request. filePath missing');
-  }
-  reqBody.isPathShared = reqBody.isPathShared || false;
   reqBody.metadata = reqBody.metadata || '';
+  if (typeof reqBody.metadata !== 'string') {
+    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+  }
   log.debug('NFS - Invoking create file request');
-  req.app.get('api').nfs.createFile(reqBody.filePath, reqBody.metadata, reqBody.isPathShared,
+  req.app.get('api').nfs.createFile(filePath, reqBody.metadata, rootPath,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), function(err) {
       if (err) {
         return responseHandler.onResponse(err);
@@ -189,13 +204,13 @@ export var deleteFile = function(req, res) {
     return res.sensStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  let params = req.params;
-  if (!(typeof params.filePath === 'string')) {
-    return responseHandler.onResponse('Invalid request. filePath is not valid');
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  params.isPathShared = JSON.parse(params.isPathShared) || false;
   log.debug('NFS - Invoking Delete file request');
-  req.app.get('api').nfs.deleteFile(params.filePath, params.isPathShared, sessionInfo.appDirKey,
+  req.app.get('api').nfs.deleteFile(filePath, rootPath, sessionInfo.appDirKey,
     sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
 
@@ -204,20 +219,23 @@ export var modifyFileMeta = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let params = req.params;
-  let reqBody = parseReqBody(req.body);
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request body');
-  }
   let responseHandler = new ResponseHandler(res, sessionInfo);;
-  if (!(typeof params.filePath === 'string')) {
-    return responseHandler.onResponse('Invalid request. filePath is not valid');
+  let reqBody = req.body;
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  params.isPathShared = JSON.parse(params.isPathShared) || false;
-  reqBody.metadata = reqBody.metadata || null;
-  reqBody.name = reqBody.name || null;
+  reqBody.metadata = reqBody.metadata || '';
+  reqBody.name = reqBody.name || '';
+  if (typeof reqBody.metadata !== 'string') {
+    return responseHandler.onResponse('Invalid request. \'metadata\' should be a string value');
+  }
+  if (typeof reqBody.name !== 'string') {
+    return responseHandler.onResponse('Invalid request. \'name\' should be a string value');
+  }
   log.debug('NFS - Invoking modify file metadata request');
-  req.app.get('api').nfs.modifyFileMeta(reqBody.name, reqBody.metadata, params.filePath, params.isPathShared,
+  req.app.get('api').nfs.modifyFileMeta(reqBody.name, reqBody.metadata, filePath, rootPath,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
 
@@ -226,29 +244,33 @@ export var getFile = function(req, res, next) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let params = req.params;
   let responseHandler = new ResponseHandler(res, sessionInfo, true);
-  if (!(typeof params.filePath === 'string')) {
-    return responseHandler.onResponse('Invalid request. filePath is not valid');
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  params.isPathShared = JSON.parse(params.isPathShared) || false;
-  let offset = req.query.offset || 0;
-  let length = req.query.length || 0;
+  var offset = 0;
+  let length = 0;
+  let range = req.headers[ 'range' ];
+  if (range) {
+    range = range.replace(/bytes=/g, '').split('-');
+    offset = range[0];
+    length = range[1] && (range[1] > range[0]) ? (range[1] - range[0]) : range[0];
+  }
   log.debug('NFS - Invoking Get file request');
-  req.app.get('api').nfs.getFile(params.filePath, params.isPathShared, offset, length,
+  req.app.get('api').nfs.getFile(filePath, rootPath, offset, length,
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
 };
 
+// TODO: Need code change according to v0.5
 export var modifyFileContent = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
   let params = req.params;
-  let reqBody = parseReqBody(req.body);
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request body');
-  }
+  let reqBody = req.body;
   let query = req.query;
   let responseHandler = new ResponseHandler(res, sessionInfo);
   if (!(typeof params.filePath === 'string')) {
@@ -266,10 +288,6 @@ export var modifyFileContent = function(req, res) {
   req.app.get('api').nfs.modifyFileContent(reqBody, parseInt(query.offset), params.filePath, params.isPathShared,
     sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
-
-export var moveDirectory = function(req, res) {
-  move(req, res, false);
-}
 
 export var moveFile = function(req, res) {
   move(req, res, true);

@@ -35,7 +35,7 @@ export var getSessionIdFromRequest = function(req) {
   }
 }
 
-export var setSession = function(req, res, next) {
+export var setSessionHeaderAndParseBody = function(req, res, next) {
   if (!req.get('Authorization')) {
     log.debug('Unauthorised Request ::' + req.path);
     return next();
@@ -48,6 +48,12 @@ export var setSession = function(req, res, next) {
     return res.sendStatus(401);
   }
   req.headers['sessionId'] = sessionId;
+  if (req.body && req.body.length > 0) {
+    req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
+    if (typeof req.body !== 'object') {
+      return res.status(400).send('Invalid Request Body');
+    }
+  }
   next();
 };
 
@@ -166,12 +172,14 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     } else {
       self.res.set('Content-Type', mime.lookup(data.metadata.name));
     }
-    self.res.set('file-name', data.metadata.name);
-    self.res.set('file-size', data.metadata.size);
-    self.res.set('file-created-time', data.metadata.createdOn);
-    self.res.set('file-modified-time', data.metadata.modifiedOn);
+    self.res.set('Accept-Ranges', 'bytes');
+    self.res.set('Content-Length', data.metadata.size);
+    // TODO: Set Content-Range
+    // self.res.set('Content-Range', 'bytes');
+    self.res.set('Last-Modified', data.metadata.modifiedOn);
+    self.res.set('Created-On', data.metadata.createdOn);
     if (data.metadata.userMetadata) {
-      self.res.set('file-metadata', data.metadata.userMetadata);
+      self.res.set('Metadata', data.metadata.userMetadata);
     }
     res.status(status).send(content);
   };
@@ -179,14 +187,4 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
   self.onResponse = self.isFileResponse ? fileResponse : generalResponse;
 
   return self;
-};
-
-export var parseReqBody = function(body) {
-  let reqBody = null;
-  try {
-    reqBody = JSON.parse(body.toString());
-  } catch (e) {
-    reqBody = body;
-  }
-  return reqBody;
 };

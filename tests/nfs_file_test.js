@@ -280,7 +280,7 @@ describe('NFS File', function() {
   //   });
   //
   //   after(function(done) {
-  //     utils.deleteDir(utils.getToken(), encodeURIComponent(destDirPath), function(status) {
+  //     utils.deleteDir(utils.getToken(), destDirPath, function(status) {
   //       if (status !== 200) {
   //         console.error('Unable to delete directory :: ' + status);
   //         return process.exit(0);
