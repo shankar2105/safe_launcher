@@ -16,11 +16,11 @@ router.post('/nfs/movedir', NFS.moveDirectory);
 
 // NFS - FILE API
 router.post('/nfs/file/:rootPath/*', NFS.createFile);
-router.post('/nfs/movefile', NFS.moveFile);
 router.delete('/nfs/file/:rootPath/*', NFS.deleteFile);
 router.put('/nfs/file/metadata/:rootPath/*', NFS.modifyFileMeta);
-router.put('/nfs/file/:filePath/:isPathShared?', NFS.modifyFileContent);
+router.put('/nfs/file/:rootPath/*', NFS.modifyFileContent);
 router.get('/nfs/file/:rootPath/*', NFS.getFile);
+router.post('/nfs/movefile', NFS.moveFile);
 
 // DNS API
 router.post('/dns', DNS.register);

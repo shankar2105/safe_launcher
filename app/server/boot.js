@@ -64,8 +64,6 @@ export default class RESTServer {
 
     app.use(bodyParser.json({strict: false}));
 
-    app.use(bodyParser.raw({ type: '*/*' }));
-
     app.use(setSessionHeaderAndParseBody);
 
     app.use(bodyParser.urlencoded({

@@ -33,7 +33,6 @@ module.exports = function(libPath) {
       'execute_for_content': [ 'pointer', [ 'string', intPtr, intPtr, intPtr, clientHandlePtrPtr ] ],
       'drop_client': [ 'void', [ clientHandlePtrPtr ] ],
       'drop_vector': [ 'void', [ 'pointer', int, int ] ],
-      'drop_null_ptr': [ 'void', [ 'pointer' ] ],
       'register_network_event_observer': [ 'void', [ clientHandlePtrPtr, notifyFuncPtr ] ]
     };
   };

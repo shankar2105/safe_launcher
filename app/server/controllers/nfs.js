@@ -1,7 +1,8 @@
+import fs from 'fs';
 import sessionManager from '../session_manager';
 import { ResponseHandler } from '../utils';
-import fs from 'fs';
 import { log } from './../../logger/log';
+import { NfsWriter } from '../stream/nfs_writer';
 
 const ROOT_PATH = {
   app: false,
@@ -12,25 +13,6 @@ const FILE_OR_DIR_ACTION = {
   copy: true,
   move: false
 };
-
-class FileUploader {
-
-  constructor(req, res, sessionInfo, responseHandler) {
-    this.req = req;
-    this.res = res;
-    this.sessionInfo = sessionInfo;
-    this.responseHandler = responseHandler;
-  }
-
-  upload() {
-    let reqBody = this.req.body;
-    let fileContent = fs.readFileSync(reqBody.localFilePath).toString('base64');
-    log.debug('NFS - FileUploader - Invoking modifying file content');
-    this.req.app.get('api').nfs.modifyFileContent(fileContent, 0, reqBody.filePath, reqBody.isPathShared,
-    this.sessionInfo.appDirKey, this.sessionInfo.hasSafeDriveAccess(), this.responseHandler.onResponse);
-  }
-
-}
 
 let deleteOrGetDirectory = function(req, res, isDelete) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -175,27 +157,7 @@ export var createFile = function(req, res) {
   }
   log.debug('NFS - Invoking create file request');
   req.app.get('api').nfs.createFile(filePath, reqBody.metadata, rootPath,
-    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), function(err) {
-      if (err) {
-        return responseHandler.onResponse(err);
-      }
-      if (reqBody.localFilePath) {
-        log.debug('NFS - Preparing upload of file content ' + reqBody.localFilePath);
-        try {
-          if (fs.statSync(reqBody.localFilePath).isFile()) {
-            log.debug('NFS - Uploading file content');
-            let uploader = new FileUploader(req, res, sessionInfo, responseHandler);
-            uploader.upload();
-          } else {
-            responseHandler.onResponse('localFilePath is not referring to a valid file');
-          }
-        } catch (e) {
-          return responseHandler.onResponse('localFilePath is not valid' + e.message);
-        }
-      } else {
-        responseHandler.onResponse();
-      }
-    });
+    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
 };
 
 export var deleteFile = function(req, res) {
@@ -263,30 +225,28 @@ export var getFile = function(req, res, next) {
     sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
 };
 
-// TODO: Need code change according to v0.5
 export var modifyFileContent = function(req, res) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let params = req.params;
-  let reqBody = req.body;
   let query = req.query;
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!(typeof params.filePath === 'string')) {
-    return responseHandler.onResponse('Invalid request. filePath is not valid');
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  params.isPathShared = JSON.parse(params.isPathShared) || false;
-  if (!reqBody) {
-    return responseHandler.onResponse('Invalid request.');
-  }
-
-  if (!query.offset || isNaN(query.offset)) {
+  var offset = query.offset || 0;
+  if (isNaN(offset)) {
     return responseHandler.onResponse('Invalid request. offset should be a number');
   }
   log.debug('NFS - Invoking Modify file content request');
-  req.app.get('api').nfs.modifyFileContent(reqBody, parseInt(query.offset), params.filePath, params.isPathShared,
-    sessionInfo.appDirKey, sessionInfo.hasSafeDriveAccess(), responseHandler.onResponse);
+  var writer = new NfsWriter(req, filePath, offset, rootPath, sessionInfo, responseHandler);
+  req.on('end', function() {
+    writer.onClose();
+  });
+  req.pipe(writer);
 };
 
 export var moveFile = function(req, res) {
