@@ -129,29 +129,10 @@ export var formatResponse = function(data) {
   return format(data);
 }
 
-export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
+export var ResponseHandler = function(res, sessionInfo) {
   let self = this;
   self.res = res;
-  self.sessionInfo = sessionInfo;
-  self.isFileResponse = isFileResponse || false;
-
-  var generalResponse = function(err, data) {
-    let status = 200;
-    if (err) {
-      if (err.hasOwnProperty('errorCode')) {
-        err.description = errorCodeLookup(err.errorCode);
-      }
-      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
-        status = 404;
-      }
-      return self.res.status(400).send(err);
-    }
-    if (data) {
-      self.res.status(status).send(formatResponse(data));
-    } else {
-      self.res.sendStatus(status);
-    }
-  };
+  self.sessionInfo = sessionInfo;    
 
   var fileResponse = function(err, data) {
     var status = 200;
@@ -184,7 +165,23 @@ export var ResponseHandler = function(res, sessionInfo, isFileResponse) {
     res.status(status).send(content);
   };
 
-  self.onResponse = self.isFileResponse ? fileResponse : generalResponse;
+  self.onResponse = function(err, data) {
+    let status = 200;
+    if (err) {
+      if (err.hasOwnProperty('errorCode')) {
+        err.description = errorCodeLookup(err.errorCode);
+      }
+      if (err.description && err.description.toLowerCase().indexOf('notfound') > -1) {
+        status = 404;
+      }
+      return self.res.status(400).send(err);
+    }
+    if (data) {
+      self.res.status(status).send(formatResponse(data));
+    } else {
+      self.res.sendStatus(status);
+    }
+  };
 
   return self;
 };

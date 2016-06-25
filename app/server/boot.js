@@ -4,7 +4,7 @@ import express from 'express';
 import EventEmitter from 'events';
 import bodyParser from 'body-parser';
 import sessionManager from './session_manager';
-import { router_0_4 } from './routes/version_0_4';
+import { router_0_5 } from './routes/version_0_5';
 import { CreateSession } from './controllers/auth';
 import { setSessionHeaderAndParseBody } from './utils';
 
@@ -55,12 +55,25 @@ export default class RESTServer {
     let EVENT_TYPE = this.app.get('EVENT_TYPE');
     let eventEmitter = this.app.get('eventEmitter');
 
-    app.use(function(req, res, next) {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-      res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT");
-      next();
-    });
+    // var corsValidator = function(req, callback) {
+    //   try {
+    //     var origin = req.get('Origin');
+    //     callback(null, {
+    //       origin: (origin ? /\.safenet$/.test(origin) : true)
+    //     });
+    //   } catch (e) {
+    //     callback(e);
+    //   }
+    // };
+    //
+    // app.options('*', cors(corsValidator));
+    // app.use(cors(corsValidator));
+    // app.use(function(req, res, next) {
+    //   res.header("Access-Control-Allow-Origin", "*");
+    //   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    //   res.header("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, POST, PUT");
+    //   next();
+    // });
 
     app.use(bodyParser.json({strict: false}));
 
@@ -73,8 +86,8 @@ export default class RESTServer {
     app.get('/pac-file', function(req, res) {
       res.download(path.resolve(__dirname, 'server/web_proxy.pac'));
     });
-    app.use('/', router_0_4);
-    app.use('/0.4', router_0_4);
+    app.use('/', router_0_5);
+    app.use('/0.5', router_0_5);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {

@@ -1,6 +1,8 @@
+import mime from 'mime';
 import sessionManager from '../session_manager';
-import { ResponseHandler } from '../utils';
+import { ResponseHandler, formatResponse } from '../utils';
 import { log } from './../../logger/log';
+import { DnsReader } from '../stream/dns_reader';
 
 var registerOrAddService = function(req, res, isRegister) {
   let sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -54,11 +56,53 @@ export var getFile = function(req, res) {
   if (!(longName && serviceName && filePath)) {
     return responseHandler.onResponse('Invalid request. Required parameters are not found');
   }
-  let offset = parseInt(req.query.offset) || 0;
-  let length = parseInt(req.query.length) || 0;
+  let onFileMetadataRecieved = function(err, fileStats) {
+    log.debug('NFS - File metatda for reading - ' + fileStats);
+    if (err) {
+      return res.status(400).send(err);
+    }
+    fileStats = formatResponse(JSON.parse(fileStats));
+    let range = req.get('range');
+    let positions = [0];
+    if (range) {
+      range = range.toLowerCase();
+      if (!/^bytes=/.test(range)) {
+        return res.status(400).send('Invalid range header specification.');
+      }
+      positions = range.toLowerCase().replace(/bytes=/g, '').split('-');
+      for (var i in positions) {
+        if (isNaN(positions[i])) {
+          return res.sendStatus(416);
+        }
+      }
+    }
+    let start = parseInt(positions[0]);
+    let total = fileStats.metadata.size;
+    let end = positions[1] ? parseInt(positions[1]) : total;
+    let chunksize = end - start;
+    if (chunksize <= 0 || end > total) {
+      return res.sendStatus(416);
+    }
+    log.debug('DNS - Ready to stream file ' + filePath + ' for range' + start + "-" + end + "/" + total);
+    var headers = {
+       "Content-Range": "bytes " + start + "-" + end + "/" + total,
+       "Accept-Ranges": "bytes",
+       "Content-Length": chunksize,
+       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
+       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
+       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+    };
+    if (fileStats.metadata.metadata) {
+      headers.metadata = fileStats.metadata.metadata;
+    }
+    res.writeHead(range ? 206 : 200, headers);
+     let dnsReader = new DnsReader(req, longName, serviceName, filePath, start, end,
+        hasSafeDriveAccess, appDirKey);
+     dnsReader.pipe(res);
+  };
   log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
-  req.app.get('api').dns.getFile(longName, serviceName, filePath, offset, length, hasSafeDriveAccess, appDirKey,
-    responseHandler.onResponse);
+  req.app.get('api').dns.getFile(longName, serviceName, filePath, 0, 1, hasSafeDriveAccess, appDirKey,
+    onFileMetadataRecieved);
 };
 
 export var register = function(req, res) {

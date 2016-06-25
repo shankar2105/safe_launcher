@@ -1,8 +1,10 @@
 import fs from 'fs';
+import mime from 'mime';
 import sessionManager from '../session_manager';
-import { ResponseHandler } from '../utils';
+import { ResponseHandler, formatResponse } from '../utils';
 import { log } from './../../logger/log';
 import { NfsWriter } from '../stream/nfs_writer';
+import { NfsReader } from '../stream/nfs_reader';
 
 const ROOT_PATH = {
   app: false,
@@ -212,17 +214,81 @@ export var getFile = function(req, res, next) {
   if (typeof rootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  var offset = 0;
-  let length = 0;
-  let range = req.headers[ 'range' ];
-  if (range) {
-    range = range.replace(/bytes=/g, '').split('-');
-    offset = range[0];
-    length = range[1] && (range[1] > range[0]) ? (range[1] - range[0]) : range[0];
-  }
+
+  let onFileMetadataRecieved = function(err, fileStats) {
+    log.debug('NFS - File metatda for reading - ' + fileStats);
+    if (err) {
+      return res.status(400).send(err);
+    }
+    fileStats = formatResponse(JSON.parse(fileStats));
+    let range = req.get('range');
+    let positions = [0];
+    if (range) {
+      range = range.toLowerCase();
+      if (!/^bytes=/.test(range)) {
+        return res.status(400).send('Invalid range header specification.');
+      }
+      positions = range.toLowerCase().replace(/bytes=/g, '').split('-');
+      for (var i in positions) {
+        if (isNaN(positions[i])) {
+          return res.sendStatus(416);
+        }
+      }
+    }
+    let start = parseInt(positions[0]);
+    let total = fileStats.metadata.size;
+    let end = positions[1] ? parseInt(positions[1]) : total;
+    let chunksize = end - start;
+    if (chunksize <= 0 || end > total) {
+      return res.sendStatus(416);
+    }
+    log.debug('NFS - Ready to stream file for range' + start + "-" + end + "/" + total);
+    var headers = {
+       "Content-Range": "bytes " + start + "-" + end + "/" + total,
+       "Accept-Ranges": "bytes",
+       "Content-Length": chunksize,
+       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
+       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
+       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+    };
+    if (fileStats.metadata.metadata) {
+      headers.metadata = fileStats.metadata.metadata;
+    }
+    res.writeHead(range ? 206 : 200, headers);
+     let nfsReader = new NfsReader(req, filePath, rootPath, start, end,
+        sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey);
+     nfsReader.pipe(res);
+  };
   log.debug('NFS - Invoking Get file request');
-  req.app.get('api').nfs.getFile(filePath, rootPath, offset, length,
-    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, responseHandler.onResponse);
+  req.app.get('api').nfs.getFile(filePath, rootPath, 0, 1,
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
+};
+
+export var getFileMetadata = function(req, res) {
+  let responseHandler = new ResponseHandler(res, sessionInfo, true);
+  let filePath = req.params['0'];
+  let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
+  if (typeof rootPath === 'undefined') {
+    return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
+  }
+  let onFileMetadataRecieved = function(err, fileStats) {
+    log.debug('NFS - File metatda for reading - ' + fileStats);
+    if (err) {
+      return res.status(400).send(err);
+    }
+    fileStats = formatResponse(JSON.parse(fileStats));
+    res.writeHead(range ? 206 : 200, {
+       "Accept-Ranges": "bytes",
+       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
+       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
+       "Metadata": fileStats.metadata.metadata,
+       "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
+     });
+     res.end();
+  };
+  log.debug('NFS - Invoking Get file Metadata request');
+  req.app.get('api').nfs.getFile(filePath, rootPath, 0, 1,
+    sessionInfo.hasSafeDriveAccess(), sessionInfo.appDirKey, onFileMetadataRecieved);
 };
 
 export var modifyFileContent = function(req, res) {
@@ -230,14 +296,21 @@ export var modifyFileContent = function(req, res) {
   if (!sessionInfo) {
     return res.sendStatus(401);
   }
-  let query = req.query;
+  let offset = 0;
   let responseHandler = new ResponseHandler(res, sessionInfo);
   let filePath = req.params['0'];
   let rootPath = ROOT_PATH[req.params.rootPath.toLowerCase()];
   if (typeof rootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
-  var offset = query.offset || 0;
+  if (req.get('range')) {
+    var range = req.get('range').toLowerCase();
+    if (!/^bytes=/.test(range)) {
+      return res.status(400).send('Invalid range header specification.');
+    }
+    var positions = range.toLowerCase().replace(/bytes=/g, '').split('-');
+    offset = positions[0];
+  }
   if (isNaN(offset)) {
     return responseHandler.onResponse('Invalid request. offset should be a number');
   }
