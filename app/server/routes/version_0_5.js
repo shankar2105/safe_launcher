@@ -20,6 +20,7 @@ router.delete('/nfs/file/:rootPath/*', NFS.deleteFile);
 router.put('/nfs/file/metadata/:rootPath/*', NFS.modifyFileMeta);
 router.put('/nfs/file/:rootPath/*', NFS.modifyFileContent);
 router.get('/nfs/file/:rootPath/*', NFS.getFile);
+router.head('/nfs/file/:rootPath/*', NFS.getFileMetadata);
 router.post('/nfs/movefile', NFS.moveFile);
 
 // DNS API
@@ -33,4 +34,4 @@ router.get('/dns/:serviceName/:longName/*', DNS.getFile);
 router.get('/dns', DNS.listLongNames);
 router.get('/dns/:longName', DNS.listServices);
 
-export { router as router_0_4 };
+export { router as router_0_5 };
