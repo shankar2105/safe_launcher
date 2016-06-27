@@ -152,7 +152,7 @@ var createDir = function(token, dirPath, callback) {
     method: 'POST',
     url: SERVER_URL + '/nfs/directory/APP/' + dirPath,
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -161,7 +161,6 @@ var createDir = function(token, dirPath, callback) {
       console.error(err);
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -208,7 +207,7 @@ var updateDir = function(token, dirPath, newName, callback) {
     method: 'PUT',
     url: SERVER_URL + '/nfs/directory/APP/' + dirPath,
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -234,7 +233,7 @@ var moveOrCopyDir = function(token, srcPath, destPath, toMove, callback) {
     method: 'POST',
     url: SERVER_URL + '/nfs/movedir',
     headers: {
-      'Content-Type': 'Application/json',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -242,7 +241,6 @@ var moveOrCopyDir = function(token, srcPath, destPath, toMove, callback) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -255,7 +253,7 @@ var createFile = function(token, filePath, callback) {
     method: 'POST',
     url: SERVER_URL + '/nfs/file/APP/' + filePath,
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -290,7 +288,7 @@ var getFile = function(token, filePath, callback) {
     headers: {
       'Content-Type': 'text/plain',
       'authorization': token,
-      'range': 'bytes=0'
+      'range': 'bytes=0-100'
     }
   }, function(err, res, body) {
     if (err) {
@@ -309,7 +307,7 @@ var updateFileMeta = function(token, newFileName, filePath, callback) {
     method: 'PUT',
     url: SERVER_URL + '/nfs/file/metadata/APP/' + filePath,
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -336,7 +334,6 @@ var updateFileContent = function(token, fileContent, filePath, callback) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -354,7 +351,7 @@ var moveOrCopyFile = function(token, srcPath, destPath, toMove, callback) {
     method: 'POST',
     url: SERVER_URL + '/nfs/movefile',
     headers: {
-      'Content-Type': 'Application/json',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -375,12 +372,11 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     serviceHomeDirPath: dirPath,
     isPathShared: false
   };
-  console.log(longName, serviceName, dirPath);
   request({
     method: 'POST',
     url: SERVER_URL + '/dns',
     headers: {
-      'Content-Type': 'Application/json',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -388,7 +384,6 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -436,7 +431,7 @@ var addService = function(token, longName, serviceName, dirPath, callback) {
     method: 'PUT',
     url: SERVER_URL + '/dns',
     headers: {
-      'Content-Type': 'Application/json',
+      'Content-Type': 'application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)

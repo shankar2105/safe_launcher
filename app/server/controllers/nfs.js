@@ -48,7 +48,7 @@ let move = function(req, res, isFile) {
   if (!(reqBody.srcPath && reqBody.hasOwnProperty('srcRootPath') &&
     reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
     return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
-}
+  }
   let srcRootPath = ROOT_PATH[reqBody.srcRootPath.toLowerCase()];
   if (typeof srcRootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'srcRootPath\' mismatch');
@@ -216,7 +216,7 @@ export var getFile = function(req, res, next) {
   }
 
   let onFileMetadataRecieved = function(err, fileStats) {
-    log.debug('NFS - File metatda for reading - ' + fileStats);
+    log.debug('NFS - File metatdata for reading - ' + fileStats);
     if (err) {
       return res.status(400).send(err);
     }
@@ -272,7 +272,7 @@ export var getFileMetadata = function(req, res) {
     return responseHandler.onResponse('Invalid request. \'rootPath\' mismatch');
   }
   let onFileMetadataRecieved = function(err, fileStats) {
-    log.debug('NFS - File metatda for reading - ' + fileStats);
+    log.debug('NFS - File metatdata for reading - ' + fileStats);
     if (err) {
       return res.status(400).send(err);
     }
