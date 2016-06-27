@@ -45,10 +45,10 @@ let move = function(req, res, isFile) {
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
   let reqBody = req.body;
-  if (!(reqBody.srcPath && reqBody.hasOwnProperty('isSrcPathShared') &&
-    reqBody.destPath && reqBody.hasOwnProperty('isDestPathShared'))) {
+  if (!(reqBody.srcPath && reqBody.hasOwnProperty('srcRootPath') &&
+    reqBody.destPath && reqBody.hasOwnProperty('destRootPath'))) {
     return responseHandler.onResponse('Invalid request. Manadatory parameters are missing');
-  }
+}
   let srcRootPath = ROOT_PATH[reqBody.srcRootPath.toLowerCase()];
   if (typeof srcRootPath === 'undefined') {
     return responseHandler.onResponse('Invalid request. \'srcRootPath\' mismatch');
