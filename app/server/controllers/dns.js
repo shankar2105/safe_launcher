@@ -20,8 +20,11 @@ var registerOrAddService = function(req, res, isRegister) {
   if (!reqBody.serviceHomeDirPath) {
     return responseHandler.onResponse('Invalid request. serviceHomeDirPath can not be empty');
   }
-  if (!(new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$')).test(reqBody.longName)) {
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$/.test(reqBody.longName)) {
     return responseHandler.onResponse('Invalid request. longName is not valid');
+  }
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$/.test(reqBody.serviceName)) {
+    return responseHandler.onResponse('Invalid request. serviceName is not valid');
   }
   reqBody.isPathShared = reqBody.isPathShared || false;
   if (isRegister) {
@@ -175,7 +178,7 @@ export var createPublicId = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if (!((new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$')).test(req.params.longName))) {
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$/.test(req.params.longName))) {
     return responseHandler.onResponse('Invalid request. longName is not valid');
   }
   log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
