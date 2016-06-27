@@ -334,6 +334,7 @@ var updateFileContent = function(token, fileContent, filePath, callback) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -372,6 +373,7 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     serviceHomeDirPath: dirPath,
     isPathShared: false
   };
+  console.log(longName, serviceName, dirPath);
   request({
     method: 'POST',
     url: SERVER_URL + '/dns',
@@ -384,6 +386,7 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   });
 };
