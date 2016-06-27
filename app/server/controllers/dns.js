@@ -175,7 +175,7 @@ export var createPublicId = function(req, res) {
     return res.sendStatus(401);
   }
   let responseHandler = new ResponseHandler(res, sessionInfo);
-  if ((new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$')).test(req.params.longName)) {
+  if (!((new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$')).test(req.params.longName))) {
     return responseHandler.onResponse('Invalid request. longName is not valid');
   }
   log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
