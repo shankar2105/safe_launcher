@@ -13,6 +13,8 @@ import { log } from './logger/log';
 
 log.debug('Application starting');
 
+let ignoreUnRegisteredObserver = false;
+
 let restServer = new RESTServer(api, env.serverPort);
 let proxyServer = {
   process: null,
@@ -92,8 +94,16 @@ var onFfiProcessTerminated = function(title, msg) {
 //   });
 // };
 
-api.setNetworkStateListener(function(state) {
-  log.debug('Network state change event recieved :: ' + state);
+api.setNetworkStateListener(function(state, isRegisteredClient) {
+  log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
+  if (ignoreUnRegisteredObserver && !isRegisteredClient) {
+    log.debug('Ignoring Network state change event for unregistered client');
+    return;
+  }
+  if (state === 0 && isRegisteredClient) {
+    ignoreUnRegisteredObserver = true;
+    window.msl.dropUnregisteredClient(function() {});
+  }
   switch (state) {
     case -1:
       log.info('Network state change event :: FFI ERROR');

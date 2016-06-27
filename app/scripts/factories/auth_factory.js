@@ -7,12 +7,7 @@ window.safeLauncher.factory('authFactory', [ 'serverFactory',
 
     // Login
     self.login = function(user, callback) {
-      window.msl.login(user.pin, user.keyword, user.password, function(err) {
-        if (err) {
-          return callback(err);
-        }
-        window.msl.dropUnregisteredClient(callback);
-      });
+      window.msl.login(user.pin, user.keyword, user.password, callback);
     };
 
     // Register

@@ -37,10 +37,19 @@ module.exports = function(libPath) {
     };
   };
 
-  var networkObserver = function(state) {
+  var unRegisteredClientObserver = function(state) {
     util.send(0, {
       type: 'status',
-      state: state
+      state: state,
+      registeredClient: false
+    });
+  };
+
+  var registeredClientObserver = function(state) {
+    util.send(0, {
+      type: 'status',
+      state: state,
+      registeredClient: true
     });
   };
 
@@ -48,7 +57,7 @@ module.exports = function(libPath) {
     if (!lib) {
       throw new Error('FFI library not yet initialised');
     }
-    return auth.getRegisteredClient() ? auth.getRegisteredClient() : auth.getUnregisteredClient(lib, networkObserver);
+    return auth.getRegisteredClient() ? auth.getRegisteredClient() : auth.getUnregisteredClient(lib, unRegisteredClientObserver);
   };
 
   var loadLibrary = function() {
@@ -66,11 +75,11 @@ module.exports = function(libPath) {
   self.dispatcher = function(message) {
     try {
       if (!lib && !loadLibrary()) {
-        return networkObserver(LIB_LOAD_ERROR);
+        return unRegisteredClientObserver(LIB_LOAD_ERROR);
       }
       switch (message.module) {
         case 'auth':
-          auth.execute(lib, message, networkObserver);
+          auth.execute(lib, message, registeredClientObserver);
           break;
 
         case 'nfs':
@@ -90,8 +99,8 @@ module.exports = function(libPath) {
           break;
 
         case 'connect':
-          if (auth.getUnregisteredClient(lib, networkObserver)) {
-            networkObserver(0);
+          if (auth.getUnregisteredClient(lib, unRegisteredClientObserver)) {
+            unRegisteredClientObserver(0);
           }
           break;
 

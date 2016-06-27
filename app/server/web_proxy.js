@@ -28,10 +28,12 @@ var args = initialiseArguments(process.argv);
 var server = http.createServer(function(req, res) {
   var urlServe = url.parse(req.url);
   if (!safenetPath.test(urlServe.host)) {
-    res.sendStatus(403);
+    res.writeHead(403);
+    res.write('Only \'.safenet\' pages can be accessed');
+    res.end();
   }
   var origin = req.headers['origin'];
-  if (origin && !/\.safenet$/.test(origin)) {
+  if (origin && !safenetPath.test(origin)) {
     res.writeHead(403);
     res.write('Invalid request origin - ' + (origin || 'No origin found') +
      '. Origin can only be from sites with .safenet TLD');
