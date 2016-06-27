@@ -221,19 +221,20 @@ var updateDir = function(token, dirPath, newName, callback) {
   });
 };
 
-var moveDir = function(token, srcPath, destPath, callback) {
+var moveOrCopyDir = function(token, srcPath, destPath, toMove, callback) {
+  var action = toMove ? 'MOVE' : 'COPY';
   var payload = {
     srcPath: srcPath,
-    srcRootPath: false,
+    srcRootPath: 'APP',
     destPath: destPath,
-    destRootPath: false,
-    action: 'MOVE'
+    destRootPath: 'APP',
+    action: action
   };
   request({
     method: 'POST',
     url: SERVER_URL + '/nfs/movedir',
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'Application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -241,6 +242,7 @@ var moveDir = function(token, srcPath, destPath, callback) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -321,10 +323,10 @@ var updateFileMeta = function(token, newFileName, filePath, callback) {
 
 // TODO: Change api to v0.5
 var updateFileContent = function(token, fileContent, filePath, callback) {
-  var query ='offset=' + 0;
+  var query ='?offset=' + 0;
   request({
     method: 'PUT',
-    url: SERVER_URL + '/nfs/file/' + encodeURIComponent(filePath) + '/false?' + query,
+    url: SERVER_URL + '/nfs/file/APP/' + filePath + query,
     headers: {
       'Content-Type': 'text/plain',
       'authorization': token
@@ -334,17 +336,19 @@ var updateFileContent = function(token, fileContent, filePath, callback) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   });
 };
 
-var moveFile = function(token, srcPath, destPath, callback) {
+var moveOrCopyFile = function(token, srcPath, destPath, toMove, callback) {
+  var action = toMove ?  'MOVE' : 'COPY'
   var payload = {
     srcPath: srcPath,
-    srcRootPath: false,
+    srcRootPath: 'APP',
     destPath: destPath,
-    destRootPath: false,
-    action: 'MOVE'
+    destRootPath: 'APP',
+    action: action
   };
   request({
     method: 'POST',
@@ -545,8 +549,8 @@ module.exports = {
   getFile: getFile,
   updateFileMeta: updateFileMeta,
   updateFileContent: updateFileContent,
-  moveFile: moveFile,
-  moveDir: moveDir,
+  moveOrCopyFile: moveOrCopyFile,
+  moveOrCopyDir: moveOrCopyDir,
   registerDns: registerDns,
   deleteDns: deleteDns,
   createPublicId: createPublicId,
