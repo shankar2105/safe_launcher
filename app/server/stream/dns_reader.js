@@ -28,7 +28,7 @@ DnsReader.prototype._read = function() {
   this.sizeToRead = diff > MAX_SIZE_TO_READ ? MAX_SIZE_TO_READ : diff;
   this.req.app.get('api').dns.getFile(this.longName, this.serviceName, this.filePath, this.curOffset,
     this.sizeToRead, this.hasSafeDriveAccess, this.appDirKey,
-    function(err, data) {
+    function(err, data) {      
       if (err) {
         return log.error(err);
       }

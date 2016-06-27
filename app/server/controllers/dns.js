@@ -63,11 +63,12 @@ export var getFile = function(req, res) {
     return responseHandler.onResponse('Invalid request. Required parameters are not found');
   }
   let onFileMetadataRecieved = function(err, fileStats) {
-    log.debug('NFS - File metatda for reading - ' + fileStats);
+    log.debug('NFS - File metadata for reading - ' + fileStats);
     if (err) {
       return res.status(400).send(err);
     }
-    fileStats = formatResponse(JSON.parse(fileStats));
+    fileStats = typeof fileStats === 'string' ? JSON.parse(fileStats) : fileStats;
+    fileStats = formatResponse(fileStats);
     let range = req.get('range');
     let positions = [0];
     if (range) {
@@ -83,7 +84,7 @@ export var getFile = function(req, res) {
       }
     }
     let start = parseInt(positions[0]);
-    let total = fileStats.metadata.size;
+    let total = fileStats.size;
     let end = positions[1] ? parseInt(positions[1]) : total;
     let chunksize = end - start;
     if (chunksize <= 0 || end > total) {
@@ -94,12 +95,15 @@ export var getFile = function(req, res) {
        "Content-Range": "bytes " + start + "-" + end + "/" + total,
        "Accept-Ranges": "bytes",
        "Content-Length": chunksize,
-       "Created-On": new Date(fileStats.metadata.createdOn).toUTCString(),
-       "Last-Modified": new Date(fileStats.metadata.modifiedOn).toUTCString(),
+       "Created-On": new Date(fileStats.createdOn).toUTCString(),
+       "Last-Modified": new Date(fileStats.modifiedOn).toUTCString(),
        "Content-Type": mime.lookup(filePath) || 'application/octet-stream'
     };
-    if (fileStats.metadata.metadata) {
-      headers.metadata = fileStats.metadata.metadata;
+    if (chunksize === 0) {
+      return res.end();
+    }
+    if (fileStats.metadata) {
+      headers.metadata = fileStats.metadata;
     }
     res.writeHead(range ? 206 : 200, headers);
      let dnsReader = new DnsReader(req, longName, serviceName, filePath, start, end,
@@ -107,7 +111,7 @@ export var getFile = function(req, res) {
      dnsReader.pipe(res);
   };
   log.debug('DNS - Invoking getFile API for ' + longName + ', ' + serviceName + ', ' + filePath);
-  req.app.get('api').dns.getFile(longName, serviceName, filePath, 0, 1, hasSafeDriveAccess, appDirKey,
+  req.app.get('api').dns.getFileMetadata(longName, serviceName, filePath, hasSafeDriveAccess, appDirKey,
     onFileMetadataRecieved);
 };
 
