@@ -81,19 +81,6 @@ var onFfiProcessTerminated = function(title, msg) {
   });
 };
 
-// var onConnectionLost = function() {
-//   // TODO change from window prompt to app prompt
-//   require('remote').dialog.showMessageBox({
-//     type: 'error',
-//     buttons: [ 'Ok' ],
-//     title: 'Connection Drop',
-//     message: 'Connection lost with the Network. Log in again to continue'
-//   }, function() {
-//     api.restart();
-//     window.location.hash = 'login';
-//   });
-// };
-
 api.setNetworkStateListener(function(state, isRegisteredClient) {
   log.debug('Network state change event recieved :: ' + state + ' :: ' + isRegisteredClient);
   if (ignoreUnRegisteredObserver && !isRegisteredClient) {
@@ -102,7 +89,9 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
   }
   if (state === 0 && isRegisteredClient) {
     ignoreUnRegisteredObserver = true;
+    log.debug('Dropping unregistered client');
     window.msl.dropUnregisteredClient(function() {});
+    log.debug('Dropped unregistered client');
   }
   switch (state) {
     case -1:
@@ -120,13 +109,11 @@ api.setNetworkStateListener(function(state, isRegisteredClient) {
     case 1:
       log.info('Network connection lost');
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
-      // onConnectionLost();
       break;
 
     case 2:
       log.info('Network connection lost');
       window.msl.networkStateChange(NETWORK_STATE.DISCONNECTED);
-      // onConnectionLost();
       break;
 
     default:
