@@ -20,7 +20,7 @@ var registerOrAddService = function(req, res, isRegister) {
   if (!reqBody.serviceHomeDirPath) {
     return responseHandler.onResponse('Invalid request. serviceHomeDirPath can not be empty');
   }
-  if ((new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$')).test(reqBody.longName)) {
+  if (!(new RegExp('^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:)+$')).test(reqBody.longName)) {
     return responseHandler.onResponse('Invalid request. longName is not valid');
   }
   reqBody.isPathShared = reqBody.isPathShared || false;

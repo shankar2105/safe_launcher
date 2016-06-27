@@ -350,7 +350,7 @@ var moveFile = function(token, srcPath, destPath, callback) {
     method: 'POST',
     url: SERVER_URL + '/nfs/movefile',
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'Application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -371,11 +371,12 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     serviceHomeDirPath: dirPath,
     isPathShared: false
   };
+  console.log(longName, serviceName, dirPath);
   request({
     method: 'POST',
     url: SERVER_URL + '/dns',
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'Application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
@@ -383,6 +384,7 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     if (err) {
       return process.exit(0);
     }
+    console.log(body);
     callback(res.statusCode);
   });
 };
@@ -430,7 +432,7 @@ var addService = function(token, longName, serviceName, dirPath, callback) {
     method: 'PUT',
     url: SERVER_URL + '/dns',
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'Application/json',
       'authorization': token
     },
     body: JSON.stringify(payload)
