@@ -59,7 +59,7 @@ window.safeLauncher = angular
   };
   $rootScope.network = {
     status: window.NETWORK_STATE.CONNECTING,
-    show: true,
+    show: false,
     messages: {
       'CONNECTED': 'Connected to the SAFE Network',
       'CONNECTING': 'Trying to connect with SAFE Network',
@@ -75,6 +75,9 @@ window.safeLauncher = angular
     }
   };
   window.msl.setNetworkStateChangeListener(function(state) {
+    if ($rootScope.isAuthenticated || state === $rootScope.network.status) {
+      return;
+    }
     $rootScope.network.show = true;
     $rootScope.network.status = state;
     if (state === window.NETWORK_STATE.DISCONNECTED) {
