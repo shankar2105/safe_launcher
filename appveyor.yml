@@ -42,7 +42,7 @@ install:
 build: off
 
 test_script:
-  - npm install --progress false --depth 0
+  - npm install
   - npm test
 
 before_deploy:
