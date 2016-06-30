@@ -42,7 +42,8 @@ install:
 build: off
 
 test_script:
-  - npm install --msvs_version=2013
+  - npm config set msvs_version 2013 --global
+  - npm install
   - npm test
 
 before_deploy:
