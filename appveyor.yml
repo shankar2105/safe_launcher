@@ -32,7 +32,7 @@ install:
         }
         $env:PROJECT_NAME=$(grep -i 'productName' $env:APPVEYOR_BUILD_FOLDER/app/package.json)
         Write-Host $env:PROJECT_NAME
-        $env:PROJECT_NAME=$env:PROJECT_NAME.Replace('"productName": ""', '').Replace('",', '')
+        $env:PROJECT_NAME=$env:PROJECT_NAME.Replace('"productName": "', '').Replace('",', '')
         Write-Host $env:PROJECT_NAME
   - node --version
   - npm --version
