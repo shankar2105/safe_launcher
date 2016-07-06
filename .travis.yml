@@ -35,7 +35,7 @@ addons:
 
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
-  - export PROJECT_NAME=$(grep -i 'productName' $TRAVIS_BUILD_DIR/app/package.json | sed 's/.*"productName": "//' | sed 's/\(",\)$//')
+  - export PROJECT_NAME=$(grep -i 'productName' $TRAVIS_BUILD_DIR/app/package.json | sed 's/.*"productName":."//' | sed 's/\(",\)$//')
   - echo $PROJECT_NAME
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; PROJECT_NAME=$(tr '[:upper:]' '[:lower:]' <<< $PROJECT_NAME | tr " " _); fi
   - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
