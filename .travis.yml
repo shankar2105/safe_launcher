@@ -78,9 +78,9 @@ before_deploy:
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package
   - git clone https://${GH_TOKEN}@github.com/maidsafe/release_config
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config app_dist/$PACKAGE_NAME/$PACKAGE_NAME.crust.config; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/$PACKAGE_NAME.crust.config; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/$PACKAGE_NAME/$PACKAGE_NAME\ Helper.crust.config; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/$PACKAGE_NAME\ Helper.crust.config; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/$PACKAGE_NAME.app/Contents/Frameworks/$PACKAGE_NAME\ Helper.app/Contents/MacOS/; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
