@@ -30,9 +30,8 @@ install:
           $env:PROJECT_VERSION = $matches[1]
           $env:DEPLOY = "true"
         }
-        $env:PROJECT_NAME =$(grep -i 'productName' $env:APPVEYOR_BUILD_FOLDER/app/package.json | sed 's/.*"productName":."//' | sed 's/\(",\)$//')
+        $env:PROJECT_NAME=$(grep -i 'productName' $env:APPVEYOR_BUILD_FOLDER/app/package.json | sed 's/.*"productName":."//' | sed 's/\(",\)$//')
   - node --version
-  - ps: echo $env:PROJECT_NAME
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
   - cd %APPVEYOR_BUILD_FOLDER%
@@ -54,7 +53,6 @@ before_deploy:
   - cargo build --release
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
   - cd %APPVEYOR_BUILD_FOLDER%
-  - ls
   - ps: |
       git config --global user.name MaidSafe-QA
       git config --global user.email qa@maidsafe.net
