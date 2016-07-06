@@ -30,8 +30,10 @@ install:
           $env:PROJECT_VERSION = $matches[1]
           $env:DEPLOY = "true"
         }
-        $env:PROJECT_NAME=$(grep -i 'productName' $env:APPVEYOR_BUILD_FOLDER/app/package.json | sed 's/.*"productName":."//' | sed 's/\(",\)$//')
-        echo $env:PROJECT_NAME
+        $env:PROJECT_NAME=$(grep -i 'productName' $env:APPVEYOR_BUILD_FOLDER/app/package.json)
+        Write-Host $env:PROJECT_NAME
+        $env:PROJECT_NAME=$env:PROJECT_NAME.Replace('"productName": ""', '').Replace('",', '')
+        Write-Host $env:PROJECT_NAME
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
@@ -69,7 +71,7 @@ before_deploy:
   - ps: |
       New-Item -ItemType directory -Path config
       git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" config  2>&1 | Out-Null
-      Copy-Item config\safe_launcher\* app_dist\safe_launcher-v$env:PROJECT_VERSION-win32-x64
+      Copy-Item config\safe_launcher\* app_dist\$env:PROJECT_NAME-v$env:PROJECT_VERSION-win32-x64
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
       cd app_dist
       7z a ../$NAME.zip *
