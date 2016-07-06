@@ -86,6 +86,7 @@ before_deploy:
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
   - cd $TRAVIS_BUILD_DIR
+  - ls
 
 deploy:
   provider: releases
