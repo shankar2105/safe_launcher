@@ -84,8 +84,8 @@ before_deploy:
   - ls app_dist
   - ls app_dist/$PACKAGE_NAME/
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config "release_config/safe_launcher/${PRODUCT_NAME} Helper.crust.config"; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* "app_dist/$PACKAGE_NAME/${PRODUCT_NAME}.app/Contents/Frameworks/${PRODUCT_NAME} Helper.app/Contents/MacOS/"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/${PRODUCT_NAME}\ Helper.crust.config; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/${PRODUCT_NAME}.app/Contents/Frameworks/${PRODUCT_NAME}\ Helper.app/Contents/MacOS/; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
