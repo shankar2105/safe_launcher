@@ -48,12 +48,10 @@ var login = function(registered, callback) {
 var register = function(callback) {
   var regKeys = generateAuthKeys();
   server.register(regKeys.secret, regKeys.password, function(err) {
-    console.log('auth');
     if (err) {
       console.error(err);
       return process.exit(0);
     }
-    console.log(regKeys);
     callback(regKeys);
   });
 };
@@ -142,7 +140,6 @@ var createDir = function(token, dirPath, callback) {
       console.error(err);
       return process.exit(0);
     }
-    console.log('======' + JSON.stringify(body));
     callback(res.statusCode);
   });
 };
@@ -285,7 +282,6 @@ var getFile = function(token, filePath, callback) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   })
 };
@@ -363,7 +359,6 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     serviceHomeDirPath: dirPath,
     isPathShared: false
   };
-  console.log(longName, serviceName, dirPath);
   request({
     method: 'POST',
     url: SERVER_URL + '/dns',
@@ -376,7 +371,6 @@ var registerDns = function(token, longName, serviceName, dirPath, callback) {
     if (err) {
       return process.exit(0);
     }
-    console.log(body);
     callback(res.statusCode);
   });
 };
