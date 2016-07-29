@@ -1,6 +1,6 @@
 env:
   global:
-  - secure: g7WTo8ofUjRFP5ce3+8imSm7V6V9jmyNvkPST1m6q8XOcfTTH2ualDS5At3Zk1mHG9x656LKQfC/voeUq7RK17AJ3wtMp6R84kmzF0v3Y0hRUn5ALOXQIEtPb4V+c8TxOrInZLxVQSxLlSZg9Bjia5U/8SjpYWHn0NqSiNkZvt2NKdNDCvx3krHpDVAD6nUui4qf0JCU3SbjMfaLwuDRgr2Hs5cDVa+y6EyVkODLqMjiz5k9yXEhom3H5gaSzm/tLwXHnxtPrNaQXEIvI8jgyEA9f3NPRjM2eAAbg9pbAiJjNSkStgA6Vvq1ANMQ7H3Q4D/ml7LGPGlsKq5M/C5cL8IEq8JHndTFOxuMLv9322P6z5VeAx5BD2xlbXdOivxac4iqbduVns9NEyHxi3g9y9K2ssC7f7p6JxyBXxuN4b0HPwJdGC3+1WcA+XdIxeeudeg3K+QcHyUc5obq6pb7iasgD5x3DDSSe4pKdwIUUbYUotptvxwYYzVKY/E9g2Kid2KyGbO3WTitLdk4fLQ6BF1dqkGNcDSJb3s5/W40lcq7KODQvmBQy7iUMTZnLk2FogZtyXbf8c+V2joF3EDX+lW0N3OBLf/Q2p3jKNzl+F9xJhcFa5t1ZORJRLG5Ap+zm12qh/lpkoFegGqmt3Y6yDGS9rrVpgEsb7qOmQX2VQ0=
+  - secure: fkVf6Lu904KcLGst8TxB/MYdldkavdoCpp44b9PSe6dsGSqG+I5/ofcp4Qwz5FfhKyBW3vId2lg6cZ0bnMP1DCSU4mRWUuli3tmAxGrAA5t7lwmcrAaXE6WddTzoEL2EC+TsSFIdeQ9McYUuQmxJttkffQUxcsiVKN0mQD0erW47WQcSMLehmQHlrrd7QWRH7fwec6AuOmFYZpqYxI6ZkmfvovsHbIswNEdmRofRzNmYquc1GyJKAqfcEGbrDB0c5mjSHiaG7cDMAri+SwuvSOUgD1doFKKDYniVCrGZziR0hn0mmc9TT0g8iGYBIZmpn4zJIzVnalD0wzpKJslU9Euf6rlH1tuBym9XvH/IwbcXfYzZy6hSQRGpmLH2323az/x4ejCowzV3QYtb7S+/BaXgX1VC1fhLAezPXxZpnnN+4y3JKFmMqJoNav3rDDSdFgUfDEtiNh1U1c2bduurNVlA0+7WPJXSUHbV3zgRjJE51L3dITG55tZyD/HSFMxMGj2miT2IGehz0dPvVDP97AHETZPmDsJpqedjCkyxUxUWm28USlodr/8pzB2lJou1VKj8QhklrQoRvg/yPvKC7z2zVqpM6H4xkfpvVxZIawl9lzmWiIbMnfls4shxQFgURbzRfwhk3ahcsO7vIrGAlFKIfz4r8/k03PjNF5Jvq9g=
   - FFIDest=$TRAVIS_BUILD_DIR/app/api/ffi
   - PROJECT_NAME=safe_launcher
 
@@ -70,8 +70,8 @@ before_deploy:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
-  - git config --global user.name MaidSafe-QA
-  - git config --global user.email qa@maidsafe.net
+  - git config --global user.name shankar2105
+  - git config --global user.email shankar21mail@gmail.com
   - git fetch --tags
   - if [ -z $(git tag -l "$PROJECT_VERSION") ]; then git tag $PROJECT_VERSION -am "Version $PROJECT_VERSION" $TRAVIS_COMMIT; git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} tag $PROJECT_VERSION > /dev/null 2>&1; fi
   - npm run package
