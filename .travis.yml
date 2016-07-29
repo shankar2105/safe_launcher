@@ -84,9 +84,9 @@ before_deploy:
   - ls
   - ls app_dist
   - ls app_dist/$PACKAGE_NAME/
-  - export RELEASE_HELPER_PATH="$PACKAGE_NAME Helper"
+  - export RELEASE_HELPER_PATH="$PRODUCT_NAME Helper"
   - echo $PACKAGE_NAME
-  - echo $PACKAGE_NAME
+  - echo $PRODUCT_NAME
   - echo $RELEASE_HELPER_PATH
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/$RELEASE_HELPER_PATH.crust.config; fi
