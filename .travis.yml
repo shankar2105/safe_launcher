@@ -6,10 +6,10 @@ env:
 
 matrix:
   include:
-  # - os: linux
-  #   env: |
-  #     PLATFORM=linux-x64
-  #     PLATFORM_NAME=linux
+  - os: linux
+    env: |
+      PLATFORM=linux-x64
+      PLATFORM_NAME=linux
   - os: osx
     env: |
       PLATFORM=osx-x64
@@ -52,7 +52,8 @@ install:
 
 after_install:
   - npm install -g json
-  - export PRODUCT_NAME=$(cat $TRAVIS_BUILD_DIR/app/package.json | json productName)
+  - cd $TRAVIS_BUILD_DIR
+  - export PRODUCT_NAME=$(cat app/package.json | json productName)
   - export PACKAGE_NAME="$PRODUCT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
 
 script:
@@ -83,7 +84,7 @@ before_deploy:
   - ls
   - ls app_dist
   - ls app_dist/$PACKAGE_NAME/
-  - export RELEASE_HELPER_PATH="$$PACKAGE_NAME Helper"
+  - export RELEASE_HELPER_PATH="$PACKAGE_NAME Helper"
   - echo $PACKAGE_NAME
   - echo $PACKAGE_NAME
   - echo $RELEASE_HELPER_PATH
