@@ -35,7 +35,6 @@ addons:
 
 before_install:
   - export PROJECT_VERSION=$(git log -1 | grep -i "version change to" | sed "s/.*[vV]ersion change to v\{0,1\}//")
-  - export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libnotify4; sudo apt-get install libgconf-2-4; fi
 install:
   - export DISPLAY=':99.0'
@@ -50,6 +49,11 @@ install:
   - node --version
   - npm --version
   - python --version
+
+after_install:
+  - npm install -g json
+  - export PRODUCT_NAME=$(cat $TRAVIS_BUILD_DIR/app/package.json | json productName)
+  - export PACKAGE_NAME="$PRODUCT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
 
 script:
   - cd $TRAVIS_BUILD_DIR
@@ -80,8 +84,8 @@ before_deploy:
   - ls app_dist
   - ls app_dist/$PACKAGE_NAME/
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/safe_launcher\ Helper.crust.config; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/safe_launcher.app/Contents/Frameworks/safe_launcher\ Helper.app/Contents/MacOS/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/safe_launcher.crust.config release_config/safe_launcher/$PRODUCT_NAME\ Helper.crust.config; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/$PACKAGE_NAME/$PRODUCT_NAME.app/Contents/Frameworks/$PRODUCT_NAME\ Helper.app/Contents/MacOS/; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
