@@ -50,12 +50,6 @@ install:
   - npm --version
   - python --version
 
-after_install:
-  - npm install -g json
-  - cd $TRAVIS_BUILD_DIR
-  - export PRODUCT_NAME=$(cat app/package.json | json productName)
-  - export PACKAGE_NAME="$PRODUCT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
-
 script:
   - cd $TRAVIS_BUILD_DIR
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
@@ -70,6 +64,9 @@ script:
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
+  - npm install -g json
+  - export PRODUCT_NAME=$(cat app/package.json | json productName)
+  - export PACKAGE_NAME="$PRODUCT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"
   - cd safe_core
   - cargo build --release
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
