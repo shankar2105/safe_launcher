@@ -92,7 +92,7 @@ before_deploy:
   - ls
   - cd $TRAVIS_BUILD_DIR
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/${PACKAGE_NAME}/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/${PACKAGE_NAME}/${PRODUCT_NAME}.app/Contents/Frameworks/${RELEASE_HELPER_PATH}.app/Contents/MacOS/'; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/${PACKAGE_NAME}/${PRODUCT_NAME}.app/Contents/Frameworks/${RELEASE_HELPER_PATH}.app/Contents/MacOS/; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
