@@ -34,7 +34,7 @@ install:
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
   - npm install -g json
-  - ps: $env:PACKAGE_NAME = $(cat $APPVEYOR_BUILD_FOLDER\app\package.json | json productName)
+  - ps: $env:PACKAGE_NAME = $(cat $env:APPVEYOR_BUILD_FOLDER\app\package.json | json productName)
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
