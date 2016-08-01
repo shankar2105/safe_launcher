@@ -70,11 +70,13 @@ before_deploy:
   - ps: |
       New-Item -ItemType directory -Path releaseConfig
       git clone -q "https://$env:GH_TOKEN@github.com/maidsafe/release_config" releaseConfig  2>&1 | Out-Null
-      Rename-Item -Path $env:APPVEYOR_BUILD_FOLDER\releaseConfig\safe_launcher\safe_launcher.crust.config -NewName $env:PACKAGE_NAME.crust.config
-      Move-Item $env:APPVEYOR_BUILD_FOLDER\releaseConfig\safe_launcher\* $env:APPVEYOR_BUILD_FOLDER\app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM
+      cd releaseConfig\safe_launcher
+      Get-ChildItem -Name safe_launcher.crust.config | Rename-Item -NewName $env:PACKAGE_NAME.crust.config
+      cd $env:APPVEYOR_BUILD_FOLDER
+      Move-Item releaseConfig\safe_launcher\* app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM
       $NAME = "$env:PROJECT_NAME-v$env:PROJECT_VERSION-win-$env:PLATFORM"
-      Rename-Item -Path $env:APPVEYOR_BUILD_FOLDER\app_dist\$env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM -NewName $NAME
       cd app_dist
+      Get-ChildItem -Name $env:PACKAGE_NAME-v$env:PROJECT_VERSION-win32-$env:PLATFORM | Rename-Item -NewName $NAME
       7z a ../$NAME.zip *
       Push-AppveyorArtifact ../$NAME.zip
 deploy:
