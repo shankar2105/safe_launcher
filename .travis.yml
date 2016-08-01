@@ -68,7 +68,7 @@ before_deploy:
   - export PRODUCT_NAME=$(cat app/package.json | json productName)
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PACKAGE_NAME="$PROJECT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PACKAGE_NAME="$PRODUCT_NAME-v$PROJECT_VERSION-$PLATFORM_NAME-x64"; fi
-  - export RELEASE_HELPER_PATH="$PRODUCT_NAME Helper"
+  - export RELEASE_HELPER_PATH="${PRODUCT_NAME} Helper"
   - echo $PACKAGE_NAME
   - echo $PRODUCT_NAME
   - echo $RELEASE_HELPER_PATH
@@ -87,12 +87,12 @@ before_deploy:
   - ls app_dist
   - ls "app_dist/$PACKAGE_NAME"
   - cd release_config/safe_launcher
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv 'safe_launcher.crust.config' '$PRODUCT_NAME.crust.config'; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv 'safe_launcher.crust.config' '$RELEASE_HELPER_PATH.crust.config'; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv safe_launcher.crust.config "${PRODUCT_NAME}.crust.config"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv safe_launcher.crust.config "${RELEASE_HELPER_PATH}.crust.config"; fi
   - ls
   - cd $TRAVIS_BUILD_DIR
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* app_dist/${PACKAGE_NAME}/; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* app_dist/${PACKAGE_NAME}/${PRODUCT_NAME}.app/Contents/Frameworks/${RELEASE_HELPER_PATH}.app/Contents/MacOS/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv release_config/safe_launcher/* "app_dist/${PACKAGE_NAME}/"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mv release_config/safe_launcher/* "app_dist/${PACKAGE_NAME}/${PRODUCT_NAME}.app/Contents/Frameworks/${RELEASE_HELPER_PATH}.app/Contents/MacOS/"; fi
   - pushd ./app_dist
   - tar czf ../${PROJECT_NAME}-v${PROJECT_VERSION}-${PLATFORM}.tar.gz *
   - popd
