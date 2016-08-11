@@ -1,24 +1,23 @@
 platform:
-  - x64
+  - x64
 image: Visual Studio 2013
 os: unstable
 environment:
-  nodejs_version: "5.5.0"
-  global:
-    Features: "use-mock-routing"
-    RUST_BACKTRACE: 1
+  nodejs_version: "5.5.0"
+  global:
+    Features: "use-mock-routing"
+    RUST_BACKTRACE: 1
 cache:
-  - node_modules
-  - '%APPDATA%\npm-cache'
+  - node_modules
+  - '%APPDATA%\npm-cache'
 install:
   - ps: |
-        $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
-        Start-FileDownload "$url/Install%20Rustup.ps1" -FileName "Install Rustup.ps1"
-        Start-FileDownload "$url/Build.ps1" -FileName "Build.ps1"
-        Start-FileDownload "$url/Run%20Tests.ps1" -FileName "Run Tests.ps1"
-        . ".\Install Rustup.ps1"
-        Install-Product node $env:nodejs_version $env:PLATFORM
-       
+        $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
+        Start-FileDownload "$url/Install%20Rustup.ps1" -FileName "Install Rustup.ps1"
+        Start-FileDownload "$url/Build.ps1" -FileName "Build.ps1"
+        Start-FileDownload "$url/Run%20Tests.ps1" -FileName "Run Tests.ps1"
+        . ".\Install Rustup.ps1"
+
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
