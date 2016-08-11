@@ -124,10 +124,13 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
     };
 
     var activityEvents = function() {
+      window.cou = 0;
       var updateActivity = function(data, isNew) {
         data.activity.appName = data.appName || 'Anonymous Application';
         if (isNew) {
-          if ($rootScope.logList.length > CONSTANTS.LOG_LIST_LIMIT) {
+          window.cou++;
+          console.log(window.cou)
+          if ($rootScope.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
             $rootScope.logList.pop();
           }
         } else {
@@ -146,10 +149,9 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
           }
           $rootScope.currentAppDetails.logs.unshift(data.activity);
         }
-        if (data.app && $rootScope.appList[ data.app ]) {
-          $rootScope.appList[ data.app ].status = data.activity;
+        if (data.app && $rootScope.appList[data.app]) {
+            $rootScope.appList[data.app].status = data.activity;
         }
-        $rootScope.$applyAsync();
       };
 
       server.onNewAppActivity(function(data) {
