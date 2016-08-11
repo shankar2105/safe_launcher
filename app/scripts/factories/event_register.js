@@ -127,17 +127,20 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
     };
 
     var activityEvents = function() {
+      window.cou = 0;
       var updateActivity = function(data, isNew) {
         data.activity['appName'] = data.appName || 'Anonymous Application';
         if (isNew) {
-          if ($rootScope.logList.length > CONSTANTS.LOG_LIST_LIMIT) {
+          window.cou++;
+          console.log(window.cou)
+          if ($rootScope.logList.length >= CONSTANTS.LOG_LIST_LIMIT) {
             $rootScope.logList.pop();
           }
         } else {
           var activityIndex = $rootScope.logList.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
           $rootScope.logList.splice(activityIndex, 1);
         }
-        $rootScope.logList.unshift(data.activity);
+        $rootScope.logList.unshift(data.activity);  
         if ($rootScope.currentAppDetails) {
           if (!isNew) {
             var currentAppLogIndex = $rootScope.currentAppDetails.logs.map(function(obj) { return obj.activityId; }).indexOf(data.activity.activityId);
@@ -147,8 +150,7 @@ window.safeLauncher.factory('eventRegistrationFactory', [ '$rootScope', 'serverF
         }
         if (data.app && $rootScope.appList[data.app]) {
             $rootScope.appList[data.app].status = data.activity;
-        }
-        $rootScope.$applyAsync();
+        }        
       };
 
       server.onNewAppActivity(function(data) {
