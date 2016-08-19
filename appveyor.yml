@@ -1,50 +1,28 @@
-platform:
-  - x64
-image: Visual Studio 2013
 os: unstable
-environment:
-  nodejs_version: "5.5.0"
-  global:
-    GH_TOKEN:
-      secure: l+aIZyW2V4zjmC5fMMNNTVXtRf812RiOYtqac8p4/qSPdA+PrSRv4sBEosdNkrJs
-    Features: "use-mock-routing"
-    PROJECT_NAME: safe_launcher
-    RUST_BACKTRACE: 1
 cache:
-  - node_modules
-  - '%APPDATA%\npm-cache'
+  - node_modules 
+environment:
+  matrix:
+    - nodejs_version: 6
+    - nodejs_version: 5
+    - nodejs_version: 4
 install:
-  - ps: |
-        $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
-        Start-FileDownload "$url/Install%20Rust.ps1" -FileName "Install Rust.ps1"
-        Start-FileDownload "$url/Install%20MinGW.ps1" -FileName "Install MinGW.ps1"
-        Start-FileDownload "$url/Install%20libsodium.ps1" -FileName "Install libsodium.ps1"
-        Start-FileDownload "$url/Build.ps1" -FileName "Build.ps1"
-        Start-FileDownload "$url/Run%20Tests.ps1" -FileName "Run Tests.ps1"
-        . ".\Install Rust.ps1"
-        . ".\Install MinGW.ps1"
-        . ".\Install libsodium.ps1"
-        Install-Product node $env:nodejs_version $env:PLATFORM
-
-        if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -match "[vV]ersion change to v?(.*)") {
-          $env:PROJECT_VERSION = $matches[1]
-          $env:DEPLOY = "true"
-        }
+  - ps: Install-Product node $env:nodejs_version
+  - set CI=true
+  - npm install -g npm@latest
+  - set PATH=%APPDATA%\npm;%PATH%
+  - npm install
+matrix:
+  fast_finish: true
+build: off
+version: '{build}'
+shallow_clone: true
+clone_depth: 1
+test_script:
   - node --version
   - npm --version
-  - set npm_config_arch=%PLATFORM:x86=ia32%
-  - npm install -g json
-  - ps: $env:PACKAGE_NAME = $(cat $env:APPVEYOR_BUILD_FOLDER\app\package.json | json productName)
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - cargo build --release --verbose --features use-mock-routing
-  - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\api\ffi
-  - cd %APPVEYOR_BUILD_FOLDER%
-
-build: off
-
-test_script:
-  - npm config set msvs_version=2013
-  - npm install --progress false --depth 0
-  - npm test
-  
+  - npm run lint
+  - npm run test
+  - npm run build
+  - npm run test-e2e
+  - npm run package
