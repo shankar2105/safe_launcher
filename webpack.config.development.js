@@ -3,25 +3,22 @@ import webpack from 'webpack';
 import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import path from 'path';
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 
 export default merge(baseConfig, {
   debug: true,
-
+  context: path.join(__dirname),
   devtool: 'cheap-module-eval-source-map',
 
-  entry: {
-    bundle: [
-      'babel-polyfill',
-      'webpack-hot-middleware/client?path=http://localhost:3000/__webpack_hmr',
-      'webpack/hot/only-dev-server',
-      './app/index'
-    ],
-    proxy: './app/web_proxy'
-  },
+  entry: [
+    'babel-polyfill',
+    'webpack-hot-middleware/client?path=http://localhost:3000/__webpack_hmr',
+    'webpack/hot/only-dev-server',
+    './app/index'
+  ],
 
   output: {
     publicPath: 'http://localhost:3000/dist/',
-    filename: "[name].js"
   },
 
   module: {
@@ -38,7 +35,6 @@ export default merge(baseConfig, {
           'css-loader?sourceMap'
         ]
       },
-
       {
         test: /^((?!\.global).)*\.css$/,
         loaders: [
@@ -50,6 +46,12 @@ export default merge(baseConfig, {
   },
 
   plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: './app/web_proxy.js',
+        to: './dist/'
+      }
+    ]),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({

@@ -3,12 +3,16 @@ import path from 'path';
 // import { log } from './../logger/log';
 import childProcess from 'child_process';
 import { remote } from 'electron';
+import temp from 'temp'
+import fse from 'fs-extra'
 
 const env = {
   proxyPort: 8120,
   serverPort: 8100
 };
 
+const webProxyPath = path.resolve('.', 'app', 'web_proxy.js');
+const webProxyTargetPath = path.resolve('.', 'dist', 'proxy.js');
 class ProxyController {
 
   constructor() {
@@ -33,8 +37,13 @@ class ProxyController {
       args.push('--unsafe_mode');
       args.push('true');
     }
-    console.log(path.resolve('.', 'dist', 'proxy.js'));
-    this.process = childProcess.fork(path.resolve('.', 'dist', 'proxy.js'), args);
+
+    // move web_proxy.js to ROOT/dist folder on non production mode
+    if (process.env.NODE_ENV !== 'production') {
+      fse.copySync(webProxyPath, webProxyTargetPath);
+    }
+
+    this.process = childProcess.fork(webProxyTargetPath, args);
     this.process.on('exit', function() {
       console.log('Proxy server stopped');
       remote.getGlobal('cleanUp').proxy = null;
@@ -42,6 +51,7 @@ class ProxyController {
     });
     this.process.on('message', function(event) {
       console.log('Proxy Server - onMessage event - received - ');
+      console.log(event);
       event = JSON.parse(event);
       switch (event.type) {
         case 'connection':
@@ -49,6 +59,7 @@ class ProxyController {
             // log.info('Proxy server started');
             console.log('Proxy server started');
             remote.getGlobal('cleanUp').proxy = self.process.pid;
+            console.log(remote.getGlobal('cleanUp'));
             return proxyListener.onStart(event.msg.data);
           }
           proxyListener.onError(event.msg);
@@ -56,12 +67,15 @@ class ProxyController {
         case 'log':
           if (event.msg.level === 'INFO') {
             // log.info(event.msg.log);
+            console.log(event.msg.log);
           } else {
             // log.error(event.msg.log);
+            console.log(event.msg.log);
           }
           break;
         default:
           // log.warn('Invalid event type from proxy');
+          console.log('Invalid event type from proxy');
       }
     });
   }

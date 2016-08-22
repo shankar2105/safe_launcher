@@ -1,9 +1,6 @@
-import url from 'url'
-import http from 'http'
-import * as httpProxy from 'http-proxy'
-// var url = require('url');
-// var http = require('http');
-// var httpProxy = require('http-proxy');
+var url = require('url');
+var http = require('http');
+var httpProxy = require('http-proxy');
 var proxy = httpProxy.createProxyServer({});
 
 var safenetPath = /\.safenet$/i;
