@@ -2,25 +2,27 @@ import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
+import path from 'path';
 
 const config = merge(baseConfig, {
   devtool: 'cheap-module-source-map',
 
-  entry: {
-    bundle: [
-      'babel-polyfill',
-      './app/index'
-    ],
-    proxy: './app/web_proxy'
-  },
+  entry: [
+    'babel-polyfill',
+    './app/index'
+  ],
 
   output: {
-    publicPath: '../dist/',
-    filename: "[name].js"
+    publicPath: '../dist/'
   },
 
   module: {
     loaders: [
+      {
+       test: /\.js$/,
+       loaders: ['babel'],
+       exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
+      },
       {
         test: /\.global\.css$/,
         loader: ExtractTextPlugin.extract(
@@ -34,10 +36,10 @@ const config = merge(baseConfig, {
           'style-loader',
           'css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]'
         )
-      }
+      },
+      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }
     ]
   },
-  externals: './app/web_proxy.js',
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({

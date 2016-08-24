@@ -3,35 +3,22 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
-import routes from './routes';
-import configureStore from './store/configureStore';
 import axios from 'axios';
-import server from './server'
-import './app.global.css';
-import { proxyController } from './proxy_controller'
+
+import './ui/app.global.css';
+import routes from './ui/routes';
+import configureStore from './ui/store/configure_store';
+import './bridge';
+import EventRegistry from './ui/event_registry';
 
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
+
+(new EventRegistry(store)).run();
 
 render(
   <Provider store={store}>
     <Router history={history} routes={routes} />
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('safeLauncher')
 );
-
-// backend async await
-async function test() {
-  var promise = axios.get('https://httpbin.org/get');
-  let res = await promise
-  console.log(res);
-}
-
-test();
-
-server();
-proxyController.start({
-  onExit: function() {},
-  onStart: function() {},
-  onError: function() {}
-});

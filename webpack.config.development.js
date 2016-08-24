@@ -3,7 +3,7 @@ import webpack from 'webpack';
 import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import path from 'path';
-import CopyWebpackPlugin from 'copy-webpack-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 export default merge(baseConfig, {
   debug: true,
@@ -26,7 +26,8 @@ export default merge(baseConfig, {
       {
        test: /\.js$/,
        loaders: ['react-hot', 'babel'],
-       include: path.join(__dirname, 'app')
+       include: path.join(__dirname, 'app'),
+       exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
       },
       {
         test: /\.global\.css$/,
@@ -41,16 +42,14 @@ export default merge(baseConfig, {
           'style-loader',
           'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]'
         ]
-      }
+      },
+      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }
     ]
   },
 
   plugins: [
     new CopyWebpackPlugin([
-      {
-        from: './app/web_proxy.js',
-        to: './dist/'
-      }
+      { from: './app/api/ffi/worker.js', to: './dist/api/ffi/worker.js' }
     ]),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
