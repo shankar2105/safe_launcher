@@ -7,6 +7,8 @@ import AccountPage from './containers/account_container';
 import InitialSettingsPage from './containers/initial_settings_container';
 import SettingsPage from './containers/settings_container';
 import LoginPage from './containers/login_container';
+import RegisterPage from './containers/register_container';
+import AccountAppListPage from './containers/account_app_list_container';
 
 export default (
   <Route path="/" component={App}>
@@ -16,6 +18,8 @@ export default (
       <Route path="/account" component={AccountPage}>
         <IndexRoute component={LoginPage}/>
         <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/account_app_list" component={AccountAppListPage}  />
       </Route>
       <Route path="/settings" component={SettingsPage} />
     </Route>

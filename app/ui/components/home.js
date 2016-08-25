@@ -3,39 +3,43 @@ import { Link } from 'react-router';
 import className from 'classnames';
 
 export default class Home extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
+
   render() {
-    const { location } = this.props;
-    const pathname = location.pathname;
+    const { router } = this.context;
+
     return (
       <div className="tab">
         <div className="tab-b">
           <div className="tab-nav">
             <ul>
-              <li className={(pathname === '/account' || pathname === '/home' )? 'active' : ''}>
+              <li className={className({ 'active': this.context.router.isActive('/account') })}>
                 <Link to="/account">
                   <span className="icn account-icn"></span>
                   <span className="txt">Account</span>
                 </Link>
               </li>
-              <li className={(pathname === '/dashboard')? 'active' : ''}>
+              <li className={className({ 'active': this.context.router.isActive('/dashboard') })}>
                 <Link to="/account">
                   <span className="icn dashboard-icn"></span>
                   <span className="txt">Dashboard</span>
                 </Link>
               </li>
-              <li className={(pathname === '/logs')? 'active' : ''}>
+              <li className={className({ 'active': this.context.router.isActive('/logs') })}>
                 <Link to="/account">
                   <span className="icn log-icn"></span>
                   <span className="txt">Logs</span>
                 </Link>
               </li>
-              <li className={(pathname === '/settings')? 'active' : ''}>
+              <li className={className({ 'active': this.context.router.isActive('/settings') })}>
                 <Link to="/settings">
                   <span className="icn settings-icn"></span>
                   <span className="txt">Settings</span>
                 </Link>
               </li>
-              <li className={(pathname === '/help')? 'active' : ''}>
+              <li className={className({ 'active': this.context.router.isActive('/help') })}>
                 <Link to="/account">
                   <span className="icn help-icn"></span>
                   <span className="txt">Help</span>

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Login from '../components/login';
-import { login } from '../actions/auth_action';
+import { login, cancelAuthReq } from '../actions/auth_action';
 
 const mapStateToProps = function(state) {
   return {
@@ -15,6 +15,9 @@ const mapDispatchToProps = function(dispatch) {
   return {
     userLogin: (payload) => {
       dispatch(login(payload))
+    },
+    cancelAuthReq: () => {
+      dispatch(cancelAuthReq())
     }
   };
 }

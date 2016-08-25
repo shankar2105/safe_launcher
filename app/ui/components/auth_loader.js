@@ -15,7 +15,7 @@ export default class AuthLoader extends Component {
         <div className="opt">
           <div className="opt-i">
             <button type="button" className="btn primary" name="cancel" onClick={() => {
-              cancelRequest()
+              cancelAuthReq()
             }}>Cancel</button>
           </div>
         </div>

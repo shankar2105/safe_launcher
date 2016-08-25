@@ -1,43 +1,96 @@
 import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import className from 'classnames';
-import { openExternal } from '../utils/app_utils';
+import RegisterWelcome from './register_welcome.js';
+import RegisterAccSecretInfo from './register_acc_secret_info.js';
+import RegisterAccSecretForm from './register_acc_secret_form.js';
+import RegisterAccPassInfo from './register_acc_pass_info.js';
+import RegisterAccPassForm from './register_acc_pass_form.js';
+import AuthLoader from './auth_loader';
 
-export default class Settings extends Component {
+export default class Register extends Component {
+
+  constructor() {
+    super();
+    this.checkAuthenticated = this.checkAuthenticated.bind(this);
+  }
+
   static propTypes = {
-  };
+    stateContinue: PropTypes.func.isRequired,
+    stateBack: PropTypes.func.isRequired,
+    setRegisterState: PropTypes.func.isRequired,
+    cancelAuthReq: PropTypes.func.isRequired,
+    userRegister: PropTypes.func.isRequired
+  }
+
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
+
+  checkAuthenticated(props) {
+    if (props.authenticated) {
+      return this.context.router.push('/account_app_list');
+    }
+  }
+
+  componentWillMount() {
+    this.checkAuthenticated(this.props);
+  }
+
+  componentWillUpdate(nextProps) {
+    this.checkAuthenticated(nextProps);
+  }
 
   render() {
+    const { registerState, authProcessing, registerStateNext, registerStateBack, setRegisterState } = this.props;
+    if (authProcessing) {
+      return <AuthLoader { ...this.props }/>
+    }
+    let currentState = null;
+    const TOTAL_STATES = 5;
+    switch (registerState) {
+      case 0:
+        currentState = <RegisterWelcome { ...this.props } />;
+        break;
+      case 1:
+        currentState = <RegisterAccSecretInfo { ...this.props } />;
+        break;
+      case 2:
+        currentState = <RegisterAccSecretForm { ...this.props } />;
+        break;
+      case 3:
+        currentState = <RegisterAccPassInfo { ...this.props } />;
+        break;
+      case 4:
+        currentState = <RegisterAccPassForm { ...this.props } />;
+        break;
+      default:
+        throw new Error('Unkown Register State');
+    }
+    let stateNavs = [];
+    let navClassNames = null;
+    for (let i = 0; i < TOTAL_STATES; i++) {
+      navClassNames = className(
+        'auth-intro-nav-btn-i',
+        { 'active': i === registerState }
+      )
+      stateNavs.push(<span key={i} className={navClassNames} onClick={e => {
+        setRegisterState(i)
+      }}></span>)
+    }
     return (
-      <div className="form-b">
-        <form className="form" name="loginForm">
-          <div id="errorTarget" className="inp-grp">
-            <input id="accountSecret" type="password" ref="accountSecret" required="true" />
-            <label htmlFor="accountSecret">Account Secret</label>
-            <div className="msg"></div>
-            <div className="opt">
-              <div className="opt-i">
-                  <span className="eye"></span>
-              </div>
-            </div>
+      <div className="auth-intro form-b">
+        <div className="auth-intro-b">
+          { currentState }
+          <div className="auth-intro-nav-btn">
+            {stateNavs}
           </div>
-          <div className="inp-grp">
-            <input id="accountPassword" type="password" ref="accountPassword" required="true" />
-            <label htmlFor="accountPassword">Account Password</label>
-            <div className="msg"></div>
-            <div className="opt">
-              <div className="opt-i">
-                  <span className="eye"></span>
-              </div>
-            </div>
-          </div>
-          <div className="inp-btn">
-            <button type="submit" className="btn primary" name="login">Login</button>
-          </div>
-        </form>
+        </div>
         <div className="form-f">
-          <div className="form-f-b">
-            Don&rsquo;t have a account ? <a>Create Account</a>
+          <div className="form-f-b no-border">
+            Already have an account? <a href="#" onClick={e => {
+              e.preventDefault();
+              this.context.router.push('/login');
+            }}>Login</a>
           </div>
         </div>
       </div>

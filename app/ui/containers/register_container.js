@@ -1,0 +1,33 @@
+import { connect } from 'react-redux';
+import Register from '../components/register';
+import { setRegisterStateNext, setRegisterStateBack, setRegisterState, register, cancelAuthReq } from '../actions/auth_action';
+
+const mapStateToProps = function(state) {
+  return {
+    registerState: state.auth.registerState,
+    authProcessing: state.auth.authProcessing,
+    user: state.auth.user
+  };
+}
+
+const mapDispatchToProps = function(dispatch) {
+  return {
+    stateContinue: (user) => {
+      dispatch(setRegisterStateNext(user))
+    },
+    stateBack: () => {
+      dispatch(setRegisterStateBack())
+    },
+    setRegisterState: (navState) => {
+      dispatch(setRegisterState(navState))
+    },
+    userRegister: (payload) => {
+      dispatch(register(payload))
+    },
+    cancelAuthReq: () => {
+      dispatch(cancelAuthReq())
+    }
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

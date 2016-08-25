@@ -169,7 +169,6 @@ export default class UIUtils {
   }
 
   setNetworkStateChangeListener(callback) {
-    console.log('test');
     this.onNetworkStateChange = callback;
   }
 

@@ -7,6 +7,7 @@ import AuthLoader from './auth_loader';
 export default class Settings extends Component {
   static propTypes = {
     userLogin: PropTypes.func.isRequired,
+    cancelAuthReq: PropTypes.func.isRequired,
     authenticated: PropTypes.bool.isRequired,
     authProcessing: PropTypes.bool.isRequired
   };
@@ -15,16 +16,25 @@ export default class Settings extends Component {
     super();
     this.handleLogin = this.handleLogin.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.checkAuthenticated = this.checkAuthenticated.bind(this);
   }
 
   static contextTypes = {
     router: React.PropTypes.object.isRequired
   }
 
-  componentWillUpdate(nextProps) {
-    if (nextProps.authenticated) {
-      return this.context.router.push('/account_list');
+  checkAuthenticated(props) {
+    if (props.authenticated) {
+      return this.context.router.push('/account_app_list');
     }
+  }
+
+  componentWillMount() {
+    this.checkAuthenticated(this.props);
+  }
+
+  componentWillUpdate(nextProps) {
+    this.checkAuthenticated(nextProps);
   }
 
   onFocus() {
@@ -49,7 +59,7 @@ export default class Settings extends Component {
   render() {
     const { error, user, authenticated, authProcessing } = this.props;
     if (authProcessing) {
-      return <AuthLoader {...this.props}/>
+      return <AuthLoader { ...this.props }/>
     }
     this.errMsg = null;
     if (error) {
@@ -105,7 +115,10 @@ export default class Settings extends Component {
         </form>
         <div className="form-f">
           <div className="form-f-b">
-            Don&rsquo;t have a account ? <a>Create Account</a>
+            Don&rsquo;t have a account ? <a href="#" onClick={e => {
+              e.preventDefault();
+              this.context.router.push('register');
+            }}>Create Account</a>
           </div>
         </div>
       </div>
