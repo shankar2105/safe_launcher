@@ -5,7 +5,8 @@ import path from 'path';
 import { remote } from 'electron';
 
 var workerProcess;
-var workerPath = path.resolve('.');
+// var workerPath = __dirname;
+var workerPath = process.cwd();
 workerPath += workerPath.indexOf('ffi') === -1 ? '/dist/api/ffi/worker.js' : '/worker.js';
 var callbackPool = {};
 var isClosed = false;

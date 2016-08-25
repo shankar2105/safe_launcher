@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-export default class Home extends Component {
+export default class AuthLoader extends Component {
   constructor() {
     super();
   }
@@ -9,7 +9,7 @@ export default class Home extends Component {
     const { location, cancelAuthReq } = this.props;
     const pathname = location.pathname;
     return (
-      <div className="auth-loader">{ $state.params.currentPage === 'register' ? 'Registering' : 'Logging'  }
+      <div className="auth-loader">
         <h3 className="title">{ pathname === '/register' ? 'Registering' : 'Logging' } you on the SAFE Network!</h3>
         <span className="loader"></span>
         <div className="opt">

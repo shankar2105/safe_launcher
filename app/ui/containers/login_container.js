@@ -5,6 +5,7 @@ import { login } from '../actions/auth_action';
 const mapStateToProps = function(state) {
   return {
     authenticated: state.auth.authenticated,
+    authProcessing: state.auth.authProcessing,
     user: state.auth.user,
     error: state.auth.error
   };
