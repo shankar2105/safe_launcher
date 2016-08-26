@@ -16,11 +16,16 @@ const auth = (state = {
       return { ...state, authenticated: true, user: action.user, authProcessing: false }
       break;
     case ActionTypes.LOGIN_ERROR:
-    case ActionTypes.REGISTER_ERROR:
       if (!state.authProcessing) {
         return state;
       }
       return { ...state, error: action.error, authProcessing: false }
+      break;
+    case ActionTypes.REGISTER_ERROR:
+      if (!state.authProcessing) {
+        return state;
+      }
+      return { ...state, error: action.error, authProcessing: false, registerState: 2 }
       break;
     case ActionTypes.AUTH_PROCESSING:
       return { ...state, authProcessing: true }
@@ -48,6 +53,9 @@ const auth = (state = {
         return state;
       }
       return { ...state, registerState: action.navState }
+      break;
+    case ActionTypes.RESET_USER:
+      return { ...state, user: null, registerState: 0 };
       break;
     default:
       return state;

@@ -6,7 +6,8 @@ const mapStateToProps = function(state) {
   return {
     registerState: state.auth.registerState,
     authProcessing: state.auth.authProcessing,
-    user: state.auth.user
+    user: state.auth.user,
+    authenticated: state.auth.authenticated
   };
 }
 

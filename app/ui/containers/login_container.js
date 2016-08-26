@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Login from '../components/login';
-import { login, cancelAuthReq } from '../actions/auth_action';
+import { login, cancelAuthReq, resetUser } from '../actions/auth_action';
 
 const mapStateToProps = function(state) {
   return {
@@ -18,6 +18,9 @@ const mapDispatchToProps = function(dispatch) {
     },
     cancelAuthReq: () => {
       dispatch(cancelAuthReq())
+    },
+    resetUser: () => {
+      dispatch(resetUser())
     }
   };
 }

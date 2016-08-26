@@ -5,18 +5,20 @@ import { openExternal } from '../utils/app_utils';
 import AuthLoader from './auth_loader';
 
 export default class Settings extends Component {
-  static propTypes = {
-    userLogin: PropTypes.func.isRequired,
-    cancelAuthReq: PropTypes.func.isRequired,
-    authenticated: PropTypes.bool.isRequired,
-    authProcessing: PropTypes.bool.isRequired
-  };
 
   constructor() {
     super();
     this.handleLogin = this.handleLogin.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.checkAuthenticated = this.checkAuthenticated.bind(this);
+    this.showPassword = this.showPassword.bind(this);
+  }
+
+  static propTypes = {
+    userLogin: PropTypes.func.isRequired,
+    cancelAuthReq: PropTypes.func.isRequired,
+    authenticated: PropTypes.bool.isRequired,
+    authProcessing: PropTypes.bool.isRequired
   }
 
   static contextTypes = {
@@ -29,16 +31,31 @@ export default class Settings extends Component {
     }
   }
 
+  showPassword(e) {
+    const currentTarget = e.currentTarget;
+    if (currentTarget.classList.contains('active')) {
+      currentTarget.classList.remove('active');
+    } else {
+      currentTarget.classList.add('active');
+    }
+    const targetEle = this.refs[currentTarget.dataset.target];
+    if (targetEle.getAttribute('type') === 'text') {
+      return targetEle.setAttribute('type', 'password');
+    }
+    targetEle.setAttribute('type', 'text');
+  }
+
+  onFocus() {
+    this.errMsg = null;
+  }
+
   componentWillMount() {
+    this.props.resetUser();
     this.checkAuthenticated(this.props);
   }
 
   componentWillUpdate(nextProps) {
     this.checkAuthenticated(nextProps);
-  }
-
-  onFocus() {
-    this.errMsg = null;
   }
 
   handleLogin(e) {
@@ -95,7 +112,7 @@ export default class Settings extends Component {
             <div className="msg">{ this.errMsg ? this.errMsg : '' }</div>
             <div className="opt">
               <div className="opt-i">
-                  <span className="eye"></span>
+                  <span className="eye" onClick={this.showPassword} data-target="accountSecret"></span>
               </div>
             </div>
           </div>
@@ -105,7 +122,7 @@ export default class Settings extends Component {
             <div className="msg"></div>
             <div className="opt">
               <div className="opt-i">
-                  <span className="eye"></span>
+                  <span className="eye" data-target="accountPassword" onClick={this.showPassword}></span>
               </div>
             </div>
           </div>

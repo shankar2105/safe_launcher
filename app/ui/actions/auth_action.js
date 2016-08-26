@@ -61,6 +61,12 @@ export const setRegisterState = (navState) => {
   };
 }
 
+export const resetUser = () => {
+  return {
+    type: ActionTypes.RESET_USER
+  };
+}
+
 export const login = (payload) => {
   return dispatch => {
     dispatch(setAuthProcessing());
