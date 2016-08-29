@@ -15,31 +15,31 @@ export default class Home extends Component {
         <div className="tab-b">
           <div className="tab-nav">
             <ul>
-              <li className={className({ 'active': this.context.router.isActive('/account') })}>
+              <li className={className({ 'active': router.isActive('/account') })}>
                 <Link to="/account">
                   <span className="icn account-icn"></span>
                   <span className="txt">Account</span>
                 </Link>
               </li>
-              <li className={className({ 'active': this.context.router.isActive('/dashboard') })}>
+              <li className={className({ 'active': router.isActive('/dashboard') })}>
                 <Link to="/account">
                   <span className="icn dashboard-icn"></span>
                   <span className="txt">Dashboard</span>
                 </Link>
               </li>
-              <li className={className({ 'active': this.context.router.isActive('/logs') })}>
-                <Link to="/account">
+              <li className={className({ 'active': router.isActive('/app_logs') })}>
+                <Link to="/app_logs">
                   <span className="icn log-icn"></span>
                   <span className="txt">Logs</span>
                 </Link>
               </li>
-              <li className={className({ 'active': this.context.router.isActive('/settings') })}>
+              <li className={className({ 'active': router.isActive('/settings') })}>
                 <Link to="/settings">
                   <span className="icn settings-icn"></span>
                   <span className="txt">Settings</span>
                 </Link>
               </li>
-              <li className={className({ 'active': this.context.router.isActive('/help') })}>
+              <li className={className({ 'active': router.isActive('/help') })}>
                 <Link to="/account">
                   <span className="icn help-icn"></span>
                   <span className="txt">Help</span>

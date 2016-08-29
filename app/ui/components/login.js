@@ -68,7 +68,7 @@ export default class Settings extends Component {
     }
     this.isLoading = true;
     userLogin({
-      accountSecret: accountPasswordVal,
+      accountSecret: accountSecretVal,
       accountPassword: accountPasswordVal
     });
   }

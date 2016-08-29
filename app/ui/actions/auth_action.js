@@ -1,5 +1,4 @@
 import ActionTypes from './action_types';
-import axios from 'axios';
 
 export const loginSuccess = (res) => {
   return {
@@ -90,5 +89,14 @@ export const register = (payload) => {
         dispatch(registerSuccess(payload))
       }
     });
+  }
+}
+
+export const logout = (userData) => {
+  window.msl.clearAllSessions();
+  window.msl.networkStateChange(0);
+  window.msl.reconnect(userData);
+  return {
+    type: ActionTypes.LOGOUT
   }
 }

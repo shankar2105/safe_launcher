@@ -10,8 +10,8 @@ const mapStateToProps = function(state) {
 
 const mapDispatchToProps = function(dispatch) {
   return {
-    onProxyClick: () => {
-      dispatch(toggleProxy())
+    onProxyClick: (status) => {
+      dispatch(toggleProxy(status))
     }
   };
 }

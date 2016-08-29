@@ -29,7 +29,6 @@ export default class RegisterAccSecretForm extends Component {
     e.preventDefault();
 
     if (!this.passwordStrengthValid) {
-      console.log('Very weak');
       accountSecretMsgEle.text('Account secret needs to be stronger.');
       return;
     }

@@ -38,7 +38,7 @@ api.setNetworkStateListener((state, isRegisteredClient) => {
 
     case 0:
       if (isRegisteredClient) {
-        log.debug('Dropping unregistered client');
+        // log.debug('Dropping unregistered client');
         window.msl.dropUnregisteredClient(function() {});
       }
       window.msl.networkStateChange(NETWORK_STATE.CONNECTED);

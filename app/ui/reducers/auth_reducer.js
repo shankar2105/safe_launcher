@@ -1,12 +1,14 @@
 import ActionTypes from '../actions/action_types';
 
-const auth = (state = {
+const initialState = {
   authProcessing: false,
   authenticated: false,
   error: null,
   user: null,
   registerState: 0
-}, action) => {
+};
+
+const auth = (state = initialState, action) => {
   switch (action.type) {
     case ActionTypes.LOGIN_SUCCESS:
     case ActionTypes.REGISTER_SUCCESS:
@@ -55,7 +57,10 @@ const auth = (state = {
       return { ...state, registerState: action.navState }
       break;
     case ActionTypes.RESET_USER:
-      return { ...state, user: null, registerState: 0 };
+      return { ...state, user: null, registerState: 0, error: null };
+      break;
+    case ActionTypes.LOGOUT:
+      return initialState;
       break;
     default:
       return state;

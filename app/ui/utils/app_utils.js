@@ -7,6 +7,11 @@ export let getProxy = () => {
 };
 
 export let setProxy = (status) => {
+  if (status) {
+    window.msl.startProxyServer();
+  } else {
+    window.msl.stopProxyServer();
+  }
   window.localStorage.setItem(LOCAL_STORAGE_KEYS.SAFE_LAUNCHER_PROXY, JSON.stringify({ 'status' : status }))
 };
 
