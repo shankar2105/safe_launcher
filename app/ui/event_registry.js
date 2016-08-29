@@ -1,9 +1,106 @@
 import { setNetworkDisconnected, setNetworkConnected, setNetworkConnecting } from './actions/network_status_action';
-import { showAuthRequest, addApplication, addActivity, updateActivity } from './actions/app_action';
+import { showAuthRequest, addApplication, addActivity, updateActivity, setDownloadData, setUploadData,
+  setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount } from './actions/app_action';
+import { CONSTANT } from './constant';
 
 export default class EventRegistry {
   constructor(store) {
+    this.state = store.getState;
     this.dispatch = store.dispatch;
+    this.intervals = [];
+    this.completeCount = 0;
+    this.authorisedData = {
+      GET: {
+        oldVal: 0,
+        newVal: 0
+      },
+      POST: {
+        oldVal: 0,
+        newVal: 0
+      },
+      PUT: {
+        oldVal: 0,
+        newVal: 0
+      },
+      DELETE: {
+        oldVal: 0,
+        newVal: 0
+      }
+    };
+  }
+
+  clearIntervals() {
+    this.intervals.map(interval => {
+      window.clearInterval(interval)
+    })
+  }
+
+  onAuthFetchComplete(target, oldVal, newVal) {
+    let self = this;
+    self.authorisedData[target].oldVal = oldVal;
+    self.authorisedData[target].newVal = newVal;
+    console.log(target, oldVal, newVal);
+    let temp = {};
+    if (self.completeCount === 4) {
+      temp.GET = self.authorisedData.GET.newVal - self.authorisedData.GET.oldVal;
+      temp.POST = self.authorisedData.POST.newVal - self.authorisedData.POST.oldVal;
+      temp.PUT = self.authorisedData.PUT.newVal - self.authorisedData.PUT.oldVal;
+      temp.DELETE = self.authorisedData.DELETE.newVal - self.authorisedData.DELETE.oldVal;
+        self.completeCount = 0;
+      self.dispatch(setAuthStateData(temp));
+    }
+  }
+
+  fetchStatsForUnauthorisedClient() {
+    let self = this;
+
+    self.intervals.push(window.setInterval(function () {
+      window.msl.fetchGetsCount(function(err, data) {
+        if (err) {
+          return;
+        }
+        self.dispatch(setUnAuthStateData(data));
+      });
+    }, CONSTANT.FETCH_DELAY))
+  }
+
+  fetchStatsForAuthorisedClient() {
+    let self = this;
+
+    self.intervals.push(window.setInterval(function () {
+      window.msl.fetchGetsCount(function(err, data) {
+        if (err) {
+          return;
+        }
+        self.completeCount++;
+        self.onAuthFetchComplete('GET', self.state().user.dashData.getsCount, data);
+        self.dispatch(setDashGetCount(data));
+      });
+      window.msl.fetchDeletesCount(function(err, data) {
+        if (err) {
+          return;
+        }
+        self.completeCount++;
+        self.onAuthFetchComplete('DELETE', self.state().user.dashData.deletesCount, data);
+        self.dispatch(setDashDeleteCount(data));
+      });
+      window.msl.fetchPostsCount(function(err, data) {
+        if (err) {
+          return;
+        }
+        self.completeCount++;
+        self.onAuthFetchComplete('POST', self.state().user.dashData.postsCount, data);
+        self.dispatch(setDashPostCount(data));
+      });
+      window.msl.fetchPutsCount(function(err, data) {
+        if (err) {
+          return;
+        }
+        self.completeCount++;
+        self.onAuthFetchComplete('PUT', self.state().user.dashData.putsCount, data);
+        self.dispatch(setDashPutCount(data));
+      });
+    }, CONSTANT.FETCH_DELAY));
   }
 
   handleNetworkEvents() {
@@ -14,9 +111,16 @@ export default class EventRegistry {
         case 0:
           self.dispatch(setNetworkConnecting());
           break;
-        case 1:
+        case 1:{
+          if (!self.state().auth.authenticated) {
+            self.fetchStatsForUnauthorisedClient();
+          } else {
+            self.clearIntervals();
+            self.fetchStatsForAuthorisedClient();
+          }
           self.dispatch(setNetworkConnected());
           break;
+        }
         case 2:
           self.dispatch(setNetworkDisconnected());
           break;
@@ -79,6 +183,23 @@ export default class EventRegistry {
     });
   }
 
+  handleDataTransfer() {
+    let self = this;
+    window.msl.onUploadEvent(function(data) {
+      if (!data) {
+        return;
+      }
+      self.dispatch(setUploadData(data));
+    });
+
+    window.msl.onDownloadEvent(function(data) {
+      if (!data) {
+        return;
+      }
+      self.dispatch(setDownloadData(data));
+    });
+  }
+
   handleActivityEvents() {
     let self = this;
     window.msl.onNewAppActivity((data) => {
@@ -96,11 +217,13 @@ export default class EventRegistry {
     });
   }
 
+
   run() {
     this.handleNetworkEvents();
     this.handleAPIServer();
     this.handleProxyServer();
     this.handleAppSession();
+    this.handleDataTransfer();
     this.handleActivityEvents();
     this.handleAuthRequest();
   }

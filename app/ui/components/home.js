@@ -22,7 +22,7 @@ export default class Home extends Component {
                 </Link>
               </li>
               <li className={className({ 'active': router.isActive('/dashboard') })}>
-                <Link to="/account">
+                <Link to="/dashboard">
                   <span className="icn dashboard-icn"></span>
                   <span className="txt">Dashboard</span>
                 </Link>
@@ -40,7 +40,7 @@ export default class Home extends Component {
                 </Link>
               </li>
               <li className={className({ 'active': router.isActive('/help') })}>
-                <Link to="/account">
+                <Link to="/help">
                   <span className="icn help-icn"></span>
                   <span className="txt">Help</span>
                 </Link>

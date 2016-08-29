@@ -27,39 +27,36 @@ class AppList extends Component {
         </div>
       )
     }
-    let appListContainer = [];
-    let list = null;
-    for (var key of Object.keys(appList)) {
-      list = appList[key];
-      appListContainer.push((
-        <div key={key} className="app-li-i" onClick={e => {
-          e.preventDefault();
-          showAppDetailPage(list.id);
-        }}>
-          <h3 className="title">{ list.name } <span className="version">{ list.version }</span></h3>
-          <h4 className="sub-title">Last Active: { list.lastActive }</h4>
-          <div className="status-bar in-progress">
-            <span className="time">{ list.status.beginTime }</span>
-            <span className="msg">{ list.status.activityName }</span>
-            <span className="status">{ ACTIVITY_STATUS[list.status.activityStatus] }</span>
-          </div>
-          <div className="opt">
-            <div className="opt-i">
-              <button type="button" className="btn flat danger" name="revoke" onClick={e => {
-                e.stopPropagation();
-                e.nativeEvent.stopImmediatePropagation();
-                revokeApplication(list.id);
-              }}>Revoke Access</button>
-            </div>
-          </div>
-        </div>
-      ))
-    }
     return (
       <div className="'app-li-cnt'">
-        { appListContainer.map(list => {
-          return list;
-        }) }
+        {
+          Object.keys(appList).map((key, i) => {
+            let list = appList[key];
+            return (
+              <div key={key} className="app-li-i" onClick={e => {
+                e.preventDefault();
+                showAppDetailPage(list.id);
+              }}>
+                <h3 className="title">{ list.name } <span className="version">{ list.version }</span></h3>
+                <h4 className="sub-title">Last Active: { list.lastActive }</h4>
+                <div className="status-bar in-progress">
+                  <span className="time">{ list.status.beginTime }</span>
+                  <span className="msg">{ list.status.activityName }</span>
+                  <span className="status">{ ACTIVITY_STATUS[list.status.activityStatus] }</span>
+                </div>
+                <div className="opt">
+                  <div className="opt-i">
+                    <button type="button" className="btn flat danger" name="revoke" onClick={e => {
+                      e.stopPropagation();
+                      e.nativeEvent.stopImmediatePropagation();
+                      revokeApplication(list.id);
+                    }}>Revoke Access</button>
+                  </div>
+                </div>
+              </div>
+            )
+          })
+        }
       </div>
     )
   }

@@ -70,3 +70,59 @@ export const resetLogsFilter = () => {
     type: ActionTypes.RESET_LOGS_FILTER
   };
 }
+
+export const setDownloadData = (downloadData) => {
+  return {
+    type: ActionTypes.SET_DOWNLOAD_DATA,
+    downloadData: downloadData
+  };
+}
+
+export const setUploadData = (uploadData) => {
+  return {
+    type: ActionTypes.SET_UPLOAD_DATA,
+    uploadData: uploadData
+  };
+}
+
+export const setUnAuthStateData = (data) => {
+  return {
+    type: ActionTypes.SET_UNAUTH_STATE_DATA,
+    data: data
+  };
+}
+
+export const setAuthStateData = (data) => {
+  return {
+    type: ActionTypes.SET_AUTH_STATE_DATA,
+    data: data
+  };
+}
+
+export const setDashGetCount = (data) => {
+  return {
+    type: ActionTypes.SET_DASH_GET_COUNT,
+    data: data
+  };
+}
+
+export const setDashPostCount = (data) => {
+  return {
+    type: ActionTypes.SET_DASH_POST_COUNT,
+    data: data
+  };
+}
+
+export const setDashDeleteCount = (data) => {
+  return {
+    type: ActionTypes.SET_DASH_DELETE_COUNT,
+    data: data
+  };
+}
+
+export const setDashPutCount = (data) => {
+  return {
+    type: ActionTypes.SET_DASH_PUT_COUNT,
+    data: data
+  };
+}
