@@ -6,6 +6,12 @@ export const toggleProxy = () => {
   }
 }
 
+export const setProxy = () => {
+  return {
+    type: ActionTypes.SET_PROXY
+  }
+}
+
 export const finishInitialProxySettings = () => {
   return {
     type: ActionTypes.FINISH_INITIAL_PROXY_SETTINGS

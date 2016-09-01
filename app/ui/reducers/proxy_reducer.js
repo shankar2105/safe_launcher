@@ -14,6 +14,10 @@ const proxy = (state = {
       setProxy(proxyStatus);
       return { ...state, proxy: proxyStatus };
       break;
+    case ActionTypes.SET_PROXY:
+      setProxy(state.proxy);
+      return { ...state };
+      break;
     case ActionTypes.FINISH_INITIAL_PROXY_SETTINGS:
       proxyStatus = getProxy();
       if (!proxyStatus) {

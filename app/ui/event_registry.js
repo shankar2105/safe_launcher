@@ -1,4 +1,5 @@
 import { setNetworkDisconnected, setNetworkConnected, setNetworkConnecting } from './actions/network_status_action';
+import { setProxy } from './actions/proxy_action';
 import { showAuthRequest, addApplication, addActivity, updateActivity, setDownloadData, setUploadData,
   setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount, updateAccountStorage,
   fetchingAccountStorage } from './actions/app_action';
@@ -125,6 +126,7 @@ export default class EventRegistry {
           self.dispatch(setNetworkConnecting());
           break;
         case 1:{
+          self.dispatch(setProxy());
           if (!self.state().auth.authenticated) {
             self.fetchStatsForUnauthorisedClient();
           } else {
@@ -162,7 +164,7 @@ export default class EventRegistry {
 
   handleProxyServer() {
     window.msl.onProxyStart(() => {
-      return console.error('Proxy Server Started');
+      return console.log('Proxy Server Started');
     });
 
     window.msl.onProxyError((err) => {
@@ -170,7 +172,7 @@ export default class EventRegistry {
     });
 
     window.msl.onProxyExit(() => {
-      return console.error('Proxy Server Stopped');
+      return console.log('Proxy Server Stopped');
     });
   }
 
