@@ -1,5 +1,6 @@
 import ActionTypes from '../actions/action_types';
 import moment from 'moment';
+import { CONSTANT } from '../constant';
 
 const initialState = {
   appList: {},
@@ -12,15 +13,21 @@ const initialState = {
   authRequestPayload: null,
   unAuthGET: [],
   authHTTPMethods: [],
+  accountStorage: {
+    fetching: false,
+    lastUpdated: null,
+    lastUpdatedFromNow: null,
+    updateTimeout: 0,
+    used: 0,
+    available: 0
+  },
   dashData: {
     getsCount: 0,
     putsCount: 0,
     postsCount: 0,
     deletesCount: 0,
     upload: 0,
-    download: 0,
-    accountStorageUsed: 0,
-    accountStorageAvailable: 0
+    download: 0
   }
 };
 
@@ -184,6 +191,37 @@ const user = (state = initialState, action) => {
       }};
       break;
     }
+    case ActionTypes.FETCHING_ACCOUNT_STORAGE:
+      return { ...state, accountStorage: {
+        ...state.accountStorage,
+        fetching: true,
+        disableUpdate: true
+      }}
+      break;
+    case ActionTypes.UPDATE_ACCOUNT_STORAGE: {
+      let accountInfoLastUpdated = (new Date()).toLocaleString();
+      return { ...state, accountStorage: {
+        ...state.accountStorage,
+        fetching: false,
+        used: action.data.used,
+        available: action.data.available,
+        lastUpdated: accountInfoLastUpdated,
+        updateTimeout: CONSTANT.ACCOUNT_UPDATE_TIMEOUT
+      }};
+      break;
+    }
+    case ActionTypes.SET_LAST_UPDATE_FROM_NOW:
+      return { ...state, accountStorage: {
+        ...state.accountStorage,
+        lastUpdatedFromNow: moment(state.accountStorage.lastUpdated).fromNow()
+      }};
+      break;
+    case ActionTypes.DEC_ACCOUNT_UPDATE_TIMEOUT:
+      return { ...state, accountStorage: {
+        ...state.accountStorage,
+        updateTimeout: state.accountStorage.updateTimeout !== 0 ? state.accountStorage.updateTimeout - 1 : 0,
+      }}
+      break;
     default:
       return state;
   }

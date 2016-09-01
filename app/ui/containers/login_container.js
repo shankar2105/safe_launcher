@@ -4,6 +4,7 @@ import { login, cancelAuthReq, resetUser } from '../actions/auth_action';
 
 const mapStateToProps = function(state) {
   return {
+    networkStatus: state.networkStatus.networkStatus,
     authenticated: state.auth.authenticated,
     authProcessing: state.auth.authProcessing,
     user: state.auth.user,

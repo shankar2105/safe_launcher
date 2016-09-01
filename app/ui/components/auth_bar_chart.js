@@ -43,7 +43,6 @@ export default class AuthBarChart extends Component {
 
     this.add();
     var tempData = this.props.authHTTPMethods;
-    console.log(tempData);
     if (this.props.authHTTPMethods.length > 0) {
       if (tempData.length > this.MAX_BARS) {
         tempData = tempData.slice(tempData.length - this.MAX_BARS);

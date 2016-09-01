@@ -1,5 +1,17 @@
 import ActionTypes from './action_types';
 
+export const updateAccountStorageSuccess = (data) => {
+  return {
+    type: ActionTypes.UPDATE_ACCOUNT_STORAGE,
+    data: data
+  }
+};
+
+//
+// export const updateAccountStorageFailure = (err) => {
+//
+// };
+
 export const showAppDetailPage = (appId) => {
   let currentAppLogs = window.msl.getAppActivityList(appId);
   return {
@@ -124,5 +136,35 @@ export const setDashPutCount = (data) => {
   return {
     type: ActionTypes.SET_DASH_PUT_COUNT,
     data: data
+  };
+}
+
+export const fetchingAccountStorage = () => {
+  return {
+    type: ActionTypes.FETCHING_ACCOUNT_STORAGE
+  };
+}
+
+export const updateAccountStorage = () => {
+  return dispatch => {
+    dispatch(fetchingAccountStorage());
+    window.msl.getAccountInfo((err, data) => {
+      if (err) {
+        return;
+      }
+      dispatch(updateAccountStorageSuccess(data));
+    });
+  };
+}
+
+export const decAccountUpdateTimeout = () => {
+  return {
+    type: ActionTypes.DEC_ACCOUNT_UPDATE_TIMEOUT
+  };
+}
+
+export const setLastUpdateFromNow = () => {
+  return {
+    type: ActionTypes.SET_LAST_UPDATE_FROM_NOW
   };
 }

@@ -1,6 +1,7 @@
 import { setNetworkDisconnected, setNetworkConnected, setNetworkConnecting } from './actions/network_status_action';
 import { showAuthRequest, addApplication, addActivity, updateActivity, setDownloadData, setUploadData,
-  setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount } from './actions/app_action';
+  setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount, updateAccountStorage,
+  fetchingAccountStorage } from './actions/app_action';
 import { CONSTANT } from './constant';
 
 export default class EventRegistry {
@@ -103,6 +104,17 @@ export default class EventRegistry {
     }, CONSTANT.FETCH_DELAY));
   }
 
+  updateAccountStorage() {
+    this.dispatch(updateAccountStorage());
+  }
+
+  fetchAccountStorage() {
+    let self = this;
+    self.intervals.push(window.setInterval(() => {
+      self.updateAccountStorage();
+    }, CONSTANT.ACCOUNT_FETCH_INTERVAL));
+  }
+
   handleNetworkEvents() {
     let self = this;
 
@@ -117,6 +129,8 @@ export default class EventRegistry {
           } else {
             self.clearIntervals();
             self.fetchStatsForAuthorisedClient();
+            self.updateAccountStorage();
+            self.fetchAccountStorage();
           }
           self.dispatch(setNetworkConnected());
           break;

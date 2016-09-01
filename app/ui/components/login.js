@@ -60,7 +60,13 @@ export default class Settings extends Component {
 
   handleLogin(e) {
     e.preventDefault();
-    const { userLogin } = this.props;
+    const { networkStatus, userLogin } = this.props;
+
+    if (networkStatus !== 1) {
+      console.log('Network not connected yet!');
+      return;
+    }
+
     let accountSecretVal = accountSecret.value.trim()
     let accountPasswordVal = accountPassword.value.trim();
     if (!accountSecretVal || !accountPasswordVal) {

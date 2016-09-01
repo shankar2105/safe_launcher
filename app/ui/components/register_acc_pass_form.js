@@ -12,6 +12,10 @@ export default class RegisterAccPassForm extends Component {
   }
 
   handleAccPassForm(e) {
+    if (this.props.networkStatus !== 1) {
+      console.log('Network not connected yet!');
+      return;
+    }
     let accountPasswordVal = accountPassword.value.trim();
     let confirmAccountPasswordVal = confirmAccountPassword.value.trim();
     let accountPasswordMsgEle = $(accountPassword).siblings('.msg');

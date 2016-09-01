@@ -3,7 +3,7 @@ import Home from '../components/home';
 
 const mapStateToProps = function(state) {
   return {
-    // status: state.networkStatus.networkStatus
+    authProcessing: state.auth.authProcessing
   };
 }
 

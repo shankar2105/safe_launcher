@@ -4,6 +4,7 @@ import { setRegisterStateNext, setRegisterStateBack, setRegisterState, register,
 
 const mapStateToProps = function(state) {
   return {
+    networkStatus: state.networkStatus.networkStatus,
     registerState: state.auth.registerState,
     authProcessing: state.auth.authProcessing,
     user: state.auth.user,

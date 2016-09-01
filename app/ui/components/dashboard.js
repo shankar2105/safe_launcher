@@ -22,14 +22,18 @@ class AuthorisedDashboard extends Component {
   }
 
   render() {
-    const { dashData, authHTTPMethods } = this.props;
+    const { dashData, authHTTPMethods, accountStorage, updateAccountStorage, setLastUpdateFromNow, decAccountUpdateTimeout } = this.props;
 
     return (
       <div>
         <AuthBarChart dashData={dashData} authHTTPMethods={authHTTPMethods} />
         <div className="dash-cnt">
           <UploadDownloadChart upload={dashData.upload} download={dashData.download}  />
-          <AccountStorageChart dashData={dashData} />
+          <AccountStorageChart
+            accountStorage={accountStorage}
+            updateAccountStorage={updateAccountStorage}
+            setLastUpdateFromNow={setLastUpdateFromNow}
+            decAccountUpdateTimeout={decAccountUpdateTimeout} />
         </div>
       </div>
     )

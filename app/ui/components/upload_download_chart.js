@@ -28,7 +28,7 @@ export default class UploadDownloadChart extends Component {
                 <div className="legends-i-name">Total Data Downloaded:</div>
                 <div className="legends-i-val">{ (this.dataAvailable ? bytesToSize(this.props.download) : 'No data yet.') }</div>
               </div>
-              <div className="legends-i download">
+              <div className="legends-i upload">
                 <div className="legends-i-name">Total Data Upload:</div>
                 <div className="legends-i-val">{ (this.dataAvailable ? bytesToSize(this.props.upload) : 'No data yet.') }</div>
               </div>
