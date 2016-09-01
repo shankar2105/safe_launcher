@@ -54,7 +54,9 @@ export default class AuthBarChart extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.add(nextProps.authHTTPMethods[nextProps.authHTTPMethods.length - 1]);
+    if (nextProps.authHTTPMethods.length !== this.props.authHTTPMethods.length) {
+      this.add(nextProps.authHTTPMethods[nextProps.authHTTPMethods.length - 1]);
+    }
   }
 
   render() {

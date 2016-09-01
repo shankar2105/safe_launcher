@@ -153,7 +153,7 @@ const user = (state = initialState, action) => {
     }
     case ActionTypes.SET_AUTH_STATE_DATA: {
       let authHTTPMethods = [];
-      state.authHTTPMethods.map(obj => {
+      authHTTPMethods = state.authHTTPMethods.map(obj => {
         return { ...obj };
       });
       authHTTPMethods.push(action.data);
