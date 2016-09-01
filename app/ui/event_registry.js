@@ -2,6 +2,7 @@ import { setNetworkDisconnected, setNetworkConnected, setNetworkConnecting } fro
 import { showAuthRequest, addApplication, addActivity, updateActivity, setDownloadData, setUploadData,
   setUnAuthStateData, setAuthStateData, setDashGetCount, setDashPostCount, setDashDeleteCount, setDashPutCount, updateAccountStorage,
   fetchingAccountStorage } from './actions/app_action';
+
 import { CONSTANT } from './constant';
 
 export default class EventRegistry {

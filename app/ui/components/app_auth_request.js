@@ -55,7 +55,7 @@ export default class AppAuthRequest extends Component {
   }
 
   render() {
-    const { authRequestPayload, hideAuthRequest } = this.props;
+    const { authRequestPayload, authRequestHasNext, showNextAuthRequest, hideAuthRequest } = this.props;
 
     return (
       <div className="auth-req">
@@ -88,7 +88,7 @@ export default class AppAuthRequest extends Component {
                 <div className="auth-req-f-i">
                   <button type="button" className="btn flat primary" name="allow" onClick={e => {
                     e.preventDefault();
-                    hideAuthRequest(authRequestPayload, true)
+                    return (authRequestHasNext ? showNextAuthRequest(authRequestPayload, true) : hideAuthRequest(authRequestPayload, true));
                   }}>Allow</button>
                 </div>
               </div>

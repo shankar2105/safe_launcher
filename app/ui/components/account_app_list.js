@@ -89,7 +89,7 @@ export default class AccountAppList extends Component {
   }
 
   render() {
-    const { appList, user, appDetailPageVisible, showAuthRequest, authRequestPayload, hideAuthRequest, logout } = this.props;
+    const { appList, user, appDetailPageVisible, showAuthRequest, authRequestPayload, authRequestHasNext, showNextAuthRequest, hideAuthRequest, logout } = this.props;
     if (appDetailPageVisible) {
       return <AppDetail { ...this.props } />
     }
@@ -109,7 +109,12 @@ export default class AccountAppList extends Component {
           </div>
           <AppList { ...this.props } />
         </div>
-        { showAuthRequest ?  <AppAuthRequest authRequestPayload={authRequestPayload} hideAuthRequest={hideAuthRequest} /> : null }
+        { showAuthRequest ?  <AppAuthRequest
+          authRequestPayload={authRequestPayload}
+          hideAuthRequest={hideAuthRequest}
+          authRequestHasNext={authRequestHasNext}
+          showNextAuthRequest={showNextAuthRequest}
+           /> : null }
       </div>
     )
   }

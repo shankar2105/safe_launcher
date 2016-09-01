@@ -2,6 +2,8 @@ import ActionTypes from '../actions/action_types';
 import moment from 'moment';
 import { CONSTANT } from '../constant';
 
+let AuthRequestQueue = [];
+
 const initialState = {
   appList: {},
   appLogs: [],
@@ -11,6 +13,7 @@ const initialState = {
   currentAppLogs: [],
   showAuthRequest: false,
   authRequestPayload: null,
+  authRequestHasNext: false,
   unAuthGET: [],
   authHTTPMethods: [],
   accountStorage: {
@@ -47,7 +50,17 @@ const user = (state = initialState, action) => {
       break;
     }
     case ActionTypes.SHOW_AUTH_REQUEST: {
-      return { ...state, showAuthRequest: true, authRequestPayload: action.payload };
+      AuthRequestQueue.unshift(action.payload);
+      if (state.showAuthRequest) {
+        return { ...state, authRequestHasNext: true };
+      }
+      let currentReq = AuthRequestQueue.pop();
+      return { ...state, showAuthRequest: true, authRequestPayload: currentReq, authRequestHasNext: (AuthRequestQueue.length !== 0) };
+      break;
+    }
+    case ActionTypes.SHOW_NEXT_AUTH_REQUEST: {
+      let currentReq = AuthRequestQueue.pop();
+      return { ...state, showAuthRequest: true, authRequestPayload: currentReq, authRequestHasNext: (AuthRequestQueue.length !== 0) };
       break;
     }
     case ActionTypes.HIDE_AUTH_REQUEST: {

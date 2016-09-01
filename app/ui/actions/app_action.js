@@ -1,5 +1,9 @@
 import ActionTypes from './action_types';
 
+let authorisationResponse = (payload, status) => {
+  window.msl.authResponse(payload, status);
+};
+
 export const updateAccountStorageSuccess = (data) => {
   return {
     type: ActionTypes.UPDATE_ACCOUNT_STORAGE,
@@ -34,8 +38,16 @@ export const showAuthRequest = (payload) => {
   };
 }
 
+export const showNextAuthRequest = (payload, status) => {
+  authorisationResponse(payload, status);
+  return {
+    type: ActionTypes.SHOW_NEXT_AUTH_REQUEST,
+    payload: payload
+  };
+}
+
 export const hideAuthRequest = (payload, status) => {
-  window.msl.authResponse(payload, status);
+  authorisationResponse(payload, status);
   return {
     type: ActionTypes.HIDE_AUTH_REQUEST
   };
