@@ -1,4 +1,5 @@
 import ActionTypes from './action_types';
+import auth from './../../ffi/api/auth';
 
 export const loginSuccess = (res) => (
   {
@@ -53,12 +54,11 @@ export const resetUser = () => ({
 export const login = payload => (
   dispatch => {
     dispatch(setAuthProcessing());
-    window.msl.login(payload.accountSecret, payload.accountPassword, (err) => {
-      if (err) {
-        dispatch(loginError(err));
-      } else {
-        dispatch(loginSuccess(payload));
-      }
+    auth.login(payload.accountSecret, payload.accountPassword)
+    .then(() => {
+      dispatch(loginSuccess(payload));
+    }, (err) => {
+      dispatch(loginError(err));
     });
   }
 );
@@ -66,12 +66,11 @@ export const login = payload => (
 export const register = payload => (
   dispatch => {
     dispatch(setAuthProcessing());
-    window.msl.register(payload.accountSecret, payload.accountPassword, (err) => {
-      if (err) {
-        dispatch(registerError(err));
-      } else {
-        dispatch(registerSuccess(payload));
-      }
+    auth.register(payload.accountSecret, payload.accountPassword)
+    .then(() => {
+      dispatch(registerSuccess(payload));
+    }, (err) => {
+      dispatch(registerError(err));
     });
   }
 );

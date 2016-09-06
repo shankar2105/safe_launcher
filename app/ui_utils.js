@@ -35,8 +35,7 @@ class ProxyListener {
 
 // UI Utils
 export default class UIUtils {
-  constructor(api, remote, restServer, proxy) {
-    this.api = api;
+  constructor(remote, restServer, proxy) {
     this.remote = remote;
     this.restServer = restServer;
     this.proxy = proxy;
@@ -45,24 +44,24 @@ export default class UIUtils {
     this.errorCodeLookup = errorCodeLookup;
   }
 
-  // login
-  login(location, password, callback) {
-    this.api.auth.login(location, password, callback);
-  }
-
-  // register
-  register(location, password, callback) {
-    this.api.auth.register(location, password, (err) => {
-      if (err) {
-        return callback(err);
-      }
-      callback(err);
-    });
-  }
-
-  dropUnregisteredClient(callback) {
-    this.api.auth.dropUnregisteredClient(callback);
-  }
+  // // login
+  // login(location, password, callback) {
+  //   this.api.auth.login(location, password, callback);
+  // }
+  //
+  // // register
+  // register(location, password, callback) {
+  //   this.api.auth.register(location, password, (err) => {
+  //     if (err) {
+  //       return callback(err);
+  //     }
+  //     callback(err);
+  //   });
+  // }
+  // 
+  // dropUnregisteredClient(callback) {
+  //   this.api.auth.dropUnregisteredClient(callback);
+  // }
 
   // close browser window
   closeWindow() {
@@ -172,44 +171,44 @@ export default class UIUtils {
   }
 
   reconnect(user) {
-    this.api.reset();
-    if (user) {
-      this.api.auth.login(user.accountSecret, user.accountPassword, (err) => {
-        if (!this.onNetworkStateChange) {
-          return;
-        }
-        let status = null;
-        if (err) {
-          status = window.NETWORK_STATE.DISCONNECTED;
-        } else {
-          status = window.NETWORK_STATE.CONNECTED;
-        }
-        this.onNetworkStateChange(status);
-      });
-    } else {
-      this.api.connectWithUnauthorisedClient();
-    }
+    // this.api.reset();
+    // if (user) {
+    //   this.api.auth.login(user.accountSecret, user.accountPassword, (err) => {
+    //     if (!this.onNetworkStateChange) {
+    //       return;
+    //     }
+    //     let status = null;
+    //     if (err) {
+    //       status = window.NETWORK_STATE.DISCONNECTED;
+    //     } else {
+    //       status = window.NETWORK_STATE.CONNECTED;
+    //     }
+    //     this.onNetworkStateChange(status);
+    //   });
+    // } else {
+    //   this.api.connectWithUnauthorisedClient();
+    // }
   }
 
-  fetchGetsCount(callback) {
-    this.api.clientStats.fetchGetsCount(callback);
-  }
-
-  fetchDeletesCount(callback) {
-    this.api.clientStats.fetchDeletesCount(callback);
-  }
-
-  fetchPostsCount(callback) {
-    this.api.clientStats.fetchPostsCount(callback);
-  }
-
-  fetchPutsCount(callback) {
-    this.api.clientStats.fetchPutsCount(callback);
-  }
-
-  getAccountInfo(callback) {
-    this.api.clientStats.getAccountInfo(callback);
-  }
+  // fetchGetsCount(callback) {
+  //   this.api.clientStats.fetchGetsCount(callback);
+  // }
+  //
+  // fetchDeletesCount(callback) {
+  //   this.api.clientStats.fetchDeletesCount(callback);
+  // }
+  //
+  // fetchPostsCount(callback) {
+  //   this.api.clientStats.fetchPostsCount(callback);
+  // }
+  //
+  // fetchPutsCount(callback) {
+  //   this.api.clientStats.fetchPutsCount(callback);
+  // }
+  //
+  // getAccountInfo(callback) {
+  //   this.api.clientStats.getAccountInfo(callback);
+  // }
 
   onUploadEvent(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, callback);

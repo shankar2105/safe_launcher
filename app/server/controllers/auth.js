@@ -11,24 +11,23 @@ import { log } from './../../logger/log';
 import { MSG_CONSTANTS } from './../message_constants';
 
 export let CreateSession = function(data) {
-  let req = data.request;
-  let res = data.response;
-  log.debug('Waiting for directory key for creating an session');
+  const req = data.request;
+  const res = data.response;
+  const appInfo = data.payload.app;
 
   var emitSessionCreationFailed = function() {
     let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
     req.app.get('eventEmitter').emit(eventType);
   };
 
-  this.onDirKey = function(err, dirKey) {
+  const onRegistered = function(app) {
     let authReq = req.body;
     if (err) {
       log.error('Creating session :: ' + JSON.stringify(err));
       emitSessionCreationFailed();
       return req.next(new ResponseError(500, err));
     }
-    log.debug('Directory key for creating an session obtained');
-    let app = authReq.app;
+    log.debug('Directory key for creating an session obtained');    
     let isNewSession = false;
     try {
       let sessionId = sessionManager.hasSessionForApp(app);
@@ -39,7 +38,7 @@ export let CreateSession = function(data) {
       } else {
         log.debug('Creating session');
         sessionId = crypto.randomBytes(32).toString('base64');
-        sessionInfo = new SessionInfo(app.id, app.name, app.version, app.vendor, data.permissions, dirKey);
+        sessionInfo = new SessionInfo(app);
         isNewSession = true;
       }
       let payload = {
@@ -66,7 +65,9 @@ export let CreateSession = function(data) {
       req.next(new ResponseError(500, e.message));
     }
   };
-  return this.onDirKey;
+
+  const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.permissions);
+  appmanager.registerApp(app).then(onRegistered, emitSessionCreationFailed);
 };
 
 export var authorise = function(req, res, next) {

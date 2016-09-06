@@ -144,7 +144,6 @@ function pack(plat, arch, cb) {
   packager(opts, cb);
 }
 
-
 function log(plat, arch) {
   return (err, filepath) => {
     if (err) return console.error(err);

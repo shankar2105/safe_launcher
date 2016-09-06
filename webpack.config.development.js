@@ -20,7 +20,9 @@ export default merge(baseConfig, {
     publicPath: 'http://localhost:3000/dist/',
   },
   externals: {
-    winston: 'winston'
+    winston: 'winston',
+    ffi: 'ffi',
+    ref: 'ref'
   },
   module: {
     loaders: [
@@ -28,7 +30,7 @@ export default merge(baseConfig, {
         test: /\.js$/,
         loaders: ['react-hot', 'babel'],
         include: path.join(__dirname, 'app'),
-        exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
+        exclude: [path.join(__dirname, 'app', 'server')]
       },
       {
         test: /\.global\.css$/,
@@ -44,7 +46,7 @@ export default merge(baseConfig, {
           'css-loader?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]'
         ]
       },
-      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }
+      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }      
     ]
   },
 

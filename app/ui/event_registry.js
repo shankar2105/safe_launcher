@@ -20,7 +20,7 @@ import {
   setDashPutCount,
   updateAccountStorage
 } from './actions/app_action';
-
+import sessionManager from '../ffi/util/session_manager';
 import { CONSTANT, MESSAGES } from './constant';
 
 export default class EventRegistry {
@@ -57,65 +57,51 @@ export default class EventRegistry {
     const self = this;
     self.authorisedData[target].oldVal = oldVal;
     self.authorisedData[target].newVal = newVal;
-    const temp = {};
-    if (self.completeCount === 4) {
-      temp.GET = self.authorisedData.GET.newVal - self.authorisedData.GET.oldVal;
-      temp.POST = self.authorisedData.POST.newVal - self.authorisedData.POST.oldVal;
-      temp.PUT = self.authorisedData.PUT.newVal - self.authorisedData.PUT.oldVal;
-      temp.DELETE = self.authorisedData.DELETE.newVal - self.authorisedData.DELETE.oldVal;
-      self.completeCount = 0;
-      self.dispatch(setAuthStateData(temp));
-    }
   }
 
   fetchStatsForUnauthorisedClient() {
     const self = this;
     self.intervals.push(window.setInterval(() => {
-      window.msl.fetchGetsCount((err, data) => {
-        if (err) {
-          return;
+      const updateGetsCount = async () => {
+        try {
+          const count = await sessionManager.getClientGetsCount();
+          self.dispatch(setUnAuthStateData(count));
+        } catch(e) {
+          console.error(e);
         }
-        self.dispatch(setUnAuthStateData(data));
-      });
+      }
+      updateGetsCount();
     }, CONSTANT.FETCH_DELAY));
   }
 
   fetchStatsForAuthorisedClient() {
     const self = this;
-
     self.intervals.push(window.setInterval(() => {
-      window.msl.fetchGetsCount((err, data) => {
-        if (err) {
-          return;
+      const fetchCounts = async () => {
+        try {
+          console.log('Update Client stats');
+          const getsCount = await sessionManager.getClientGetsCount();
+          const putsCount = await sessionManager.getClientPutsCount();
+          const postsCount = await sessionManager.getClientPostsCount();
+          const deletesCount = await sessionManager.getClientDeletesCount();
+          self.onAuthFetchComplete('GET', self.state().user.dashData.getsCount, getsCount);
+          self.onAuthFetchComplete('DELETE', self.state().user.dashData.deletesCount, deletesCount);
+          self.onAuthFetchComplete('POST', self.state().user.dashData.postsCount, postsCount);
+          self.onAuthFetchComplete('PUT', self.state().user.dashData.putsCount, putsCount);
+          let temp = {};
+          temp.GET = self.authorisedData.GET.newVal - self.authorisedData.GET.oldVal;
+          temp.POST = self.authorisedData.POST.newVal - self.authorisedData.POST.oldVal;
+          temp.PUT = self.authorisedData.PUT.newVal - self.authorisedData.PUT.oldVal;
+          temp.DELETE = self.authorisedData.DELETE.newVal - self.authorisedData.DELETE.oldVal;
+          self.dispatch(setAuthStateData(temp));
+          // TODO - verify is this needed?
+          self.dispatch(setDashPutCount(putsCount));
+          console.log('Updated Client stats');
+        } catch(e) {
+          console.error(e);
         }
-        self.completeCount++;
-        self.onAuthFetchComplete('GET', self.state().user.dashData.getsCount, data);
-        self.dispatch(setDashGetCount(data));
-      });
-      window.msl.fetchDeletesCount((err, data) => {
-        if (err) {
-          return;
-        }
-        self.completeCount++;
-        self.onAuthFetchComplete('DELETE', self.state().user.dashData.deletesCount, data);
-        self.dispatch(setDashDeleteCount(data));
-      });
-      window.msl.fetchPostsCount((err, data) => {
-        if (err) {
-          return;
-        }
-        self.completeCount++;
-        self.onAuthFetchComplete('POST', self.state().user.dashData.postsCount, data);
-        self.dispatch(setDashPostCount(data));
-      });
-      window.msl.fetchPutsCount((err, data) => {
-        if (err) {
-          return;
-        }
-        self.completeCount++;
-        self.onAuthFetchComplete('PUT', self.state().user.dashData.putsCount, data);
-        self.dispatch(setDashPutCount(data));
-      });
+      };
+      fetchCounts()
     }, CONSTANT.FETCH_DELAY));
   }
 

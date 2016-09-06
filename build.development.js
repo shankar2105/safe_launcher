@@ -5,8 +5,7 @@ const build = () => {
   const srcDir = 'app';
   const destDir = 'dist';
   const filesToMove = [
-    'server',
-    'api',
+    'server',     
     'logger',
     'ui/images',
     'app.html'

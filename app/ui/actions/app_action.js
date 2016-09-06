@@ -1,4 +1,5 @@
 import ActionTypes from './action_types';
+import sessionManager from '../../ffi/util/session_manager';
 
 const authorisationResponse = (payload, status) => {
   window.msl.authResponse(payload, status);
@@ -120,12 +121,11 @@ export const fetchingAccountStorage = () => ({
 
 export const updateAccountStorage = () => (
   dispatch => {
-    dispatch(fetchingAccountStorage());
-    window.msl.getAccountInfo((err, data) => {
-      if (err) {
-        return;
-      }
+    dispatch(fetchingAccountStorage());    
+    sessionManager.getAccountInfo().then((data) => {
       dispatch(updateAccountStorageSuccess(data));
+    }, (e) => {
+      console.error(e);
     });
   }
 );
