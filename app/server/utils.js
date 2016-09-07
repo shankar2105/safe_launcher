@@ -50,6 +50,11 @@ export var formatDirectoryResponse = function(dir) {
 export class ResponseError {
   constructor(status, message) {
     message = message || MSG_CONSTANTS.ERROR_CODE[status];
+    if (!isNaN(message) && message < 0) {
+      message = {
+        errorCode: message
+      };
+    }
     if (typeof message === 'object' && message.hasOwnProperty('errorCode')) {
       message.description = errorCodeLookup(message.errorCode);
       if (message.description.toLowerCase().indexOf('notfound') > -1 ||

@@ -45,6 +45,7 @@ const DirectoryMetadataHandle = ref.refType(DirectoryMetadata);
 const VoidPointerHandle = ref.refType(Void);
 const PointerToVoidPointer = ref.refType(ref.refType(Void));
 const FileMetadataHandle = ref.refType(FileMetadata);
+const PointerToFileMetadataPointer = ref.refType(FileMetadataHandle);
 
 const FileDetails =new StructType({
   content: u8Pointer,
@@ -53,6 +54,7 @@ const FileDetails =new StructType({
 });
 
 const FileDetailsHandle = ref.refType(FileDetails);
+const PointerToFileDetailsPointer = ref.refType(FileDetailsHandle);
 
 class NFS extends FfiApi {
   constructor() {
@@ -80,9 +82,9 @@ class NFS extends FfiApi {
       'nfs_delete_file': [int32, [AppHandle, u8Pointer, u64, bool]],
       'nfs_modify_file': [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, u8Pointer, u64, u8Pointer, u64]],
       'nfs_move_file': [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, bool, bool]],
-      'nfs_get_file_metadata': [int32, [AppHandle, u8Pointer, u64, bool, PointerToVoidPointer]],
+      'nfs_get_file_metadata': [int32, [AppHandle, u8Pointer, u64, bool, PointerToFileMetadataPointer]],
       'file_metadata_drop': [Void, [FileMetadataHandle]],
-      'nfs_get_file': [int32, [AppHandle, int64, int64, u8Pointer, u64, bool, bool, PointerToVoidPointer]],
+      'nfs_get_file': [int32, [AppHandle, int64, int64, u8Pointer, u64, bool, bool, PointerToFileDetailsPointer]],
       'file_details_drop': [Void, [FileDetailsHandle]]
     };
   }
@@ -305,24 +307,21 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  createFile(app, filePath, metadata) {
+  createFile(app, filePath, metadata, isShared=false) {
     if (!filePath || !filePath.trim()) {
       return error('Invalid parameters');
     }
     const self = this;
-    const writerVoidPointer = ref.alloc(PointerToVoidPointer);
     const executor = (resolve, reject) => {
+      const writerVoidPointer = ref.alloc(PointerToVoidPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        let key;
-        do {
-          key = {id: uuid.v4()};
-        }
-        while (!self.writerHolder.has(key));
+        const key = {writerId: uuid.v4()};
         self.writerHolder.set(key, writerVoidPointer.deref());
         resolve(key);
+        console.log('Invoked resolve');
       };
       const filePathBuff = new Buffer(filePath);
       let metadataBuff = null;
@@ -332,6 +331,7 @@ class NFS extends FfiApi {
       self.safeCore.nfs_create_file.async(appManager.getHandle(app),
         filePathBuff, filePathBuff.length,
         metadataBuff, (metadataBuff ? metadataBuff.length : 0),
+        isShared,
         writerVoidPointer, onResult);
     };
     return new Promise(executor);
@@ -352,7 +352,7 @@ class NFS extends FfiApi {
         }
         resolve();
       };
-      self.nfs_writer_write.async(self.writerHolder.get(writerKey), data, data.length, onResult);
+      self.safeCore.nfs_writer_write.async(self.writerHolder.get(writerKey), data, data.length, onResult);
     };
     return new Promise(executor);
   }
@@ -370,7 +370,7 @@ class NFS extends FfiApi {
         self.writerHolder.delete(writerKey);
         resolve();
       };
-      self.nfs_writer_close.async(self.writerHolder.get(writerKey), onResult);
+      self.safeCore.nfs_writer_close.async(self.writerHolder.get(writerKey), onResult);
     };
     return new Promise(executor);
   }
@@ -449,26 +449,31 @@ class NFS extends FfiApi {
       return error('Invalid parameters');
     }
     const self = this;
-    const fileMetadataHandle = ref.alloc(PointerToVoidPointer);
+    const fileMetadataPointerHandle = ref.alloc(PointerToFileMetadataPointer);
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const fileMetadata = fileMetadataHandle.deref();
-        const metadata = derefFileMetadataStruct(fileMetadata);
-        self.safeCore.file_metadata_drop.async(fileMetadata, (e) => {});
-        resolve(metadata);
+        try {
+          const fileMetadataHandle = fileMetadataPointerHandle.deref();
+          const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
+          const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
+          self.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
+          resolve(metadata);
+        } catch(e) {
+          console.error(e);
+        }
       };
 
       const pathBuff = new Buffer(path);
       self.safeCore.nfs_get_file_metadata.async(appManager.getHandle(app),
-        pathBuff, pathBuff.length, isShared, onResult);
+        pathBuff, pathBuff.length, isShared, fileMetadataPointerHandle, onResult);
     };
     return new Promise(executor);
   }
 
-  readFile(app, path, isShared, offset = 0, length = 0) {
+  readFile(app, path, isShared=false, offset = 0, length = 0) {
     if (!path || !path.trim()) {
       return error('Invalid parameters');
     }
@@ -477,19 +482,25 @@ class NFS extends FfiApi {
       if (length === 0) {
         return resolve(new Buffer(0));
       }
-      const fileDetailsHandle = ref.alloc(PointerToVoidPointer);
+      const fileDetailsPointerHandle = ref.alloc(PointerToFileDetailsPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const handle = fileDetailsHandle.deref();
+        const fileDetailsHandle = fileDetailsPointerHandle.deref();
+        const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
         const fileDetails = handle.deref();
         const data = ref.reinterpret(fileDetails.content, fileDetails.content_len);
-        self.safeCore.file_details_drop.async(handle, (e) => {});
+        self.safeCore.file_details_drop.async(handle, (e) => {
+          if (e) {
+            console.error(e);
+          }
+        });
+        resolve(data);
       };
       const pathBuffer = new Buffer(path);
-      self.safeCore.nfs_get_file.async(appManager.getHandle(app), offset,
-        length, pathBuffer, pathBuffer.length, isShared, onResult);
+      self.safeCore.nfs_get_file.async(appManager.getHandle(app), offset, length,
+        pathBuffer, pathBuffer.length, isShared, false, fileDetailsPointerHandle, onResult);
     };
     return new Promise(executor);
   }

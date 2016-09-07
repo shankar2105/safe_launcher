@@ -48,10 +48,10 @@ export let CreateSession = function(data) {
           id: sessionId,
           info: sessionInfo
         });
-        console.log('session3');
       } else {
         emitSessionCreationFailed();
       }
+      console.log(sessionId);
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,

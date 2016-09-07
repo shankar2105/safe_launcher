@@ -2,6 +2,7 @@ import mime from 'mime';
 import sessionManager from '../session_manager';
 import { formatDirectoryResponse, formatResponse, ResponseError, ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
+import dns from '../../ffi/api/dns';
 import { DnsReader } from '../stream/dns_reader';
 import { errorCodeLookup } from './../error_code_lookup';
 import util from 'util';
@@ -186,7 +187,10 @@ export var listLongNames = function(req, res, next) {
   }
   let responseHandler = new ResponseHandler(req, res);
   log.debug('DNS - Invoking listLongNames API');
-  req.app.get('api').dns.listLongNames(sessionInfo.appDirKey, responseHandler);
+  dns.listLongNames(sessionInfo.app)
+    .then((list) => {
+      responseHandler(null, list);
+    }, responseHandler, console.error);
 };
 
 export var listServices = function(req, res, next) {
@@ -196,7 +200,8 @@ export var listServices = function(req, res, next) {
   }
   let responseHandler = new ResponseHandler(req, res);
   log.debug('DNS - Invoking listServices API for ' + req.params.longName);
-  req.app.get('api').dns.listServices(req.params.longName, sessionInfo.appDirKey, responseHandler);
+  responseHandler(null, []);
+  // req.app.get('api').dns.listServices(req.params.longName, sessionInfo.appDirKey, responseHandler);
 };
 
 export var createPublicId = function(req, res, next) {
@@ -210,5 +215,6 @@ export var createPublicId = function(req, res, next) {
   }
   let responseHandler = new ResponseHandler(req, res);
   log.debug('DNS - Invoking createPublicId API for ' + req.params.longName);
-  req.app.get('api').dns.createPublicId(req.params.longName, sessionInfo.appDirKey, responseHandler);
+  dns.createLongName(sessionInfo.app, req.params.longName)
+    .then(responseHandler, responseHandler, console.error);
 };

@@ -10,18 +10,34 @@ export const error = (msg) => {
 };
 
 export const derefFileMetadataStruct = (metadataStruct) => {
+  let name = '';
+  let metadata = '';
+  if (metadataStruct.name_len > 0) {
+    name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
+  }
+  if (metadataStruct.user_metadata_len > 0) {
+    metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
+  }
   return {
-    name: ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString(),
-    metadata: ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString(),
-    isPrivate: metadataStruct.is_private,
-    isVersioned: metadataStruct.is_versioned
+    name: name,
+    metadata: metadata,    
+    size: metadataStruct.size,
+    createdOn: 'to be set',
+    modifiedOn: 'to be set'
   };
 };
 
 export const derefDirectoryMetadataStruct = (metadataStruct) => {
-  return {
-    name: ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString(),
-    metadata: ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString(),
+  let name = '';
+  let metadata = '';
+  if (metadataStruct.name_len > 0) {
+    name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
+  }
+  if (metadataStruct.user_metadata_len > 0) {
+    metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
+  }  return {
+    name: name,
+    metadata: metadata,
     isPrivate: metadataStruct.is_private,
     isVersioned: metadataStruct.is_versioned
   };

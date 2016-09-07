@@ -83,6 +83,7 @@ export default class RESTServer {
 
     // API Error handling
     app.use(function(err, req, res, next) {
+      console.error(err);
       if (!(err instanceof ResponseError)) {
         return next();
       }
@@ -95,7 +96,7 @@ export default class RESTServer {
     app.use(function(err, req, res) {
       if (res.headersSent) {
         return;
-      }
+      }      
       if (typeof res === 'function') {
         return req.status(404).send({ errorCode: 404, description: 'Endpoint Not Found' });
       }
