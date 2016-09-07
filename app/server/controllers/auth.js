@@ -2,8 +2,10 @@ import util from 'util';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import sessionManager from '../session_manager';
+import App from '../../ffi/model/app';
 import SessionInfo from '../model/session_info';
-import Permission from '../model/permission';
+import Permission from '../../ffi/model/permission';
+import appManager from '../../ffi/util/app_manager';
 import {
   ResponseError, ResponseHandler
 } from '../utils';
@@ -14,7 +16,6 @@ export let CreateSession = function(data) {
   const req = data.request;
   const res = data.response;
   const appInfo = data.payload.app;
-
   var emitSessionCreationFailed = function() {
     let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
     req.app.get('eventEmitter').emit(eventType);
@@ -22,12 +23,7 @@ export let CreateSession = function(data) {
 
   const onRegistered = function(app) {
     let authReq = req.body;
-    if (err) {
-      log.error('Creating session :: ' + JSON.stringify(err));
-      emitSessionCreationFailed();
-      return req.next(new ResponseError(500, err));
-    }
-    log.debug('Directory key for creating an session obtained');    
+    log.debug('Directory key for creating an session obtained');
     let isNewSession = false;
     try {
       let sessionId = sessionManager.hasSessionForApp(app);
@@ -52,22 +48,31 @@ export let CreateSession = function(data) {
           id: sessionId,
           info: sessionInfo
         });
+        console.log('session3');
       } else {
         emitSessionCreationFailed();
       }
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,
-        permissions: authReq.permissions
+        permissions: app.permission.list
       });
     } catch (e) {
+      console.error(e);
       emitSessionCreationFailed();
       req.next(new ResponseError(500, e.message));
     }
   };
-
-  const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.permissions);
-  appmanager.registerApp(app).then(onRegistered, emitSessionCreationFailed);
+  try {
+    const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.version, appInfo.permissions || []);
+    appManager.registerApp(app).then(onRegistered, (err) => {
+      log.error('Creating session :: ' + JSON.stringify(err));
+      emitSessionCreationFailed();
+      return req.next(new ResponseError(500, err));
+    });
+  } catch(e) {
+    console.log(e);
+  }
 };
 
 export var authorise = function(req, res, next) {
@@ -87,8 +92,11 @@ export var authorise = function(req, res, next) {
     log.debug('Authorisation request - permissions field missing');
     return next(new ResponseError(400, 'Permission field is missing'));
   }
-  let permissions = new Permission(authReq.permissions);
-  if (!permissions.isValid()) {
+  let permissions;
+  try {
+    permissions = new Permission(authReq.permissions);
+  } catch(e) {
+    console.error(e);
     log.debug('Authorisation request - Invalid permissions requested');
     return next(new ResponseError(400, 'Invalid permissions requested'));
   }

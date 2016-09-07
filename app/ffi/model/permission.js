@@ -5,7 +5,7 @@ export const availablePermissions = [
   'LOW_LEVEL_API'
 ];
 
-export class Permission {
+export default class Permission {
 
   constructor(permissionsRequested = []) {
     permissionsRequested.forEach(permission => {
@@ -22,7 +22,7 @@ export class Permission {
 
   isEqual(compareWith) {
     compareWith = compareWith || [];
-    if (compareWith.length !== this.list.length) {
+    if (compareWith.length !== this.permissionsRequested.length) {
       return false;
     }
     for (var i in compareWith) {
@@ -39,6 +39,10 @@ export class Permission {
 
   get lowLevelApi() {
     return this._validate(1);
+  }
+
+  get list() {
+    return this.permissionsRequested;
   }
 
 }

@@ -44,7 +44,7 @@ export default class SessionInfo {
   }
 
   get permissions() {
-    return this.ffiApp.permissions;
+    return this.ffiApp.permission;
   }
 
   get signingKey() {
