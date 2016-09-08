@@ -7,6 +7,16 @@ export const loginSuccess = (res) => (
   }
 );
 
+
+export const setErrorMessage = (msg) => ({
+  type: ActionTypes.SET_ERROR_MESSAGE,
+  msg
+});
+
+export const clearErrorMessage = () => ({
+  type: ActionTypes.CLEAR_ERROR_MESSAGE
+});
+
 export const loginError = (err) => (
   {
     type: ActionTypes.LOGIN_ERROR,

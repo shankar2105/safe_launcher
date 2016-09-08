@@ -24,14 +24,27 @@ const packageForOs = {
   darwin: {
     icon: 'resources/osx/icon',
     unpack: '*.dylib',
+    preferences: {
+      'app-bundle-id': pkg.identifier,
+      'app-category-type': 'public.app-category.utilities',
+      'helper-bundle-id': pkg.identifier + 'helper'
+    }
   },
   linux: {
     icon: 'resources/icon',
     unpack: '*.so',
+    preferences: {}
   },
   win32: {
     icon: 'resources/windows/icon',
     unpack: '*.dll',
+    preferences: {
+      'version-string': {
+        CompanyName: pkg.author.name,
+        FileDescription: pkg.description,
+        ProductName: pkg.productName
+      }
+    }
   }
 };
 

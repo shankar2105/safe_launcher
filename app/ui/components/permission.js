@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 export default class Permission extends Component {
   static propTypes = {
-    type: PropTypes.string.isRequired
+    type: PropTypes.string
   };
 
   render() {

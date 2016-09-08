@@ -24,8 +24,9 @@ export const hideToaster = () => (
 export const showNextToaster = () => (
   dispatch => {
     dispatch(hideToaster());
-    setTimeout(() => {
+    let timer = setTimeout(() => {
       dispatch(nextToaster());
+      clearTimeout(timer);
     }, CONSTANT.TOASTER_INTERVAL);
   }
 );

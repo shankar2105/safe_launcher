@@ -4,6 +4,7 @@ const initialState = {
   authProcessing: false,
   authenticated: false,
   error: {},
+  errorMsg: null,
   user: {},
   registerState: 0
 };
@@ -36,6 +37,12 @@ const auth = (state = initialState, action) => {
       return { ...state, authProcessing: true };
     case ActionTypes.AUTH_CANCEL:
       return { ...state, authProcessing: false };
+    case ActionTypes.SET_ERROR_MESSAGE: {
+      return { ...state, errorMsg: action.msg, error: Object.assign({}) };
+    }
+    case ActionTypes.CLEAR_ERROR_MESSAGE: {
+      return { ...state, errorMsg: '' };
+    }
     case ActionTypes.REGISTER_STATE_NEXT:
       if (state.registerState === 2 && action.user.accountSecret) {
         return {
@@ -59,7 +66,7 @@ const auth = (state = initialState, action) => {
       }
       return { ...state, registerState: action.navState };
     case ActionTypes.RESET_USER: {
-      return { ...state, user: Object.assign({}), registerState: 0, error: Object.assign({}) };
+      return { ...state, user: Object.assign({}), registerState: 0, error: Object.assign({}), errorMsg: '' };
     }
     case ActionTypes.LOGOUT:
       return initialState;
