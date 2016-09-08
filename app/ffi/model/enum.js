@@ -1,0 +1,7 @@
+const ENCRYPTION_TYPE = {
+  PLAIN: 'PLAIN',
+  SYMETRIC: 'SYMETRIC',
+  HYBRID: 'HYBRID'
+}
+
+export default ENCRYPTION_TYPE;
