@@ -68,7 +68,9 @@ export const login = payload => (
     .then(() => {
       dispatch(loginSuccess(payload));
     }, (err) => {
-      dispatch(loginError(err));
+      dispatch(loginError({
+        errorCode: err
+      }));
     });
   }
 );
@@ -80,7 +82,7 @@ export const register = payload => (
     .then(() => {
       dispatch(registerSuccess(payload));
     }, (err) => {
-      dispatch(registerError(err));
+      dispatch(registerError({ errorCode: err }));
     });
   }
 );

@@ -84,7 +84,7 @@ export default class Settings extends Component {
   }
 
   clearErrMsg(e) {
-    if (!this.props.errorMsg && (e.keyCode === 13)) {
+    if (!this.props.errorMsg || (e.keyCode === 13)) {
       return;
     }
     this.props.clearErrorMessage();
@@ -105,7 +105,6 @@ export default class Settings extends Component {
     if (!accountSecretVal || !accountPasswordVal) {
       return;
     }
-    this.isLoading = true;
     userLogin({
       accountSecret: accountSecretVal,
       accountPassword: accountPasswordVal
@@ -115,7 +114,7 @@ export default class Settings extends Component {
   render() {
     const { authProcessing, errorMsg } = this.props;
     if (authProcessing) {
-      return (<AuthLoader {...this.props} />);
+      return <AuthLoader {...this.props} />;
     }
 
     const inputGrpClassNames = className(
