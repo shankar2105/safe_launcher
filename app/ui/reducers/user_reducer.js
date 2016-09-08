@@ -9,6 +9,7 @@ const initialState = {
   appLogs: [],
   logFilter: [],
   appDetailPageVisible: false,
+  revokedAppList: {},
   currentApp: null,
   currentAppLogs: [],
   showAuthRequest: false,
@@ -108,8 +109,17 @@ const user = (state = initialState, action) => {
           permissions: list.permissions.slice()
         };
       }
+      const revokedAppList = { ...state.revokedAppList };
+      revokedAppList[action.appId] = appList[action.appId].name;
+
       delete appList[action.appId];
-      return { ...state, appList, appDetailPageVisible: false, currentApp: null };
+      return {
+        ...state,
+        appList,
+        appDetailPageVisible: false,
+        currentApp: null,
+        revokedAppList
+      };
     }
     case ActionTypes.LOGOUT: {
       return initialState;
@@ -137,6 +147,7 @@ const user = (state = initialState, action) => {
       };
       activity.beginTime = moment(activity.beginTime).format('HH:mm:ss');
       appLogs.unshift(activity);
+
       const currentAppLogs = state.currentAppLogs.slice();
       if (state.appDetailPageVisible && (state.currentApp.id === action.activityLog.app)) {
         const currentAppActivityIndex = currentAppLogs.map(obj => obj.activityId)
@@ -145,7 +156,23 @@ const user = (state = initialState, action) => {
         currentAppLogs.unshift(activity);
       }
 
-      return { ...state, appLogs, currentAppLogs };
+      const appList = {};
+      let list = null;
+      let key = null;
+      for (key of Object.keys(state.appList)) {
+        list = state.appList[key];
+        appList[key] = {
+          ...list,
+          status: { ...list.status },
+          permissions: list.permissions.slice()
+        };
+      }
+      if (action.activityLog.app) {
+        appList[action.activityLog.app].status.activityName = activity.activityName;
+        appList[action.activityLog.app].status.beginTime = activity.beginTime;
+        appList[action.activityLog.app].status.activityStatus = activity.activityStatus;
+      }
+      return { ...state, appLogs, currentAppLogs, appList };
     }
     case ActionTypes.SET_LOGS_FILTER: {
       return { ...state, logFilter: action.fields };

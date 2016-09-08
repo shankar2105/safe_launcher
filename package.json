@@ -5,6 +5,7 @@
   "description": "SAFE Launcher Application",
   "copyright": "© 2016, MaidSafe.net Ltd",
   "main": "dist/main.js",
+  "identifier": "net.maidsafe.safelauncher",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
     "test-watch": "npm test -- --watch",
@@ -87,6 +88,8 @@
     "istanbul": "^0.4.4",
     "jsdom": "^9.4.1",
     "json-loader": "^0.5.4",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
     "minimist": "^1.2.0",
     "mocha": "^3.0.0",
     "node-libs-browser": "^1.0.0",

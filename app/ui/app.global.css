@@ -81,6 +81,7 @@ body {
 a {
   color: #5592d7;
   font-weight: 600;
+  cursor: pointer;
 }
 a:hover {
   color: #6FAFEF;

@@ -21,21 +21,22 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   componentWillMount() {
-    const { error, showToaster } = this.props;
-    this.errMsg = null;
+    const { error, showToaster, setErrorMessage } = this.props;
+    let errMsg = null;
     if (Object.keys(error).length > 0) {
-      this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
-      switch (this.errMsg) {
+      errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
+      switch (errMsg) {
         case 'CoreError::RequestTimeout':
-          this.errMsg = 'Request timed out';
+          errMsg = 'Request timed out';
           break;
         case 'CoreError::MutationFailure::MutationError::AccountExists':
-          this.errMsg = 'This account is already taken.';
+          errMsg = 'This account is already taken.';
           break;
         default:
-          this.errMsg = this.errMsg.replace('CoreError::', '');
+          errMsg = errMsg.replace('CoreError::', '');
       }
-      showToaster(this.errMsg, { autoHide: true, error: true });
+      setErrorMessage(errMsg);
+      showToaster(errMsg, { autoHide: true, error: true });
     }
   }
 
@@ -88,6 +89,9 @@ export default class RegisterAccSecretForm extends Component {
     if (e.keyCode === 13) {
       return;
     }
+    if (this.props.errorMsg) {
+      this.props.clearErrorMessage();
+    }
     const MSG = {
       PASS_VERY_WEEK: 'Very weak',
       PASS_WEEK: 'Weak',
@@ -104,8 +108,6 @@ export default class RegisterAccSecretForm extends Component {
     const resetField = () => {
       strengthEle.width('0');
       statusEle.removeClass('icn');
-      this.errMsg = '';
-      parentEle.removeClass('error');
       msgEle.text('');
       this.passwordStrengthValid = false;
       return;
@@ -155,13 +157,13 @@ export default class RegisterAccSecretForm extends Component {
   }
 
   render() {
-    const { error } = this.props;
+    const { error, errorMsg } = this.props;
 
     const inputGrpClassNames = className(
       'inp-grp',
       'validate-field',
       'light-theme',
-      { error }
+      { error: errorMsg }
     );
 
     return (
@@ -182,7 +184,7 @@ export default class RegisterAccSecretForm extends Component {
                 autoFocus
               />
               <label htmlFor="accountSecret">Account Secret</label>
-              <div className="msg">{ this.errMsg ? this.errMsg : '' }</div>
+              <div className="msg">{errorMsg}</div>
               <div className="opt">
                 <div className="opt-i">
                   <span

@@ -7,6 +7,7 @@ import { MESSAGES } from '../constant';
 export default class Settings extends Component {
   static propTypes = {
     error: PropTypes.object.isRequired,
+    errorMsg: PropTypes.string,
     user: PropTypes.object.isRequired,
     authenticated: PropTypes.bool.isRequired,
     networkStatus: PropTypes.number.isRequired,
@@ -14,7 +15,9 @@ export default class Settings extends Component {
     userLogin: PropTypes.func.isRequired,
     cancelAuthReq: PropTypes.func.isRequired,
     resetUser: PropTypes.func.isRequired,
-    showToaster: PropTypes.func.isRequired
+    showToaster: PropTypes.func.isRequired,
+    setErrorMessage: PropTypes.func.isRequired,
+    clearErrorMessage: PropTypes.func.isRequired
   };
 
   static contextTypes = {
@@ -35,27 +38,28 @@ export default class Settings extends Component {
   }
 
   componentWillUpdate(nextProps) {
-    const { error, showToaster } = nextProps;
+    const { error, setErrorMessage, showToaster } = nextProps;
     this.checkAuthenticated(nextProps);
-    this.errMsg = null;
+    let errMsg = null;
     if (Object.keys(error).length > 0) {
-      this.errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
-      switch (this.errMsg) {
+      errMsg = window.msl.errorCodeLookup(error.errorCode || 0);
+      switch (errMsg) {
         case 'CoreError::RequestTimeout':
-          this.errMsg = 'Request timed out';
+          errMsg = 'Request timed out';
           break;
         case 'CoreError::GetFailure::GetError::NoSuchAccount':
         case 'CoreError::GetFailure::GetError::NoSuchData':
-          this.errMsg = 'Account not found';
+          errMsg = 'Account not found';
           break;
         case 'CoreError::SymmetricDecipherFailure':
-          this.errMsg = 'Invalid password';
+          errMsg = 'Invalid password';
           break;
         default:
-          this.errMsg = this.errMsg.replace('CoreError::', '');
+          errMsg = errMsg.replace('CoreError::', '');
       }
-      this.errMsg = `Login failed. ${this.errMsg}`;
-      showToaster(this.errMsg, { autoHide: true, error: true });
+      errMsg = `Login failed. ${errMsg}`;
+      setErrorMessage(errMsg);
+      showToaster(errMsg, { autoHide: true, error: true });
     }
   }
 
@@ -80,22 +84,18 @@ export default class Settings extends Component {
   }
 
   clearErrMsg(e) {
-    const ele = $(e.currentTarget);
-    const parentEle = ele.parent();
-    if (!parentEle.hasClass('error')) {
+    if (!this.props.errorMsg && (e.keyCode === 13)) {
       return;
     }
-    const msgEle = ele.siblings('.msg');
-    parentEle.removeClass('error');
-    msgEle.text('');
+    this.props.clearErrorMessage();
   }
 
   handleLogin(e) {
     e.preventDefault();
-    const { networkStatus, userLogin } = this.props;
+    const { networkStatus, userLogin, showToaster } = this.props;
 
     if (networkStatus !== 1) {
-      this.props.showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
+      showToaster(MESSAGES.NETWORK_NOT_CONNECTED, { autoHide: true });
       console.warn(MESSAGES.NETWORK_NOT_CONNECTED);
       return;
     }
@@ -113,14 +113,14 @@ export default class Settings extends Component {
   }
 
   render() {
-    const { authProcessing } = this.props;
+    const { authProcessing, errorMsg } = this.props;
     if (authProcessing) {
       return (<AuthLoader {...this.props} />);
     }
 
     const inputGrpClassNames = className(
       'inp-grp',
-      { error: this.errMsg }
+      { error: errorMsg }
     );
 
     return (
@@ -132,12 +132,11 @@ export default class Settings extends Component {
               type="password"
               ref={c => { this.accountSecret = c; }}
               required="true"
-              onFocus={this.onFocus}
               onKeyUp={this.clearErrMsg}
               autoFocus
             />
             <label htmlFor="accountSecret">Account Secret</label>
-            <div className="msg">{ this.errMsg ? this.errMsg : '' }</div>
+            <div className="msg">{errorMsg}</div>
             <div className="opt">
               <div className="opt-i">
                 <span
