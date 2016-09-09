@@ -12,11 +12,12 @@ import {
 import { log } from './../../logger/log';
 import { MSG_CONSTANTS } from './../message_constants';
 
-export let CreateSession = function(data) {
+export let CreateSession = async (data) => {
   const req = data.request;
   const res = data.response;
   const appInfo = data.payload.app;
-  var emitSessionCreationFailed = function() {
+
+  const emitSessionCreationFailed = () => {
     let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
     req.app.get('eventEmitter').emit(eventType);
   };
@@ -65,13 +66,12 @@ export let CreateSession = function(data) {
   };
   try {
     const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.version, appInfo.permissions || []);
-    appManager.registerApp(app).then(onRegistered, (err) => {
-      log.error('Creating session :: ' + JSON.stringify(err));
-      emitSessionCreationFailed();
-      return req.next(new ResponseError(500, err));
-    });
+    await appManager.registerApp(app);
+    onRegistered(app);
   } catch(e) {
-    console.log(e);
+    console.error(e);
+    emitSessionCreationFailed();
+    return req.next(new ResponseError(500, err));
   }
 };
 

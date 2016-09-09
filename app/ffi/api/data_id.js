@@ -5,6 +5,7 @@ import FfiApi from '../ffi_api';
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
 const u8 = ref.types.uint8;
+const bool = ref.types.bool;
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 
@@ -17,6 +18,7 @@ class DataId extends FfiApi {
   getFunctionsToRegister() {
     return {
       'data_id_new_struct_data': [int32, [u64, u8Pointer, u64Pointer]],
+      'data_id_new_appendable_data': [int32, [u8Pointer, bool, u64Pointer]],
       'data_id_free': [int32, [u64]]
     };
   }
@@ -46,6 +48,21 @@ class DataId extends FfiApi {
         resolve(handleRef.deref());
       };
       self.safeCore.data_id_new_struct_data(typeTag, id, handleRef, onResult);
+    };
+    return new Promise(executor);
+  }
+
+  getAppendableDataHandle(id, isPrivate) {
+    const self = this;
+    const executor = (reject, resolve) => {
+      const handleRef = ref.alloc(u8P);
+      const onResult = (err, res) => {
+        if (err || res !== 0) {
+          return reject(err || res);
+        }
+        resolve(handleRef.deref());
+      };
+      self.safeCore.data_id_new_appendable_data(id, isPrivate, handleRef, onResult);
     };
     return new Promise(executor);
   }

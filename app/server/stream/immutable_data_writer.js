@@ -3,7 +3,7 @@ import immutableData from '../../ffi/api/immutable_data';
 import { Writable } from 'stream';
 
 export var ImmutableDataWriter = function(req, app, writerId, encryptionType, publicKeyHandle, responseHandler, size, offset) {
-  Writable.call(this);  
+  Writable.call(this);
   this.app = app;
   this.req = req;
   this.writerId = writerId;
@@ -30,7 +30,7 @@ ImmutableDataWriter.prototype._write = function(data, enc, next) {
       self.curOffset += data.length;
       if (self.curOffset === self.maxSize) {
         immutableData.closeWriter(self.writerId, this.encryptionType, this.publicKeyHandle)
-          .then(dataIdHandle) => {
+          .then((dataIdHandle) => {
             this.res.set('Handle-Id', dataHanldeId);
             this.res.sendStatus(200);
           }, self.responseHandler, console.error);

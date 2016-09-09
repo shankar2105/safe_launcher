@@ -1,5 +1,6 @@
 import ref from 'ref';
 
+import misc from './misc';
 import FfiApi from '../ffi_api';
 import cipherOpts from './cipher_opts';
 import appManager from '../util/app_manager';
@@ -68,46 +69,42 @@ class ImmutableData extends FfiApi {
 
   closeWriter(app, writerHandleId, encryptionType, privateKeyHandle) {
     const self = this;
-    const executor = (resolve, reject) => {
+    const executor = async (resolve, reject) => {
       const dataIdRef = ref.alloc(u64Pointer);
-
-      const getCipherOptHandle = async () => {
-        try {
-          let cipherOptHandle;
-          switch (encryptionType) {
-            case ENCRYPTION_TYPE.PLAIN:
-              cipherOptHandle = await cipherOpts.getCipherOptPlain();
-              break;
-            case ENCRYPTION_TYPE.SYMMETRIC:
-              cipherOptHandle = await cipherOpts.getCipherOptSymmetric();
-              break;
-            case ENCRYPTION_TYPE.HYBRID:
-              if (!privateKeyHandle) {
-                return reject('Invalid private key handle');
-              }
-              cipherOptHandle = await cipherOpts.getCipherOptSymmetric(privateKeyHandle);
-              break;
-          }
-          const dataIdRef = ref.alloc(u64Pointer);
-          const onResult = (err, res) => {
-            self.safeCore.immut_data_self_encryptor_writer_free.async(writerHandleId, (e) => {
-              if (e) {
-                console.error(e);
-              }
-            });
-            if (err || res !== 0) {
-              return reject(err || res);
+      try {
+        let cipherOptHandle;
+        switch (encryptionType) {
+          case ENCRYPTION_TYPE.PLAIN:
+            cipherOptHandle = await cipherOpts.getCipherOptPlain();
+            break;
+          case ENCRYPTION_TYPE.SYMMETRIC:
+            cipherOptHandle = await cipherOpts.getCipherOptSymmetric();
+            break;
+          case ENCRYPTION_TYPE.ASYMMETRIC:
+            if (!privateKeyHandle) {
+              return reject('Invalid private key handle');
             }
-            cipherOpts.dropHandle(cipherOptHandle);
-            resolve(dataIdRef.deref());
-          };
-          self.safeCore.immut_data_close_self_encryptor.async(app, writerHandleId,
-            cipherOptHandle, dataIdRef, onResult);
-        } catch (e) {
-          reject(e);
+            cipherOptHandle = await cipherOpts.getCipherOptSymmetric(privateKeyHandle);
+            break;
         }
-      };
-      getCipherOptHandle();
+        const dataIdRef = ref.alloc(u64Pointer);
+        const onResult = (err, res) => {
+          self.safeCore.immut_data_self_encryptor_writer_free.async(writerHandleId, (e) => {
+            if (e) {
+              console.error(e);
+            }
+          });
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          cipherOpts.dropHandle(cipherOptHandle);
+          resolve(dataIdRef.deref());
+        };
+        self.safeCore.immut_data_close_self_encryptor.async(app, writerHandleId,
+          cipherOptHandle, dataIdRef, onResult);
+      } catch (e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }
@@ -154,8 +151,9 @@ class ImmutableData extends FfiApi {
         }
         const dataRef = dataRefRef.deref();
         const size = sizeRef.deref();
+        const capacity = capacityRef.deref();
         const data = ref.reinterpret(dataRef, size);
-        // TODO clean dataRef by droping it - not exposed in safe_core
+        misc.dropVector(dataRef, size, capacity);
         resolve(data);
       };
       self.immut_data_read_from_self_encryptor.async(readerId, offset, length,

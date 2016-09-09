@@ -1,5 +1,5 @@
 import { log } from './../../logger/log';
-import immutableData from '../../ffi/api/immutableData';
+import immutableData from '../../ffi/api/immutable_data';
 import { updateAppActivity } from './../utils.js';
 var Readable = require('stream').Readable;
 var util = require('util');
