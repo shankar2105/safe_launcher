@@ -31,7 +31,7 @@ class AppManager extends FfiApi {
   }
 
   getHandle(app) {
-    if (!this.holder.has(app)) {
+    if (!app || !this.holder.has(app)) {
       return this.anonymousApp;
     }
     return this.holder.get(app);
