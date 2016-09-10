@@ -15,12 +15,13 @@ export const derefFileMetadataStruct = (metadataStruct) => {
   if (metadataStruct.name_len > 0) {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
-  if (metadataStruct.user_metadata_len > 0) {
+  // TODO change to 0 when fixed in safe_core
+  if (metadataStruct.user_metadata_len > 1) {
     metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
   }
   return {
     name: name,
-    metadata: metadata,    
+    metadata: metadata,
     size: metadataStruct.size,
     createdOn: 'to be set',
     modifiedOn: 'to be set'
@@ -33,9 +34,11 @@ export const derefDirectoryMetadataStruct = (metadataStruct) => {
   if (metadataStruct.name_len > 0) {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
-  if (metadataStruct.user_metadata_len > 0) {
+  // TODO change to 0 when fixed in safe_core
+  if (metadataStruct.user_metadata_len > 1) {
     metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
-  }  return {
+  }
+  return {
     name: name,
     metadata: metadata,
     isPrivate: metadataStruct.is_private,

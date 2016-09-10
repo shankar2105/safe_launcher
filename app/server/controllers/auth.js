@@ -16,13 +16,14 @@ export let CreateSession = async (data) => {
   const req = data.request;
   const res = data.response;
   const appInfo = data.payload.app;
+  const permissions = data.payload.permissions;
 
   const emitSessionCreationFailed = () => {
     let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
     req.app.get('eventEmitter').emit(eventType);
   };
 
-  const onRegistered = function(app) {
+  const onRegistered = (app) => {
     let authReq = req.body;
     log.debug('Directory key for creating an session obtained');
     let isNewSession = false;
@@ -65,13 +66,13 @@ export let CreateSession = async (data) => {
     }
   };
   try {
-    const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.version, appInfo.permissions || []);
+    const app = new App(appInfo.name, appInfo.id, appInfo.vendor, appInfo.version, permissions);
     await appManager.registerApp(app);
     onRegistered(app);
   } catch(e) {
     console.error(e);
     emitSessionCreationFailed();
-    return req.next(new ResponseError(500, err));
+    return req.next(new ResponseError(500, e));
   }
 };
 
@@ -100,14 +101,13 @@ export var authorise = function(req, res, next) {
     log.debug('Authorisation request - Invalid permissions requested');
     return next(new ResponseError(400, 'Invalid permissions requested'));
   }
-
-  let payload = {
+  const payload = {
     payload: authReq,
     request: req,
     response: res,
     permissions: permissions
   };
-  let eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
+  const eventType = req.app.get('EVENT_TYPE').AUTH_REQUEST;
   log.debug('Emitting event for auth request received');
   req.app.get('eventEmitter').emit(eventType, payload);
 };

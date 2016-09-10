@@ -7,7 +7,6 @@ const API_ACCESS_NOT_GRANTED = 'Low level api access is not granted';
 const UNAUTHORISED_ACCESS = 'Unauthorised access';
 const HANDLE_ID_KEY = 'Handle-Id';
 
-// GET /handleId
 export const serialise = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -26,7 +25,6 @@ export const serialise = async (req, res, next) => {
   }
 };
 
-// POST /
 export const deserialise = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
@@ -38,6 +36,9 @@ export const deserialise = async (req, res, next) => {
     if (!app.permission.lowLevelAccess) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
+    if (!req.body || req.body.length === 0) {
+      return next(new ResponseError(400, 'Body can not be empty'));
+    }
     const dataHandle = await misc.deserialise(req.body);
     res.set('Handle-Id', dataHandle);
   } catch(e) {
@@ -45,7 +46,6 @@ export const deserialise = async (req, res, next) => {
   }
 };
 
-// DELETE /id
 export const dropHandle = (req, res, next) => {
   const sessionInfo = sessionManager.get(req.headers.sessionId);
   if (!sessionInfo) {

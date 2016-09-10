@@ -20,7 +20,7 @@ import sessionManager from './util/session_manager';
 let ffiFunctions = {};
 // add modules in the order of invoking the drop function
 let mods = [nfs, appManager, sessionManager, auth, dns, immutableData,
-  structuredData, appendableData, misc, dataId];
+   structuredData, appendableData, misc, dataId];
 
 mods.forEach(mod => {
   if (!(mod instanceof FfiApi)) {

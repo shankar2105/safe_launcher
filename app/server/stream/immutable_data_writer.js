@@ -1,13 +1,14 @@
 import util from 'util';
-import immutableData from '../../ffi/api/immutable_data';
 import { Writable } from 'stream';
+import immutableData from '../../ffi/api/immutable_data';
 
-export var ImmutableDataWriter = function(req, app, writerId, encryptionType, publicKeyHandle, responseHandler, size, offset) {
+export var ImmutableDataWriter = function(req, app, writerId, encryptionType,
+    encryptKeyHandle, responseHandler, size, offset) {
   Writable.call(this);
   this.app = app;
   this.req = req;
   this.writerId = writerId;
-  this.publicKeyHandle = publicKeyHandle;
+  this.encryptKeyHandle = encryptKeyHandle;
   this.curOffset = parseInt(offset || 0);
   this.responseHandler = responseHandler;
   this.encryptionType = encryptionType;
@@ -16,7 +17,7 @@ export var ImmutableDataWriter = function(req, app, writerId, encryptionType, pu
   return this;
 };
 
-util.inherits(NfsWriter, Writable);
+util.inherits(ImmutableDataWriter, Writable);
 
 /*jscs:disable disallowDanglingUnderscores*/
 ImmutableDataWriter.prototype._write = function(data, enc, next) {
@@ -29,7 +30,7 @@ ImmutableDataWriter.prototype._write = function(data, enc, next) {
       eventEmitter.emit(uploadEvent, data.length);
       self.curOffset += data.length;
       if (self.curOffset === self.maxSize) {
-        immutableData.closeWriter(self.writerId, this.encryptionType, this.publicKeyHandle)
+        immutableData.closeWriter(self.writerId, this.encryptionType, this.encryptKeyHandle)
           .then((dataIdHandle) => {
             this.res.set('Handle-Id', dataHanldeId);
             this.res.sendStatus(200);

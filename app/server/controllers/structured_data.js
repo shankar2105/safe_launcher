@@ -44,13 +44,13 @@ const createOrUpdate = async (req, res, next, isCreate = true) => {
     }
     let publicKeyHandle;
     if (encryptionType === ENCRYPTION_TYPE.ASYMMETRIC) {
-      if (!res.headers['public-key']) {
+      if (!res.headers['encrypt-key-handle']) {
         return next(new ResponseError(400, 'Public key handle is not present in the header'));
       }
-      if (isNaN(res.headers['public-key'])) {
+      if (isNaN(res.headers['encrypt-key-handle'])) {
         return next(new ResponseError(400, 'Public key handle is not a valid number'));
       }
-      publicKeyHandle = parseInt(res.headers['public-key']);
+      publicKeyHandle = parseInt(res.headers['encrypt-key-handle']);
     }
     let data = null;
     if (req.body && req.body.length > 0) {
@@ -74,47 +74,41 @@ export const create = (req, res, next) => {
 };
 
 // GET /handle/{id}
-export const getHandle =  (req, res, next) => {
-  const sessionInfo = sessionManager.get(req.headers.sessionId);
-  const app = sessionInfo ? sessionInfo.app : null;
-  const id = new Buffer(req.params.id, 'base64');
-  if (!id || id.length !== ID_LENGTH) {
-    return next(new ResponseError(400, 'Invalid id specified'));
-  }
-  let tagType = req.headers['tag-type'] || TAG_TYPE.UNVERSIONED;
-  if (isNaN(tagType)) {
-    return next(new ResponseError(400, 'Tag type must be a valid number'));
-  }
-  tagType = parseInt(tagType)
-  if (!(tagType === TAG_TYPE.UNVERSIONED || tagType === TAG_TYPE.VERSIONED || tagType >= 15000)) {
-    return next(new ResponseError(400, 'Invalid tag type specified'));
-  }
-  const exec = async () => {
-    const responseHandler = new ResponseHandler(req, res);
-    try {
-      const result = await dataId.getStructuredDataHandle(tagType, id);
-      // res.set('Is-Owner', result.isOwner);
-      res.set(HANDLE_ID_KEY, result.handleId);
-      res.sendStatus(200);
-    } catch(e) {
-      responseHandler(e);
+export const getHandle = async (req, res, next) => {
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    const app = sessionInfo ? sessionInfo.app : null;
+    const id = new Buffer(req.params.id, 'base64');
+    if (!id || id.length !== ID_LENGTH) {
+      return next(new ResponseError(400, 'Invalid id specified'));
     }
-  };
-  exec();
+    let tagType = req.headers['tag-type'] || TAG_TYPE.UNVERSIONED;
+    if (isNaN(tagType)) {
+      return next(new ResponseError(400, 'Tag type must be a valid number'));
+    }
+    tagType = parseInt(tagType)
+    if (!(tagType === TAG_TYPE.UNVERSIONED || tagType === TAG_TYPE.VERSIONED || tagType >= 15000)) {
+      return next(new ResponseError(400, 'Invalid tag type specified'));
+    }
+    const result = await dataId.getStructuredDataHandle(tagType, id);
+    // res.set('Is-Owner', result.isOwner);
+    res.set(HANDLE_ID_KEY, result.handleId);
+    res.sendStatus(200);
+  } catch(e) {
+    new ResponseHandler(req, res)(e);
+  }
 };
 
-// PUT /{handleId}
 export const update = (req, res, next) => {
   createOrUpdate(req, res, next, false);
 };
 
-// GET /{handleId}
 export const read = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sesssionInfo.app : null;
-    const data = await structuredData.read(app, handleId);
+    const data = await structuredData.read(app, req.params.handleId);
     responseHandler(null, data);
   } catch (e) {
     responseHandler(e);
