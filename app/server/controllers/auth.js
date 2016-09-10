@@ -57,7 +57,7 @@ export let CreateSession = async (data) => {
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,
-        permissions: app.permission.list
+        permissions: permissions
       });
     } catch (e) {
       console.error(e);
