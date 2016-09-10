@@ -216,7 +216,7 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  getDirectory(app, path, isShared = false) {
+  getDirectory(app, path, isShared = false) {    
     if (!path || !path.trim()) {
       return error('Invalid parameters');
     }

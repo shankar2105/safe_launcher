@@ -81,13 +81,13 @@ const user = (state = initialState, action) => {
       return { ...state, showAuthRequest: false, authRequestPayload: Object.assign({}) };
     }
     case ActionTypes.ADD_APPLICATION: {
-      const appList = { ...state.appList };
+      const appList = { ...state.appList };      
       appList[action.app.id] = {
         id: action.app.id,
         name: action.app.info.appName,
         version: action.app.info.appVersion,
         vendor: action.app.info.vendor,
-        permissions: action.app.info.permissions.list,
+        permissions: action.app.info.permissions,
         status: {
           beginTime: moment().format('HH:mm:ss'),
           activityName: 'Authorisation',
@@ -147,7 +147,6 @@ const user = (state = initialState, action) => {
       };
       activity.beginTime = moment(activity.beginTime).format('HH:mm:ss');
       appLogs.unshift(activity);
-
       const currentAppLogs = state.currentAppLogs.slice();
       if (state.appDetailPageVisible && (state.currentApp.id === action.activityLog.app)) {
         const currentAppActivityIndex = currentAppLogs.map(obj => obj.activityId)
@@ -160,7 +159,7 @@ const user = (state = initialState, action) => {
       let list = null;
       let key = null;
       for (key of Object.keys(state.appList)) {
-        list = state.appList[key];
+        list = state.appList[key];11
         appList[key] = {
           ...list,
           status: { ...list.status },

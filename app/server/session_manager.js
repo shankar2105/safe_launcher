@@ -1,4 +1,8 @@
-var sessionManager = null;
+import Permission from '../ffi/model/permission';
+import _ from 'lodash';
+
+let sessionManager = null;
+
 class SessionManager {
   constructor() {
     this.sessionPool = {};
@@ -28,10 +32,8 @@ class SessionManager {
   hasSessionForApp(appData) {
     let app;
     for (var key in this.sessionPool) {
-      app = this.sessionPool[key];
-      if (app.id === appData.id && app.name === appData.name &&
-      app.version === app.version && app.vendor === app.vendor &&
-      app.permissions.isEqual(appData.permissions)) {
+      app = this.sessionPool[key].app;
+      if (_.isEqual(app, appData)) {
         return key;
       }
     }

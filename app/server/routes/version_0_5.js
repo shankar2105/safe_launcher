@@ -7,7 +7,7 @@ import * as Auth from '../controllers/auth';
 import * as ImmutableData from '../controllers/immutable_data';
 import * as DataId from '../controllers/data_id';
 import * as StructuredData from '../controllers/structured_data';
-import * as appendable_data from '../controllers/appendable_data';
+import * as AppendableData from '../controllers/appendable_data';
 
 var router = express.Router();
 
@@ -76,18 +76,20 @@ router.get('/immutableData/handleId', new ActivityMiddleware('Read immutable dat
 
 // Structured Data
 router.post('/structuredData', new ActivityMiddleware('Create structured data'), StructuredData.create);
-router.put('/structuredData/:handleId', new ActivityMiddleware('Update structured data'), StructuredData.update);
 router.get('/structuredData/handle/:id', new ActivityMiddleware('Get structured data handle'), StructuredData.getHandle);
-router.get('/structuredData/:id', new ActivityMiddleware('Read structured data'), StructuredData.read);
+router.put('/structuredData/:handleId', new ActivityMiddleware('Update structured data'), StructuredData.update);
+router.get('/structuredData/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);
 
 // Appendable Data
 router.post('/appendableData', jsonParser, new ActivityMiddleware('Create appendable data'), AppendableData.create);
 router.get('/appendableData/handle/:id', new ActivityMiddleware('Get appendable data handle'), AppendableData.getHandle);
 router.head('/appendableData/:handleId', new ActivityMiddleware('Get encrypt key'), AppendableData.getMetadata);
 router.put('/appendableData/:handleId/:dataIdHandle', new ActivityMiddleware('Append to appendable data'), AppendableData.append);
-router.get('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Get encrypt key'), AppendableData.getEncryptKey);
 router.get('/appendableData/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'), AppendableData.getDataIdAt);
 router.delete('/appendableData/:handleId/:index', new ActivityMiddleware('Remove from appendable data'), AppendableData.remove);
+
+// AppendableData - encryptKey API
+router.get('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Get encrypt key'), AppendableData.getEncryptKey);
 router.delete('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Remove from appendable data'), AppendableData.dropEncryptKeyHandle);
 
 /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/

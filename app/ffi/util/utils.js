@@ -2,6 +2,11 @@
 
 import ref from 'ref';
 
+const computeTime = function(seconds, nanoSeconds) {
+  return new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString();
+};
+
+
 export const error = (msg) => {
   const promise = new Promise((resolve, reject) => {
     reject(msg);
@@ -15,15 +20,16 @@ export const derefFileMetadataStruct = (metadataStruct) => {
   if (metadataStruct.name_len > 0) {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
-  if (metadataStruct.user_metadata_len > 0) {
+  // TODO change to 0 when fixed in safe_core
+  if (metadataStruct.user_metadata_len > 1) {
     metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
   }
   return {
     name: name,
-    metadata: metadata,    
+    metadata: metadata,
     size: metadataStruct.size,
-    createdOn: 'to be set',
-    modifiedOn: 'to be set'
+    createdOn: computeTime(metadataStruct.creation_time_sec, metadataStruct.creation_time_nsec),
+    modifiedOn: computeTime(metadataStruct.modification_time_sec, metadataStruct.modification_time_nsec)
   };
 };
 
@@ -33,13 +39,17 @@ export const derefDirectoryMetadataStruct = (metadataStruct) => {
   if (metadataStruct.name_len > 0) {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
-  if (metadataStruct.user_metadata_len > 0) {
+  // TODO change to 0 when fixed in safe_core
+  if (metadataStruct.user_metadata_len > 1) {
     metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
-  }  return {
+  }  
+  return {
     name: name,
     metadata: metadata,
     isPrivate: metadataStruct.is_private,
-    isVersioned: metadataStruct.is_versioned
+    isVersioned: metadataStruct.is_versioned,
+    createdOn: computeTime(metadataStruct.creation_time_sec, metadataStruct.creation_time_nsec),
+    modifiedOn: computeTime(metadataStruct.modification_time_sec, metadataStruct.modification_time_nsec)
   };
 };
 

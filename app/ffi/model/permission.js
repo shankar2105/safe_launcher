@@ -20,19 +20,6 @@ export default class Permission {
     return this.permissionsRequested.indexOf(availablePermissions[index]) > -1;
   }
 
-  isEqual(compareWith) {
-    compareWith = compareWith || [];
-    if (compareWith.length !== this.permissionsRequested.length) {
-      return false;
-    }
-    for (var i in compareWith) {
-      if (this.permissionsRequested.indexOf(compareWith[i]) < 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   get safeDrive() {
     return this._validate(0);
   }
