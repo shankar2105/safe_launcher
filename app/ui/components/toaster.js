@@ -48,12 +48,14 @@ export default class Toaster extends Component {
   }
 
   setTimer(timeout) {
+    const { hasNext, message, showNextToaster, hideToaster } = this.props;
     this.timer = window.setTimeout(() => {
-      this.clearTimer();
-      if (this.props.hasNext) {
-        return this.props.showNextToaster();
+      if (hasNext && message) {
+        showNextToaster();
+      } else {
+        hideToaster()
       }
-      return this.props.hideToaster();
+      return this.clearTimer();
     }, timeout || CONSTANT.TOSATER_TIMEOUT);
   }
 

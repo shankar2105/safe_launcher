@@ -1,3 +1,4 @@
+import { browserHistory } from 'react-router'
 import {
   setNetworkDisconnected,
   setNetworkConnected,
@@ -24,9 +25,10 @@ import sessionManager from '../ffi/util/session_manager';
 import { CONSTANT, MESSAGES } from './constant';
 
 export default class EventRegistry {
-  constructor(store) {
+  constructor(store, history) {
     this.state = store.getState;
     this.dispatch = store.dispatch;
+    this.history = history;
     this.intervals = [];
     this.completeCount = 0;
     this.authorisedData = {
@@ -171,16 +173,23 @@ export default class EventRegistry {
 
     window.msl.onSessionCreationFailed(() => console.error('Failed to create App Session'));
 
-    window.msl.onSessionRemoved(data => {
-      this.dispatch(showToaster(MESSAGES.APP_REVOKED, { autoHide: true }));
-      return console.error('Removed App Session :: ', data);
+    window.msl.onSessionRemoved(appId => {
+      const appName = this.state().user.appList[appId] ?
+        this.state().user.appList[appId].name : this.state().user.revokedAppList[appId].name;
+      this.dispatch(showToaster(`${MESSAGES.APP_REVOKED} ${appName}`, { autoHide: true }));
+      return console.error('Removed App Session :: ', appId);
     });
   }
 
   handleAuthRequest() {
     window.msl.onAuthRequest(payload => {
-      window.msl.focusWindow();
-      this.dispatch(showAuthRequest(payload));
+      if (this.state().auth.authenticated) {
+        window.msl.focusWindow();
+        this.history.push('/account_app_list');
+        this.dispatch(showAuthRequest(payload));
+      } else {
+        window.msl.authResponse(payload, false);
+      }
     });
   }
 

@@ -18,7 +18,7 @@ class Auth extends FfiApi {
     return {
       'create_unregistered_client': [int32, [SessionHandlePointer]],
       'create_account': [int32, [CString, u64, CString, u64, SessionHandlePointer]],
-      'log_in': [int32, [CString, u64, CString, u64, SessionHandlePointer]]      
+      'log_in': [int32, [CString, u64, CString, u64, SessionHandlePointer]]
     };
   }
 
@@ -59,8 +59,8 @@ class Auth extends FfiApi {
     const executor = (resolve, reject) => {
       let sessionHandle = ref.alloc(SessionHandlePointer);
       let onResult = (err, res) => {
-        if (err && res !== 0) {
-          return reject(res || res);
+        if (err || res !== 0) {
+          return reject(err || res);
         }
         try {
           sessionManager.sessionHandle = sessionHandle.deref();

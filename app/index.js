@@ -13,7 +13,7 @@ import EventRegistry from './ui/event_registry';
 const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
-(new EventRegistry(store)).run();
+(new EventRegistry(store, history)).run();
 
 render(
   <Provider store={store}>
