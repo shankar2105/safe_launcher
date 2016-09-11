@@ -48,7 +48,7 @@ class ImmutableData extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.immut_data_new_self_encryptor.async(appManager.get(app), handleRef, onResult);
+      self.safeCore.immut_data_new_self_encryptor.async(appManager.getHandle(app), handleRef, onResult);
     };
     return new Promise(executor);
   }
@@ -89,18 +89,18 @@ class ImmutableData extends FfiApi {
         }
         const dataIdRef = ref.alloc(u64);
         const onResult = (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
           self.safeCore.immut_data_self_encryptor_writer_free.async(writerHandleId, (e) => {
             if (e) {
               console.error(e);
             }
           });
-          if (err || res !== 0) {
-            return reject(err || res);
-          }
           cipherOpts.dropHandle(cipherOptHandle);
           resolve(dataIdRef.deref());
         };
-        self.safeCore.immut_data_close_self_encryptor.async(app, writerHandleId,
+        self.safeCore.immut_data_close_self_encryptor.async(appManager.getHandle(app), writerHandleId,
           cipherOptHandle, dataIdRef, onResult);
       } catch (e) {
         reject(e);
@@ -119,7 +119,7 @@ class ImmutableData extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.immut_data_fetch_self_encryptor.async(app, handleRef, onResult);
+      self.safeCore.immut_data_fetch_self_encryptor.async(appManager.getHandle(app), dataIdHandle, handleRef, onResult);
     };
     return new Promise(executor);
   }
@@ -134,7 +134,7 @@ class ImmutableData extends FfiApi {
         }
         resolve(sizeRef.deref());
       };
-      self.immut_data_size.async(readerId, sizeRef, onResult);
+      self.safeCore.immut_data_size.async(readerId, sizeRef, onResult);
     };
     return new Promise(executor);
   }
@@ -156,7 +156,7 @@ class ImmutableData extends FfiApi {
         misc.dropVector(dataRef, size, capacity);
         resolve(data);
       };
-      self.immut_data_read_from_self_encryptor.async(readerId, offset, length,
+      self.safeCore.immut_data_read_from_self_encryptor.async(readerId, offset, length,
         dataRefRef, sizeRef, capacityRef, onResult);
     };
     return new Promise(executor);
@@ -171,7 +171,7 @@ class ImmutableData extends FfiApi {
         }
         resolve();
       };
-      self.immut_data_self_encryptor_reader_free.async(readerId, onResult);
+      self.safeCore.immut_data_self_encryptor_reader_free.async(readerId, onResult);
     };
     return new Promise(executor);
   }

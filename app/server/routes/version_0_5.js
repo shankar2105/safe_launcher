@@ -68,12 +68,12 @@ router.get('/dns/:longName', new ActivityMiddleware('List services'), DNS.listSe
 
 // DATA-ID API
 router.get('/dataId/:handleId', new ActivityMiddleware('Get serialised dataId'), DataId.serialise);
-router.post('/dataId', new ActivityMiddleware('Deserialise dataId'), DataId.deserialise);
-router.delete('/dataId/:handleId', new ActivityMiddleware('Drop dataId handle'), DataId.deserialise);
+router.post('/dataId', rawBodyParser(), new ActivityMiddleware('Deserialise dataId'), DataId.deserialise);
+router.delete('/dataId/:handleId', new ActivityMiddleware('Drop dataId handle'), DataId.dropHandle);
 
 // ImmutableData API
 router.post('/immutableData', new ActivityMiddleware('Create immutable data chunks'), ImmutableData.write);
-router.get('/immutableData/handleId', new ActivityMiddleware('Read immutable data chunks'), ImmutableData.read);
+router.get('/immutableData/:handleId', new ActivityMiddleware('Read immutable data chunks'), ImmutableData.read);
 
 // Structured Data
 router.post('/structuredData/:id', rawBodyParser(), new ActivityMiddleware('Create structured data'), StructuredData.create);
@@ -81,17 +81,18 @@ router.get('/structuredData/handle/:id', new ActivityMiddleware('Get structured 
 router.put('/structuredData/:handleId', rawBodyParser(), new ActivityMiddleware('Update structured data'), StructuredData.update);
 router.get('/structuredData/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);
 
-// Appendable Data
-router.post('/appendableData', jsonParser, new ActivityMiddleware('Create appendable data'), AppendableData.create);
-router.get('/appendableData/handle/:id', new ActivityMiddleware('Get appendable data handle'), AppendableData.getHandle);
-router.head('/appendableData/:handleId', new ActivityMiddleware('Get encrypt key'), AppendableData.getMetadata);
-router.put('/appendableData/:handleId/:dataIdHandle', new ActivityMiddleware('Append to appendable data'), AppendableData.append);
-router.get('/appendableData/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'), AppendableData.getDataIdAt);
-router.delete('/appendableData/:handleId/:index', new ActivityMiddleware('Remove from appendable data'), AppendableData.remove);
 
 // AppendableData - encryptKey API
 router.get('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Get encrypt key'), AppendableData.getEncryptKey);
 router.delete('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Remove from appendable data'), AppendableData.dropEncryptKeyHandle);
+
+// Appendable Data
+router.post('/appendableData', jsonParser, new ActivityMiddleware('Create appendable data'), AppendableData.create);
+router.get('/appendableData/handle/:id', new ActivityMiddleware('Get appendable data handle'), AppendableData.getHandle);
+router.head('/appendableData/:handleId', new ActivityMiddleware('Get appendable data length'), AppendableData.getMetadata);
+router.put('/appendableData/:handleId/:dataIdHandle', new ActivityMiddleware('Append to appendable data'), AppendableData.append);
+router.get('/appendableData/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'), AppendableData.getDataIdAt);
+router.delete('/appendableData/:handleId/:index', new ActivityMiddleware('Remove from appendable data'), AppendableData.remove);
 
 /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
 export { router as router_0_5 };

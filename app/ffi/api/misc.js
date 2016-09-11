@@ -73,8 +73,8 @@ class Misc extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const dataPointerRef = ref.alloc(PointerToU8Pointer);
-      const sizeRef = ref.alloc(u8Pointer);
-      const capacityRef = ref.alloc(u8Pointer);
+      const sizeRef = ref.alloc(u8);
+      const capacityRef = ref.alloc(u8);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -82,7 +82,7 @@ class Misc extends FfiApi {
         const size = sizeRef.deref();
         const capacity = capacityRef.deref();
         const dataPointer = dataPointerRef.deref();
-        const data = ref.reinterpret(dataPointerRef, size);
+        const data = ref.reinterpret(dataPointer, size);
         self.dropVector(dataPointer, size, capacity);
         resolve(data);
       };
@@ -95,7 +95,7 @@ class Misc extends FfiApi {
   deserialiseDataId(data) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u8Pointer);
+      const handleRef = ref.alloc(u8);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);

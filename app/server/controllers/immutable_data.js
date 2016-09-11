@@ -13,7 +13,7 @@ const HANDLE_ID_KEY = 'Handle-Id';
 export const write = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
@@ -30,13 +30,13 @@ export const write = async (req, res, next) => {
       encryptionType = ENCRYPTION_TYPE[req.headers.encryption.toUpperCase()] || ENCRYPTION_TYPE.PLAIN;
     }
     if (encryptionType === ENCRYPTION_TYPE.ASYMMETRIC) {
-      if (!res.headers['encrypt-key-handle']) {
+      if (!req.headers['encrypt-key-handle']) {
         return next(new ResponseError(400, 'Encrypt key handle is not present in the header'));
       }
-      if (isNaN(res.headers['encrypt-key-handle'])) {
+      if (isNaN(req.headers['encrypt-key-handle'])) {
         return next(new ResponseError(400, 'Encrypt key handle is not a valid number'));
       }
-      publicKeyHandle = parseInt(res.headers['encrypt-key-handle']);
+      publicKeyHandle = req.headers['encrypt-key-handle'];
     }
     const length = parseInt(req.headers['content-length']);
     const writerHandle = await immutableData.getWriterHandle(app);
@@ -55,17 +55,31 @@ export const write = async (req, res, next) => {
 export const read = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
-    if (req.params.handleId) {
-      return new ResponseError(400, '\'handleId\' parameter is missing');
+    if (!req.params.handleId) {
+      return next(new ResponseError(400, '\'handleId\' parameter is missing'));
     }
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const handleId = req.params.handleId;
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     let app = sessionInfo ? sessionInfo.app : null;
     if (!app && encryptionType !== ENCRYPTION_TYPE.PLAIN) {
-      return new ResponseError(400, 'Unauthorised request can only read PLAIN data');
+      return next(new ResponseError(400, 'Unauthorised request can only read PLAIN data'));
     }
+    // let publicKeyHandle;
+    // let encryptionType = ENCRYPTION_TYPE.PLAIN;
+    // if (req.headers.encryption) {
+    //   encryptionType = ENCRYPTION_TYPE[req.headers.encryption.toUpperCase()] || ENCRYPTION_TYPE.PLAIN;
+    // }
+    // if (encryptionType === ENCRYPTION_TYPE.ASYMMETRIC) {
+    //   if (!res.headers['encrypt-key-handle']) {
+    //     return next(new ResponseError(400, 'Encrypt key handle is not present in the header'));
+    //   }
+    //   if (isNaN(res.headers['encrypt-key-handle'])) {
+    //     return next(new ResponseError(400, 'Encrypt key handle is not a valid number'));
+    //   }
+    //   publicKeyHandle = parseInt(res.headers['encrypt-key-handle']);
+    // }
     const readerId = await immutableData.getReaderHandle(app, handleId);
     const size = await immutableData.getReaderSize(readerId);
-    const reader = new ImmutableDataReader(req, res);
     let range = req.get('range');
     let positions = [ 0 ];
     if (range) {
@@ -87,7 +101,7 @@ export const read = async (req, res, next) => {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('ImmutableData - Ready to stream file for range' + start + '-' + end + '/' + total);
+    // log.debug('ImmutableData - Ready to stream file for range' + start + '-' + end + '/' + total);
     var headers = {
       'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
       'Accept-Ranges': 'bytes',
@@ -99,6 +113,7 @@ export const read = async (req, res, next) => {
       updateAppActivity(req, res, true);
       return res.end();
     }
+    const reader = new ImmutableDataReader(req, res, readerId, start, end);
     reader.pipe(res);
   } catch(e) {
     responseHandler(e);

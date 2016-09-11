@@ -97,8 +97,7 @@ export default class EventRegistry {
           temp.DELETE = self.authorisedData.DELETE.newVal - self.authorisedData.DELETE.oldVal;
           self.dispatch(setAuthStateData(temp));
           // TODO - verify is this needed?
-          self.dispatch(setDashPutCount(putsCount));
-          console.log('Updated Client stats');
+          self.dispatch(setDashPutCount(putsCount));          
         } catch(e) {
           console.error(e);
         }

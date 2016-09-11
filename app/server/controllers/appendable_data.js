@@ -1,7 +1,7 @@
 import sessionManager from '../session_manager';
 import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import { FILTER_TYPE } from '../../ffi/model/enum';
-import appendableData from '../../ffi/api/immutable_data';
+import appendableData from '../../ffi/api/appendable_data';
 import dataId from '../../ffi/api/data_id';
 import misc from '../../ffi/api/misc';
 
@@ -13,7 +13,7 @@ const ID_LENGTH = 32;
 // post /
 export const create = async (req, res, next) => {
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
@@ -44,7 +44,7 @@ export const create = async (req, res, next) => {
 // GET /id
 export const getHandle = async (req, res, next) => {
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     let isPrivate = false;
     if (req.headers.hasOwnProperty('is-private')) {
       isPrivate = (req.headers['is-private'].toLowerCase() === 'true');
@@ -56,7 +56,7 @@ export const getHandle = async (req, res, next) => {
     if (sessionInfo) {
       app = sessionInfo.app;
     }
-    const id = new Buffer(payload.id, 'base64');
+    const id = new Buffer(req.params.id, 'base64');
     if (id.length !== ID_LENGTH) {
       return next(new ResponseError(400, 'Invalid id'));
     }
@@ -72,7 +72,9 @@ export const getHandle = async (req, res, next) => {
 // HEAD /handleId
 export const getMetadata = async (req, res, next) => {
   try {
-    const length = await appendableData.getLength(req.params.handleId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    const app = sessionInfo ? sessionInfo.app : null;
+    const length = await appendableData.getLength(app, req.params.handleId);
     res.set('Data-Length', length);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
@@ -84,15 +86,16 @@ export const getMetadata = async (req, res, next) => {
 // GET /encryptKey/handleId
 export const getEncryptKey = async (req, res, next) => {
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelApi) {
+    if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const encryptKeyHandle = await appendableData.getEncryptKey(req.params.handleId);
-    res.set('Encrypt-Key-Handle', encryptKeyHandle);
+    const app = sessionInfo.app;
+    const encryptKeyHandle = await appendableData.getEncryptKey(app, req.params.handleId);
+    res.set('Handle-Id', encryptKeyHandle);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
   } catch(e) {
@@ -103,15 +106,15 @@ export const getEncryptKey = async (req, res, next) => {
 // PUT /hanldeId/dataHandleId
 export const append = async (req, res, next) => {
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelApi) {
+    if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const app = sessionInfo.app;
-    await appendableData.append(app, req.params.handleId, req.params.dataHandleId);
+    await appendableData.append(app, req.params.handleId, req.params.dataIdHandle);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
   } catch(e) {
@@ -122,15 +125,15 @@ export const append = async (req, res, next) => {
 // GET /id/at
 export const getDataIdAt = async (req, res, next) => {
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelApi) {
+    if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const dataIdHandle = await appendableData.getDataIdFrom(req.params.handleId, req.params.index);
-    res.set('Data-Id-Handle', encryptKeyHandle);
+    const dataIdHandle = await appendableData.getDataIdFrom(sessionInfo.app, req.params.handleId, req.params.index);
+    res.set('Handle-Id', dataIdHandle);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
   } catch(e) {
@@ -141,14 +144,14 @@ export const getDataIdAt = async (req, res, next) => {
 // DELETE /id/at
 export const remove = async (req, res, next) => {
   try {
-    const sessionInfo = sessionManager.get(req.sessionId);
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelApi) {
+    if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    await appendableData.removeFrom(req.params.handleId, req.params.index);
+    await appendableData.removeFrom(sessionInfo.app, req.params.handleId, req.params.index);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
   } catch(e) {
@@ -163,7 +166,7 @@ export const dropEncryptKeyHandle = async (req, res, next) => {
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelApi) {
+    if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await misc.dropEncryptKeyHandle(req.params.handleId);
