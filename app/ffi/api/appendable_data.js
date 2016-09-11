@@ -30,7 +30,7 @@ class AppendableData extends FfiApi {
       'appendable_data_num_of_data': [int32, [u64, u64Pointer]],
       'appendable_data_nth_data_id': [int32, [VoidPointer, u64, u64, u64Pointer]],
       'appendable_data_append': [int32, [VoidPointer, u64, u64]],
-      'appendable_data_remove_nth': [int32, [u64, u64]],
+      'appendable_data_remove_nth_data': [int32, [u64, u64]],
       'appendable_data_toggle_filter': [int32, [u64]],
       'appendable_data_free': [int32, [u64]],
       'appendable_data_insert_to_filter': [int32, [u64, u64]]
