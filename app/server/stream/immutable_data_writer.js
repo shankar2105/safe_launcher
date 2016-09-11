@@ -2,7 +2,7 @@ import util from 'util';
 import { Writable } from 'stream';
 import immutableData from '../../ffi/api/immutable_data';
 
-export var ImmutableDataWriter = function(req, app, writerId, encryptionType,
+export var ImmutableDataWriter = function(req, res, app, writerId, encryptionType,
     encryptKeyHandle, responseHandler, size, offset) {
   Writable.call(this);
   this.app = app;
@@ -34,6 +34,7 @@ ImmutableDataWriter.prototype._write = function(data, enc, next) {
           .then((dataIdHandle) => {
             this.res.set('Handle-Id', dataHanldeId);
             this.res.sendStatus(200);
+            updateAppActivity(self.req, self.res, true);
           }, self.responseHandler, console.error);
       }
       next();

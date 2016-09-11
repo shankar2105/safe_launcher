@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import {ResponseError, ResponseHandler} from '../utils';
+import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import misc from '../../ffi/api/misc';
 import dataId from '../../ffi/api/data_id';
 
@@ -15,7 +15,7 @@ export const serialise = async (req, res, next) => {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     const app = sessionInfo.app;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const data = await misc.serialise(req.params.handleId);
@@ -33,7 +33,7 @@ export const deserialise = async (req, res, next) => {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     const app = sessionInfo.app;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     if (!req.body || req.body.length === 0) {
@@ -41,6 +41,8 @@ export const deserialise = async (req, res, next) => {
     }
     const dataHandle = await misc.deserialise(req.body);
     res.set('Handle-Id', dataHandle);
+    res.sendStatus(200);
+    updateAppActivity(req, res, true);
   } catch(e) {
     responseHandler(e);
   }
@@ -52,10 +54,12 @@ export const dropHandle = (req, res, next) => {
     return next(new ResponseError(401, UNAUTHORISED_ACCESS));
   }
   const app = sessionInfo.app;
-  if (!app.permission.lowLevelAccess) {
+  if (!app.permission.lowLevelApi) {
     return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
   }
   const responseHandler = new ResponseHandler(req, res);
   dataId.dropHandle(req.params.handleId)
     .then(responseHandler, responseHandler, console.error);
+  res.sendStatus(200);
+  updateAppActivity(req, res, true);  
 };

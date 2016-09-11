@@ -30,7 +30,7 @@ class AppendableData extends FfiApi {
       'appendable_data_num_of_data': [int32, [u64, u64Pointer]],
       'appendable_data_nth_data_id': [int32, [VoidPointer, u64, u64, u64Pointer]],
       'appendable_data_append': [int32, [VoidPointer, u64, u64]],
-      'appendable_data_remove_nth': [int32, [u64, u64]],
+      'appendable_data_remove_nth_data': [int32, [u64, u64]],
       'appendable_data_toggle_filter': [int32, [u64]],
       'appendable_data_free': [int32, [u64]],
       'appendable_data_insert_to_filter': [int32, [u64, u64]]
@@ -58,7 +58,7 @@ class AppendableData extends FfiApi {
   _asDataId(appendHandleId) {
     const self = this;
     const executor = (resolve, reject) => {
-      const dataHandleRef = ref.alloc(u64Pointer);
+      const dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err, res);
@@ -73,7 +73,7 @@ class AppendableData extends FfiApi {
   _asAppendableDataHandle(app, dataIdHandle) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err, res);
@@ -119,7 +119,7 @@ class AppendableData extends FfiApi {
       if (!app) {
         return reject('App parameter is mandatory');
       }
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = async (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -153,7 +153,7 @@ class AppendableData extends FfiApi {
   getEncryptKey(dataIdHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const keyHandleRef = ref.alloc(u64Pointer);
+      const keyHandleRef = ref.alloc(u64);
       const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {

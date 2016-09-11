@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import rawBodyParser from 'raw-body-parser';
 import { addAppActivity } from '../utils';
 import * as NFS from '../controllers/nfs';
 import * as DNS from '../controllers/dns';
@@ -75,9 +76,9 @@ router.post('/immutableData', new ActivityMiddleware('Create immutable data chun
 router.get('/immutableData/handleId', new ActivityMiddleware('Read immutable data chunks'), ImmutableData.read);
 
 // Structured Data
-router.post('/structuredData', new ActivityMiddleware('Create structured data'), StructuredData.create);
+router.post('/structuredData/:id', rawBodyParser(), new ActivityMiddleware('Create structured data'), StructuredData.create);
 router.get('/structuredData/handle/:id', new ActivityMiddleware('Get structured data handle'), StructuredData.getHandle);
-router.put('/structuredData/:handleId', new ActivityMiddleware('Update structured data'), StructuredData.update);
+router.put('/structuredData/:handleId', rawBodyParser(), new ActivityMiddleware('Update structured data'), StructuredData.update);
 router.get('/structuredData/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);
 
 // Appendable Data

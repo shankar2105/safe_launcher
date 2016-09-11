@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import {ResponseError, ResponseHandler} from '../utils';
+import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import structuredData from '../../ffi/api/structured_data';
 import dataId from '../../ffi/api/data_id';
 import { ENCRYPTION_TYPE } from '../../ffi/model/enum';
@@ -21,19 +21,15 @@ const createOrUpdate = async (req, res, next, isCreate = true) => {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     const app = sessionInfo.app;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const id = new Buffer(req.params.id, 'base64');
-    if (!id || id.length !== ID_LENGTH) {
-      return next(new ResponseError(400, 'Invalid id specified'));
-    }
-    let tagType = req.headers['tag-type'] || TAG_TYPE.UNVERSIONED;
-    if (isNaN(tagType)) {
+    let typeTag = req.headers['type-tag'] || TAG_TYPE.UNVERSIONED;
+    if (isNaN(typeTag)) {
       return next(new ResponseError(400, 'Tag type must be a valid number'));
     }
-    tagType = parseInt(tagType)
-    if (!(tagType === TAG_TYPE.UNVERSIONED || tagType === TAG_TYPE.VERSIONED || tagType >= 15000)) {
+    typeTag = parseInt(typeTag)
+    if (!(typeTag === TAG_TYPE.UNVERSIONED || typeTag === TAG_TYPE.VERSIONED || typeTag >= 15000)) {
       return next(new ResponseError(400, 'Invalid tag type specified'));
     }
     let encryptionType = ENCRYPTION_TYPE.PLAIN;
@@ -53,18 +49,24 @@ const createOrUpdate = async (req, res, next, isCreate = true) => {
       publicKeyHandle = parseInt(res.headers['encrypt-key-handle']);
     }
     let data = null;
-    if (req.body && req.body.length > 0) {
-      data = req.body;
+    if (req.rawBody && req.rawBody.length > 0) {
+      data = new Buffer(req.rawBody);
     }
     let handleId;
     if (isCreate) {
+      const id = new Buffer(req.params.id, 'base64');
+      if (!id || id.length !== ID_LENGTH) {
+        return next(new ResponseError(400, 'Invalid id specified'));
+      }
       handleId = await structuredData.create(app, id, typeTag, encryptionType, data, publicKeyHandle);
     } else {
-      handleId = await structuredData.update(app, req.params.handleId, encryptionType, data);
+      handleId = await structuredData.update(app, req.params.handleId, encryptionType, data, publicKeyHandle);
     }
     res.set(HANDLE_ID_KEY, handleId);
     res.sendStatus(200);
+    updateAppActivity(req, res, true);
   } catch(e) {
+    console.error(e);
     new ResponseHandler(req, res)(e);
   }
 };
@@ -82,18 +84,19 @@ export const getHandle = async (req, res, next) => {
     if (!id || id.length !== ID_LENGTH) {
       return next(new ResponseError(400, 'Invalid id specified'));
     }
-    let tagType = req.headers['tag-type'] || TAG_TYPE.UNVERSIONED;
-    if (isNaN(tagType)) {
+    let typeTag = req.headers['type-tag'] || TAG_TYPE.UNVERSIONED;
+    if (isNaN(typeTag)) {
       return next(new ResponseError(400, 'Tag type must be a valid number'));
     }
-    tagType = parseInt(tagType)
-    if (!(tagType === TAG_TYPE.UNVERSIONED || tagType === TAG_TYPE.VERSIONED || tagType >= 15000)) {
+    typeTag = parseInt(typeTag)
+    if (!(typeTag === TAG_TYPE.UNVERSIONED || typeTag === TAG_TYPE.VERSIONED || typeTag >= 15000)) {
       return next(new ResponseError(400, 'Invalid tag type specified'));
     }
-    const result = await dataId.getStructuredDataHandle(tagType, id);
+    const result = await dataId.getStructuredDataHandle(typeTag, id);
     // res.set('Is-Owner', result.isOwner);
     res.set(HANDLE_ID_KEY, result.handleId);
     res.sendStatus(200);
+    updateAppActivity(req, res, true);
   } catch(e) {
     new ResponseHandler(req, res)(e);
   }
@@ -107,10 +110,13 @@ export const read = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
-    const app = sessionInfo ? sesssionInfo.app : null;
-    const data = await structuredData.read(app, req.params.handleId);
-    responseHandler(null, data);
+    const app = sessionInfo ? sessionInfo.app : null;
+    const handleId = parseInt(req.params.handleId);
+    const data = await structuredData.read(app, handleId);
+    res.send(data || new Buffer(0));
+    updateAppActivity(req, res, true);
   } catch (e) {
+    console.error(e);
     responseHandler(e);
   }
 };

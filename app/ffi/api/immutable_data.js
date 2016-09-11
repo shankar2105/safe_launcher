@@ -41,7 +41,7 @@ class ImmutableData extends FfiApi {
       if (!app) {
         reject('app parameter missing');
       }
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -70,7 +70,7 @@ class ImmutableData extends FfiApi {
   closeWriter(app, writerHandleId, encryptionType, privateKeyHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const dataIdRef = ref.alloc(u64Pointer);
+      const dataIdRef = ref.alloc(u64);
       try {
         let cipherOptHandle;
         switch (encryptionType) {
@@ -87,7 +87,7 @@ class ImmutableData extends FfiApi {
             cipherOptHandle = await cipherOpts.getCipherOptSymmetric(privateKeyHandle);
             break;
         }
-        const dataIdRef = ref.alloc(u64Pointer);
+        const dataIdRef = ref.alloc(u64);
         const onResult = (err, res) => {
           self.safeCore.immut_data_self_encryptor_writer_free.async(writerHandleId, (e) => {
             if (e) {
@@ -112,7 +112,7 @@ class ImmutableData extends FfiApi {
   getReaderHandle(app, dataIdHandle) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           reject(err || res);
@@ -127,7 +127,7 @@ class ImmutableData extends FfiApi {
   getReaderSize(readerId) {
     const self = this;
     const executor = (resolve, reject) => {
-      const sizeRef = ref.alloc(u64Pointer);
+      const sizeRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           reject(err || res);
@@ -143,8 +143,8 @@ class ImmutableData extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const dataRefRef = ref.alloc(PointerToU8Pointer);
-      const sizeRef = ref.alloc(u64Pointer);
-      const capacityRef = ref.alloc(u64Pointer);
+      const sizeRef = ref.alloc(u64);
+      const capacityRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           reject(err || res);
