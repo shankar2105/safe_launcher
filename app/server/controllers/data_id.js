@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import {ResponseError, ResponseHandler} from '../utils';
+import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import misc from '../../ffi/api/misc';
 import dataId from '../../ffi/api/data_id';
 
@@ -41,6 +41,8 @@ export const deserialise = async (req, res, next) => {
     }
     const dataHandle = await misc.deserialise(req.body);
     res.set('Handle-Id', dataHandle);
+    res.sendStatus(200);
+    updateAppActivity(req, res, true);
   } catch(e) {
     responseHandler(e);
   }
@@ -58,4 +60,6 @@ export const dropHandle = (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   dataId.dropHandle(req.params.handleId)
     .then(responseHandler, responseHandler, console.error);
+  res.sendStatus(200);
+  updateAppActivity(req, res, true);  
 };

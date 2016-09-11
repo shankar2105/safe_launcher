@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import {ResponseError, ResponseHandler} from '../utils';
+import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import immutableData from '../../ffi/api/immutable_data';
 import dataId from '../../ffi/api/data_id';
 import { ENCRYPTION_TYPE } from '../../ffi/model/enum';
@@ -40,7 +40,8 @@ export const write = async (req, res, next) => {
     }
     const length = parseInt(req.headers['content-length']);
     const writerHandle = await immutableData.getWriterHandle(app);
-    const writer = new ImmutableDataWriter(req, app, writerHandle, encryptionType, publicKeyHandle, responseHandler, length);
+    const writer = new ImmutableDataWriter(req, res, app, writerHandle, encryptionType,
+      publicKeyHandle, responseHandler, length);
     req.on('aborted', function() {
       next(new ResponseError(400, 'Request aborted by client'));
     });
@@ -95,6 +96,7 @@ export const read = async (req, res, next) => {
     };
     res.writeHead(range ? 206 : 200, headers);
     if (chunksize === 0) {
+      updateAppActivity(req, res, true);
       return res.end();
     }
     reader.pipe(res);

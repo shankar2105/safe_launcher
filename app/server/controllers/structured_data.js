@@ -1,5 +1,5 @@
 import sessionManager from '../session_manager';
-import {ResponseError, ResponseHandler} from '../utils';
+import {ResponseError, ResponseHandler, updateAppActivity} from '../utils';
 import structuredData from '../../ffi/api/structured_data';
 import dataId from '../../ffi/api/data_id';
 import { ENCRYPTION_TYPE } from '../../ffi/model/enum';
@@ -64,6 +64,7 @@ const createOrUpdate = async (req, res, next, isCreate = true) => {
     }
     res.set(HANDLE_ID_KEY, handleId);
     res.sendStatus(200);
+    updateAppActivity(req, res, true);
   } catch(e) {
     console.error(e);
     new ResponseHandler(req, res)(e);
@@ -95,6 +96,7 @@ export const getHandle = async (req, res, next) => {
     // res.set('Is-Owner', result.isOwner);
     res.set(HANDLE_ID_KEY, result.handleId);
     res.sendStatus(200);
+    updateAppActivity(req, res, true);
   } catch(e) {
     new ResponseHandler(req, res)(e);
   }
@@ -110,7 +112,7 @@ export const read = async (req, res, next) => {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sesssionInfo.app : null;
     const data = await structuredData.read(app, req.params.handleId);
-    responseHandler(null, data);
+    responseHandler(null, data);    
   } catch (e) {
     responseHandler(e);
   }
