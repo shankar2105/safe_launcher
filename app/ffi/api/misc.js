@@ -59,9 +59,9 @@ class Misc extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
+        // if (err || res !== 0) {
+        //   return reject(err || res);
+        // }
         resolve();
       };
       self.safeCore.misc_u8_ptr_free.async(dataPointer, size, capacity, onResult);

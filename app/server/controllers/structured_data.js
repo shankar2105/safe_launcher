@@ -49,8 +49,8 @@ const createOrUpdate = async (req, res, next, isCreate = true) => {
       publicKeyHandle = parseInt(res.headers['encrypt-key-handle']);
     }
     let data = null;
-    if (req.body && req.body.length > 0) {
-      data = req.body;
+    if (req.rawBody && req.rawBody.length > 0) {
+      data = new Buffer(req.rawBody);
     }
     let handleId;
     if (isCreate) {
@@ -60,7 +60,7 @@ const createOrUpdate = async (req, res, next, isCreate = true) => {
       }
       handleId = await structuredData.create(app, id, typeTag, encryptionType, data, publicKeyHandle);
     } else {
-      handleId = await structuredData.update(app, req.params.handleId, encryptionType, data);
+      handleId = await structuredData.update(app, req.params.handleId, encryptionType, data, publicKeyHandle);
     }
     res.set(HANDLE_ID_KEY, handleId);
     res.sendStatus(200);
@@ -110,10 +110,13 @@ export const read = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
-    const app = sessionInfo ? sesssionInfo.app : null;
-    const data = await structuredData.read(app, req.params.handleId);
-    responseHandler(null, data);    
+    const app = sessionInfo ? sessionInfo.app : null;
+    const handleId = parseInt(req.params.handleId);
+    const data = await structuredData.read(app, handleId);
+    res.send(data || new Buffer(0));
+    updateAppActivity(req, res, true);
   } catch (e) {
+    console.error(e);
     responseHandler(e);
   }
 };

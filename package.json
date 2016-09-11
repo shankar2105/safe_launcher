@@ -126,6 +126,7 @@
     "moment": "^2.14.1",
     "open-sans-fontface": "^1.4.0",
     "postcss": "^5.1.0",
+    "raw-body-parser": "0.0.2",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",
