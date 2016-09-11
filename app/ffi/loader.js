@@ -11,6 +11,7 @@ import dns from './api/dns';
 import auth from './api/auth';
 import misc from './api/misc';
 import dataId from './api/data_id';
+import cipherOpts from './api/cipher_opts';
 import immutableData from './api/immutable_data';
 import structuredData from './api/structured_data';
 import appendableData from './api/appendable_data';
@@ -20,7 +21,7 @@ import sessionManager from './util/session_manager';
 let ffiFunctions = {};
 // add modules in the order of invoking the drop function
 let mods = [nfs, appManager, sessionManager, auth, dns, immutableData,
-   structuredData, appendableData, misc, dataId];
+   structuredData, appendableData, misc, dataId, cipherOpts];
 
 mods.forEach(mod => {
   if (!(mod instanceof FfiApi)) {

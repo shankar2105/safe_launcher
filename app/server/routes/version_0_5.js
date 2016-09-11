@@ -75,7 +75,7 @@ router.post('/immutableData', new ActivityMiddleware('Create immutable data chun
 router.get('/immutableData/handleId', new ActivityMiddleware('Read immutable data chunks'), ImmutableData.read);
 
 // Structured Data
-router.post('/structuredData', new ActivityMiddleware('Create structured data'), StructuredData.create);
+router.post('/structuredData/:id', new ActivityMiddleware('Create structured data'), StructuredData.create);
 router.get('/structuredData/handle/:id', new ActivityMiddleware('Get structured data handle'), StructuredData.getHandle);
 router.put('/structuredData/:handleId', new ActivityMiddleware('Update structured data'), StructuredData.update);
 router.get('/structuredData/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);

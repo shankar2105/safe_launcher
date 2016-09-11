@@ -58,7 +58,7 @@ export default class UIUtils {
   //     callback(err);
   //   });
   // }
-  // 
+  //
   // dropUnregisteredClient(callback) {
   //   this.api.auth.dropUnregisteredClient(callback);
   // }
@@ -113,7 +113,7 @@ export default class UIUtils {
   }
 
   // handle auth response
-  authResponse(payload, status) {
+  authResponse(payload, status) {    
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
 

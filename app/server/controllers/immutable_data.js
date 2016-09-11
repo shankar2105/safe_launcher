@@ -19,7 +19,7 @@ export const write = async (req, res, next) => {
     }
     const app = sessionInfo.app;
     let publicKeyHandle;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     if (!req.headers['content-length'] || isNaN(req.headers['content-length'])) {

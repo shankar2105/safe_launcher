@@ -15,7 +15,7 @@ export const serialise = async (req, res, next) => {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     const app = sessionInfo.app;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const data = await misc.serialise(req.params.handleId);
@@ -33,7 +33,7 @@ export const deserialise = async (req, res, next) => {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     const app = sessionInfo.app;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     if (!req.body || req.body.length === 0) {
@@ -52,7 +52,7 @@ export const dropHandle = (req, res, next) => {
     return next(new ResponseError(401, UNAUTHORISED_ACCESS));
   }
   const app = sessionInfo.app;
-  if (!app.permission.lowLevelAccess) {
+  if (!app.permission.lowLevelApi) {
     return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
   }
   const responseHandler = new ResponseHandler(req, res);

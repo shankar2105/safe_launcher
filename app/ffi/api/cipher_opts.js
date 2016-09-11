@@ -23,13 +23,13 @@ class CipherOpts extends FfiApi {
 
   getCipherOptPlain() {
     const self = this;
-    const executor = async (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+    const executor = async (resolve, reject) => {      
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        resolve(handleRef.deref());
+        resolve(ref.reinterpret(handleRef, 8).deref());
       };
       self.safeCore.cipher_opt_new_plaintext.async(handleRef, onResult);
     };
@@ -39,7 +39,7 @@ class CipherOpts extends FfiApi {
   getCipherOptSymmetric() {
     const self = this;
     const executor = async (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -54,7 +54,7 @@ class CipherOpts extends FfiApi {
   getCipherOptAsymmetric(privateKeyHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);

@@ -58,7 +58,7 @@ class AppendableData extends FfiApi {
   _asDataId(appendHandleId) {
     const self = this;
     const executor = (resolve, reject) => {
-      const dataHandleRef = ref.alloc(u64Pointer);
+      const dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err, res);
@@ -73,7 +73,7 @@ class AppendableData extends FfiApi {
   _asAppendableDataHandle(app, dataIdHandle) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err, res);
@@ -119,7 +119,7 @@ class AppendableData extends FfiApi {
       if (!app) {
         return reject('App parameter is mandatory');
       }
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = async (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -153,7 +153,7 @@ class AppendableData extends FfiApi {
   getEncryptKey(dataIdHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const keyHandleRef = ref.alloc(u64Pointer);
+      const keyHandleRef = ref.alloc(u64);
       const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
       const onResult = (err, res) => {
         if (err || res !== 0) {

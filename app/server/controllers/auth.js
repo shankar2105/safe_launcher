@@ -16,7 +16,7 @@ export let CreateSession = async (data) => {
   const req = data.request;
   const res = data.response;
   const appInfo = data.payload.app;
-  const permissions = data.payload.permissions;
+  const permissions = data.permissions;
 
   const emitSessionCreationFailed = () => {
     let eventType = req.app.get('EVENT_TYPE').SESSION_CREATION_FAILED;
@@ -57,7 +57,7 @@ export let CreateSession = async (data) => {
       log.debug('Session for app created');
       new ResponseHandler(req, res)(null, {
         token: token,
-        permissions: permissions
+        permissions: permissions.list
       });
     } catch (e) {
       console.error(e);

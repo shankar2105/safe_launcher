@@ -18,7 +18,7 @@ export const create = async (req, res, next) => {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
     const app = sessionInfo.app;
-    if (!app.permission.lowLevelAccess) {
+    if (!app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const payload = req.body;
@@ -85,7 +85,7 @@ export const getEncryptKey = async (req, res, next) => {
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelAccess) {
+    if (sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const encryptKeyHandle = await appendableData.getEncryptKey(req.params.handleId);
@@ -103,7 +103,7 @@ export const append = async (req, res, next) => {
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelAccess) {
+    if (sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const app = sessionInfo.app;
@@ -121,7 +121,7 @@ export const getDataIdAt = async (req, res, next) => {
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelAccess) {
+    if (sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     const dataIdHandle = await appendableData.getDataIdFrom(req.params.handleId, req.params.index);
@@ -139,7 +139,7 @@ export const remove = async (req, res, next) => {
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelAccess) {
+    if (sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await appendableData.removeFrom(req.params.handleId, req.params.index);
@@ -156,7 +156,7 @@ export const dropEncryptKeyHandle = async (req, res, next) => {
     if (!sessionInfo) {
       return next(new ResponseError(401, UNAUTHORISED_ACCESS));
     }
-    if (sessionInfo.app.permission.lowLevelAccess) {
+    if (sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
     await misc.dropEncryptKeyHandle(req.params.handleId)

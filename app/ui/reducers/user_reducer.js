@@ -81,13 +81,13 @@ const user = (state = initialState, action) => {
       return { ...state, showAuthRequest: false, authRequestPayload: Object.assign({}) };
     }
     case ActionTypes.ADD_APPLICATION: {
-      const appList = { ...state.appList };      
+      const appList = { ...state.appList };
       appList[action.app.id] = {
         id: action.app.id,
         name: action.app.info.appName,
         version: action.app.info.appVersion,
         vendor: action.app.info.vendor,
-        permissions: action.app.info.permissions,
+        permissions: action.app.info.permissions.list,
         status: {
           beginTime: moment().format('HH:mm:ss'),
           activityName: 'Authorisation',

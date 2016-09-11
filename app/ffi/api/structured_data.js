@@ -80,7 +80,7 @@ class StructuredData extends FfiApi {
   _asDataId(structuredDataHandle) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -95,7 +95,7 @@ class StructuredData extends FfiApi {
   _asStructuredData(app, dataIdHandle) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -113,7 +113,7 @@ class StructuredData extends FfiApi {
       if (!app) {
         reject('app parameter missing');
       }
-      const handleRef = ref.alloc(u64Pointer);
+      const handleRef = ref.alloc(u64);
       try {
         const cipherOptHandle = await self._getCipherOpt(encryptionType, publicKeyHandle);
         const onResult = async (err, res) => {
@@ -124,12 +124,13 @@ class StructuredData extends FfiApi {
           const structDataHandle = handleRef.deref();
           await self._put(app, structDataHandle);
           const dataIdHandle = await self._asDataId(structDataHandle);
-          self.safe_core.struct_data_free.async(structDataHandle, (e) => {});
+          self.safeCore.struct_data_free.async(structDataHandle, (e) => {});
           resolve(dataIdHandle);
         };
-        self.safeCore.struct_data_new.async(appManager.get(app), tagType, id,
-          cipherHandle, data, (data ? data.length : 0), handleRef, onResult);
+        self.safeCore.struct_data_new.async(appManager.getHandle(app), tagType, id,
+          cipherOptHandle, data, (data ? data.length : 0), handleRef, onResult);
       } catch(e) {
+        console.error(e);
         reject(e);
       }
     };
@@ -151,10 +152,10 @@ class StructuredData extends FfiApi {
           cipherOpts.dropHandle(cipherOptHandle);
           const structuredDataHandle = await self._asStructuredData(app, dataIdHandle);
           await self._put(app, structuredDataHandle);
-          self.safe_core.struct_data_free.async(structuredDataHandle, (e) => {});
+          self.safeCore.struct_data_free.async(structuredDataHandle, (e) => {});
           resolve(dataIdHandle);
         };
-        self.safeCore.struct_data_new_data.async(appManager.get(app), dataIdHandle,
+        self.safeCore.struct_data_new_data.async(appManager.getHandle(app), dataIdHandle,
           cipherHandle, data, (data ? data.length : 0), onResult);
       } catch(e) {
         reject(e);
