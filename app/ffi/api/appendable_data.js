@@ -241,10 +241,11 @@ class AppendableData extends FfiApi {
     const executor = async (resolve, reject) => {
       try {
         const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
-        const onResult = (err, res) => {
+        const onResult = async (err, res) => {
           if (err || res !== 0) {
             return reject(err || res);
           }
+          await self._save(app, appendableDataHandle, true);
           self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
           resolve();
         };
