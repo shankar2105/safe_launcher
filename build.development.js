@@ -11,19 +11,18 @@ const build = () => {
     'linux': 'libsafe_core.so',
     'win32': 'safe_core.dll',
   };
-
+  const libPath = 'ffi/' + (LIB_NAME[os.platform()] || LIB_NAME['linux'])
   const filesToMove = [
     'server',
     'logger',
     'ui/images',
-    'app.html'
+    'app.html',
+    libPath
   ];
   let filePath = null;
   for (filePath of filesToMove) {
     fse.copySync(path.resolve('.', srcDir, filePath), path.resolve('.', destDir, filePath));
   }
-  const libPath = 'ffi/' + (LIB_NAME[os.platform()] || LIB_NAME['linux'])
-  fse.copySync(path.resolve('.', srcDir, libPath), path.resolve('.', destDir, libPath));
 };
 
 build();

@@ -43,7 +43,7 @@ export default class AccountStorageChart extends Component {
 
   handleUpdateTimoutTimer(props) {
     if ((props.accountStorage.updateTimeout !== 0) && !self.updateTimeoutTimer) {
-      this.updateTimeoutTimer = window.setInterval(() => {
+      this.updateTimeoutTimer = window.setInterval(_ => {
         props.decAccountUpdateTimeout();
       }, 1000);
     }

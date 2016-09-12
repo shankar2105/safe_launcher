@@ -21,6 +21,19 @@ export default class Permission extends Component {
         </div>
       );
     }
+    if (type === 'LOW_LEVEL_API') {
+      return (
+        <div className="permissions-i icn safe-drive">
+          <input type="checkbox" name="lowLevelApi" id="lowLevelApi" />
+          <label htmlFor="lowLevelApi" className="permissions-name">
+            Low Level API
+          </label>
+          <p className="permissions-desc">
+            Allow this app to access the data stored in your SAFE Drive.
+          </p>
+        </div>
+      );
+    }
 
     return (
       <div className="permissions-i">

@@ -58,7 +58,7 @@ const DEFAULT_OPTS = {
   },
   'app-copyright': appCopyright,
   ignore: [
-    '^app',
+    // '^/app',
     '^/test($|/)',
     '^/release($|/)',
     '^/resources($|/)',

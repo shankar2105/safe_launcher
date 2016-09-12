@@ -6,11 +6,12 @@ export const toastNetworkStatus = () => (
   }
 );
 
-export const retryNetwork = () => (
-  {
+export const retryNetwork = (user) => {
+  window.msl.reconnet(user);
+  return {
     type: ActionTypes.RETRYING_NETWORK
-  }
-);
+  };
+};
 
 export const setNetworkDisconnected = () => (
   {

@@ -158,7 +158,7 @@ class StructuredData extends FfiApi {
           } catch(e) {
             reject(e);
           }
-        };        
+        };
         self.safeCore.struct_data_new_data.async(appManager.getHandle(app), structuredDataHandle,
           cipherOptHandle, data, (data ? data.length : 0), onResult);
       } catch(e) {
@@ -171,27 +171,31 @@ class StructuredData extends FfiApi {
   read(app, handleId) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const structuredDataHandleId = await self._asStructuredData(app, handleId);
-      const dataPointerRef = ref.alloc(PointerToU8Pointer);
-      const sizeRef = ref.alloc(u8);
-      const capacityRef = ref.alloc(u8);
-      const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        const capacity = capacityRef.deref();
-        const size = sizeRef.deref();
-        let data;
-        if (size > 0) {
-          const dataPointer = dataPointerRef.deref();
-          data = ref.reinterpret(dataPointer, size);
-          misc.dropVector(dataPointer, size, capacity);
-        }
-        self.safeCore.struct_data_free.async(structuredDataHandleId, () => {});
-        resolve(data);
-      };
-      self.safeCore.struct_data_extract_data.async(appManager.getHandle(app), structuredDataHandleId,
-        dataPointerRef, sizeRef, capacityRef, onResult);
+      try {
+        const structuredDataHandleId = await self._asStructuredData(app, handleId);
+        const dataPointerRef = ref.alloc(PointerToU8Pointer);
+        const sizeRef = ref.alloc(u8);
+        const capacityRef = ref.alloc(u8);
+        const onResult = (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          const capacity = capacityRef.deref();
+          const size = sizeRef.deref();
+          let data;
+          if (size > 0) {
+            const dataPointer = dataPointerRef.deref();
+            data = ref.reinterpret(dataPointer, size);
+            misc.dropVector(dataPointer, size, capacity);
+          }
+          self.safeCore.struct_data_free.async(structuredDataHandleId, () => {});
+          resolve(data);
+        };
+        self.safeCore.struct_data_extract_data.async(appManager.getHandle(app), structuredDataHandleId,
+          dataPointerRef, sizeRef, capacityRef, onResult);
+      } catch (e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }

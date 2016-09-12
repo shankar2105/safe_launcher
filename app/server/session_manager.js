@@ -5,7 +5,7 @@ import _ from 'lodash';
 let sessionManager = null;
 
 class SessionManager {
-  
+
   constructor() {
     this.sessionPool = {};
   }

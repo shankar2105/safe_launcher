@@ -278,8 +278,8 @@ const user = (state = initialState, action) => {
         accountStorage: {
           ...state.accountStorage,
           fetching: false,
-          used: action.data.used,
-          available: action.data.available,
+          used: isNaN(action.data.used) ? 0 : action.data.used,
+          available: isNaN(action.data.available) ? 0 : action.data.available,
           lastUpdated: accountInfoLastUpdated,
           updateTimeout: CONSTANT.ACCOUNT_UPDATE_TIMEOUT
         }

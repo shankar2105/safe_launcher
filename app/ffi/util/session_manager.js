@@ -9,7 +9,8 @@ import appManager from './app_manager';
 const Void = ref.types.void;
 const int32 = ref.types.int32;
 const int64 = ref.types.int64;
-const u64Pointer = ref.refType(ref.types.uint64);
+const u64 = ref.types.uint64;
+const u64Pointer = ref.refType(u64);
 const SessionHandle = ref.refType(ref.types.void);
 
 class SessionManager extends FfiApi {
@@ -45,8 +46,8 @@ class SessionManager extends FfiApi {
   getAccountInfo() {
     const self = this;
     const executor = (resolve, reject) => {
-      const used = ref.alloc(u64Pointer);
-      const total = ref.alloc(u64Pointer);
+      const used = ref.alloc(u64);
+      const total = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);

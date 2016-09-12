@@ -115,17 +115,19 @@ export const setDashPutCount = data => ({
   data
 });
 
-export const fetchingAccountStorage = () => ({
+export const fetchingAccountStorage = _ => ({
   type: ActionTypes.FETCHING_ACCOUNT_STORAGE
 });
 
-export const updateAccountStorage = () => (
+export const updateAccountStorage = _ => (
   dispatch => {
-    dispatch(fetchingAccountStorage());    
-    sessionManager.getAccountInfo().then((data) => {
+    dispatch(fetchingAccountStorage());
+    sessionManager.getAccountInfo()
+    .then(data => {
       dispatch(updateAccountStorageSuccess(data));
-    }, (e) => {
-      console.error(e);
+    })
+    .catch(err => {
+      // dispatch(updateAccountStorageSuccess({}))
     });
   }
 );
