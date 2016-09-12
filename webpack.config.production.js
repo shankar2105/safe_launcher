@@ -25,7 +25,7 @@ const config = merge(baseConfig, {
       {
         test: /\.js$/,
         loaders: ['babel'],
-        exclude: [path.join(__dirname, 'app', 'api'), path.join(__dirname, 'app', 'server')]
+        exclude: [path.join(__dirname, 'app', 'server')]
       },
       {
         test: /\.global\.css$/,
@@ -57,7 +57,6 @@ const config = merge(baseConfig, {
     }),
     new ExtractTextPlugin('style.css', { allChunks: true }),
     new CopyWebpackPlugin([
-      { from: 'app/api', to: 'api' },
       { from: 'app/server', to: 'server' },
       { from: 'app/app.html' },
       { from: 'app/ui/images', to: 'ui/images' }

@@ -5,7 +5,8 @@ const build = () => {
   const srcDir = 'app';
   const destDir = 'dist';
   const filesToMove = [
-    'server',     
+    'ffi/libsafe_core.dylib',
+    'server',
     'logger',
     'ui/images',
     'app.html'

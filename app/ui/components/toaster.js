@@ -64,7 +64,7 @@ export default class Toaster extends Component {
       this.message.innerText = `${this.props.message} ${this.initialRetryCount} sec`;
       if (this.initialRetryCount === 0) {
         this.clearNetworkRetryTimer();
-        return this.props.retryNetwork();
+        return this.props.retryNetwork(this.props.user);
       }
       this.initialRetryCount--;
     }, 1000);
@@ -99,7 +99,7 @@ export default class Toaster extends Component {
   }
 
   render() {
-    const { active, message, options, retryNetwork } = this.props;
+    const { active, user, message, options, retryNetwork } = this.props;
     let option = null;
 
     if (Object.keys(options).length > 0) {
@@ -113,7 +113,7 @@ export default class Toaster extends Component {
                 name="retry"
                 onClick={() => {
                   clearTimeout(self.retryTimer);
-                  retryNetwork();
+                  retryNetwork(user);
                 }}
               >RETRY</button>
             </div>

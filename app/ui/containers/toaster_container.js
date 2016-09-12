@@ -9,7 +9,8 @@ const mapStateToProps = state => (
     message: state.toaster.message,
     options: state.toaster.options,
     hasNext: state.toaster.hasNext,
-    retryCount: state.networkStatus.retryCount
+    retryCount: state.networkStatus.retryCount,
+    user: state.auth.user
   }
 );
 
@@ -21,9 +22,9 @@ const mapDispatchToProps = dispatch => (
     showNextToaster: (message, options) => {
       dispatch(showNextToaster(message, options));
     },
-    retryNetwork: () => {
+    retryNetwork: (user) => {
       dispatch(hideToaster());
-      dispatch(retryNetwork());
+      dispatch(retryNetwork(user));
     }
   }
 );

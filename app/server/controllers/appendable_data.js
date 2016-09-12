@@ -74,7 +74,7 @@ export const getMetadata = async (req, res, next) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
     const app = sessionInfo ? sessionInfo.app : null;
-    const length = await appendableData.getLength(app, req.params.handleId);
+    const length = await appendableData.getLength(app, parseInt(req.params.handleId));
     res.set('Data-Length', length);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
