@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import moment from 'moment';
 import { LOG_STATUS as STATUS } from '../utils/app_utils';
 
 export default class Log extends Component {
@@ -22,7 +23,7 @@ export default class Log extends Component {
         <td>{log.appName || 'Anonymous Application'}</td>
         <td>{log.activityName}</td>
         <td>{STATUS[log.activityStatus].code.replace(/_/g, ' ')}</td>
-        <td>{log.beginTime}</td>
+        <td>{moment(log.beginTime).format('HH:mm:ss')}</td>
       </tr>
     );
   }
