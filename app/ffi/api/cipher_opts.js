@@ -23,13 +23,13 @@ class CipherOpts extends FfiApi {
 
   getCipherOptPlain() {
     const self = this;
-    const executor = async (resolve, reject) => {      
+    const executor = async (resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        resolve(ref.reinterpret(handleRef, 8).deref());
+        resolve(handleRef.deref());
       };
       self.safeCore.cipher_opt_new_plaintext.async(handleRef, onResult);
     };
@@ -69,7 +69,7 @@ class CipherOpts extends FfiApi {
   dropHandle(handleId) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const onResult = (err, res) => {
+      const onResult = (err, res) => {        
         if (err || res !== 0) {
           return reject(err || res);
         }

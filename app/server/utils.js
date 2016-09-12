@@ -8,7 +8,7 @@ import { MSG_CONSTANTS } from './message_constants';
 import { Activity, ActivityStatus } from './model/activity';
 
 export var getSessionIdFromRequest = function(req) {
-  let authHeader = req.get('Authorization');
+  let authHeader = req.get('Authorization');  
   if (!authHeader) {
     return;
   }
@@ -33,6 +33,7 @@ export var getSessionIdFromRequest = function(req) {
     jwt.verify(token, new Buffer(sessionInfo.signingKey));
     return payload.id;
   } catch (e) {
+    console.error(e);
     return;
   }
 };
@@ -118,6 +119,7 @@ export var setSessionHeaderAndParseBody = function(req, res, next) {
     return res.sendStatus(401);
   }
   req.headers.sessionId = sessionId;
+  // TODO remove this manual parsing code - map parser in routes
   if (req.body && req.body.length > 0) {
     req.body = ((req.body instanceof Buffer) ? JSON.parse(req.body.toString()) : req.body);
     if (typeof req.body !== 'object') {

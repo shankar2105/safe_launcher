@@ -321,7 +321,6 @@ class NFS extends FfiApi {
         const key = {writerId: uuid.v4()};
         self.writerHolder.set(key, writerVoidPointer.deref());
         resolve(key);
-        console.log('Invoked resolve');
       };
       const filePathBuff = new Buffer(filePath);
       let metadataBuff = null;
@@ -351,7 +350,7 @@ class NFS extends FfiApi {
           return reject(err || res);
         }
         resolve();
-      };
+      };      
       self.safeCore.nfs_writer_write.async(self.writerHolder.get(writerKey), data, data.length, onResult);
     };
     return new Promise(executor);

@@ -1,5 +1,6 @@
 import util from 'util';
 import { Writable } from 'stream';
+import { updateAppActivity } from './../utils.js';
 import immutableData from '../../ffi/api/immutable_data';
 
 export var ImmutableDataWriter = function(req, res, app, writerId, encryptionType,
@@ -7,6 +8,7 @@ export var ImmutableDataWriter = function(req, res, app, writerId, encryptionTyp
   Writable.call(this);
   this.app = app;
   this.req = req;
+  this.res = res;
   this.writerId = writerId;
   this.encryptKeyHandle = encryptKeyHandle;
   this.curOffset = parseInt(offset || 0);
@@ -30,10 +32,10 @@ ImmutableDataWriter.prototype._write = function(data, enc, next) {
       eventEmitter.emit(uploadEvent, data.length);
       self.curOffset += data.length;
       if (self.curOffset === self.maxSize) {
-        immutableData.closeWriter(self.writerId, this.encryptionType, this.encryptKeyHandle)
+        immutableData.closeWriter(self.app, self.writerId, self.encryptionType, self.encryptKeyHandle)
           .then((dataIdHandle) => {
-            this.res.set('Handle-Id', dataHanldeId);
-            this.res.sendStatus(200);
+            self.res.set('Handle-Id', dataIdHandle);
+            self.res.sendStatus(200);
             updateAppActivity(self.req, self.res, true);
           }, self.responseHandler, console.error);
       }

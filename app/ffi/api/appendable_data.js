@@ -26,7 +26,7 @@ class AppendableData extends FfiApi {
       'appendable_data_extract_data_id': [int32, [u64, u64Pointer]],
       'appendable_data_put': [int32, [VoidPointer, u64]],
       'appendable_data_post': [int32, [VoidPointer, u64]],
-      'appendable_data_encrypt_key': [int32, [VoidPointer, u64Pointer]],
+      'appendable_data_encrypt_key': [int32, [u64, u64Pointer]],
       'appendable_data_num_of_data': [int32, [u64, u64Pointer]],
       'appendable_data_nth_data_id': [int32, [VoidPointer, u64, u64, u64Pointer]],
       'appendable_data_append': [int32, [VoidPointer, u64, u64]],
@@ -37,19 +37,19 @@ class AppendableData extends FfiApi {
     };
   }
 
-  _save(app, appendHandleId, isPost = true) {
+  _save(app, appendHandleId, isPost) {
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          return reject(err, res);
+          return reject(err || res);
         }
         resolve();
       };
       if (isPost) {
-        self.appendable_data_post.async(appManager.get(app), appendHandleId, onResult);
+        self.safeCore.appendable_data_post.async(appManager.getHandle(app), appendHandleId, onResult);
       } else {
-        self.appendable_data_put.async(appManager.get(app), appendHandleId, onResult);
+        self.safeCore.appendable_data_put.async(appManager.getHandle(app), appendHandleId, onResult);
       }
     };
     return new Promise(executor);
@@ -61,11 +61,11 @@ class AppendableData extends FfiApi {
       const dataHandleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          return reject(err, res);
+          return reject(err || res);
         }
         resolve(dataHandleRef.deref());
       };
-      self.appendable_data_extract_data_id.async(appendHandleId, dataHandleRef, onResult);
+      self.safeCore.appendable_data_extract_data_id.async(appendHandleId, dataHandleRef, onResult);
     };
     return new Promise(executor);
   }
@@ -76,11 +76,11 @@ class AppendableData extends FfiApi {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          return reject(err, res);
+          return reject(err || res);
         }
         resolve(handleRef.deref());
       };
-      self.appendable_data_get.async(appManager.get(app), dataIdHandle, handleRef, onResult);
+      self.safeCore.appendable_data_get.async(appManager.getHandle(app), dataIdHandle, handleRef, onResult);
     };
     return new Promise(executor);
   }
@@ -90,11 +90,11 @@ class AppendableData extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          return reject(err, res);
+          return reject(err || res);
         }
         resolve();
       };
-      self.appendable_data_toggle_filter.async(appendDataHandle, onResult);
+      self.safeCore.appendable_data_toggle_filter.async(appendDataHandle, onResult);
     };
     return new Promise(executor);
   }
@@ -104,18 +104,18 @@ class AppendableData extends FfiApi {
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
-          return reject(err, res);
+          return reject(err || res);
         }
         resolve();
       };
-      self.appendable_data_insert_to_filter.async(appendDataHandle, signKeyHandle, onResult);
+      self.safeCore.appendable_data_insert_to_filter.async(appendDataHandle, signKeyHandle, onResult);
     };
     return new Promise(executor);
   }
 
   create(app, id, isPrivate = true, filterType, filterKeys = []) {
     const self = this;
-    const exeecutor = (resolve, reject) => {
+    const executor = (resolve, reject) => {
       if (!app) {
         return reject('App parameter is mandatory');
       }
@@ -133,7 +133,7 @@ class AppendableData extends FfiApi {
           for (key of filterKeys) {
             await self._insertToFilter(appendDataHandle, key);
           }
-          await self._save(app, appendDataHandle, true);
+          await self._save(app, appendDataHandle, false);
           const dataHandleId = await self._asDataId(appendDataHandle);
           self.safeCore.appendable_data_free.async(appendDataHandle, (e) => {});
           resolve(dataHandleId);
@@ -150,54 +150,66 @@ class AppendableData extends FfiApi {
     return new Promise(executor);
   }
 
-  getEncryptKey(dataIdHandle) {
+  getEncryptKey(app, dataIdHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
       const keyHandleRef = ref.alloc(u64);
-      const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
-      const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        self.safe_core.appendable_data_free.async(appendableDataHandle, (e) => {});
-        resolve(keyHandleRef.deref());
-      };
-      self.safeCore.appendable_data_encrypt_key.async(appendableDataHandle, onResult);
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
+        const onResult = (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          resolve(keyHandleRef.deref());
+        };
+        self.safeCore.appendable_data_encrypt_key.async(appendableDataHandle, keyHandleRef, onResult);
+      } catch(e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }
 
-  append(app, appendableDataHandle, dataIdHandle) {
+  append(app, appendableDataIdHandle, dataIdHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const appendableDataHandle = await self._asAppendableDataHandle(dataIdHandle);
-      const onResult = async (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        await self._save(app, appendableDataHandle, false);
-        self.safe_core.appendable_data_free.async(appendableDataHandle, (e) => {});
-        resolve();
-      };
-      self.safeCore.appendable_data_append.async(appManager.getHandle(app),
-        appendableDataHandle, dataIdHandle, onResult);
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, appendableDataIdHandle);
+        const onResult = async (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          await self._save(app, appendableDataHandle, true);
+          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          resolve();
+        };
+        self.safeCore.appendable_data_append.async(appManager.getHandle(app),
+          appendableDataHandle, dataIdHandle, onResult);
+      } catch(e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }
 
-  getLength(dataIdHandle) {
+  getLength(app, dataIdHandle) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const appendableDataHandle = await self._asAppendableDataHandle(dataIdHandle);
-      const lengthRef = ref.alloc(u8Pointer);
-      const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        self.safe_core.appendable_data_free.async(appendableDataHandle, (e) => {});
-        resolve(lengthRef.deref());
-      };
-      self.safeCore.appendable_data_num_of_data.async(appendableDataHandle, lengthRef, onResult);
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
+        const lengthRef = ref.alloc(u64);
+        const onResult = (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          resolve(lengthRef.deref());
+        };
+        self.safeCore.appendable_data_num_of_data.async(appendableDataHandle, lengthRef, onResult);
+      } catch(e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }
@@ -205,17 +217,21 @@ class AppendableData extends FfiApi {
   getDataIdFrom(app, dataIdHandle, index) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const appendableDataHandle = await self._asAppendableDataHandle(dataIdHandle);
-      const dataIdRef = ref.alloc(u8Pointer);
-      const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        self.safe_core.appendable_data_free.async(appendableDataHandle, (e) => {});
-        resolve(dataIdRef.deref());
-      };
-      self.safeCore.appendable_data_nth_data_id.async(appManager.getHandle(app),
-        appendableDataHandle, index, dataIdRef, onResult);
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
+        const dataIdRef = ref.alloc(u64);
+        const onResult = (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          resolve(dataIdRef.deref());
+        };
+        self.safeCore.appendable_data_nth_data_id.async(appManager.getHandle(app),
+          appendableDataHandle, index, dataIdRef, onResult);
+      } catch (e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }
@@ -223,15 +239,20 @@ class AppendableData extends FfiApi {
   removeFrom(app, dataIdHandle, index) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const appendableDataHandle = await self._asAppendableDataHandle(dataIdHandle);
-      const onResult = (err, res) => {
-        if (err || res !== 0) {
-          return reject(err || res);
-        }
-        self.safe_core.appendable_data_free.async(appendableDataHandle, (e) => {});
-        resolve();
-      };
-      self.safeCore.appendable_data_remove_nth.async(appendableDataHandle, index, onResult);
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, dataIdHandle);
+        const onResult = async (err, res) => {
+          if (err || res !== 0) {
+            return reject(err || res);
+          }
+          await self._save(app, appendableDataHandle, true);
+          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          resolve();
+        };
+        self.safeCore.appendable_data_remove_nth_data.async(appendableDataHandle, index, onResult);
+      } catch(e) {
+        reject(e);
+      }
     };
     return new Promise(executor);
   }
