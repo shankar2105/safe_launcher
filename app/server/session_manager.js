@@ -1,9 +1,11 @@
 import Permission from '../ffi/model/permission';
+import appManager from '../ffi/util/app_manager';
 import _ from 'lodash';
 
 let sessionManager = null;
 
 class SessionManager {
+  
   constructor() {
     this.sessionPool = {};
   }
@@ -38,6 +40,22 @@ class SessionManager {
       }
     }
     return null;
+  }
+
+  registerApps() {
+    const exec = async () => {
+      try {
+        for (let key in this.sessionPool) {
+          app = this.sessionPool[key].app;
+          await appManager.registerApp(app)
+        }
+        return true;
+      } catch (e) {
+        console.error(e);
+      }
+      return false;
+    };
+    exec();
   }
 }
 

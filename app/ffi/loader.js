@@ -39,6 +39,7 @@ export const loadLibrary = () => {
   libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
   const safeCore = ffi.Library(libPath, ffiFunctions);
   console.log('Library loaded from - ', libPath);
+  safeCore.init_logging();
   mods.forEach(mod => {
     if (!(mod instanceof FfiApi)) {
       return;
@@ -48,14 +49,15 @@ export const loadLibrary = () => {
 };
 
 export const cleanup = () => {
+  let promise;
   const executor = async (mod) => {
     try {
-      const promise = mod.drop();
+      promise = mod.drop();
       if (promise) {
         await promise;
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   mods.forEach(mod => {

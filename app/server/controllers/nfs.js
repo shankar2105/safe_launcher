@@ -296,13 +296,13 @@ export var getFile = function(req, res, next) {
     res.writeHead(range ? 206 : 200, headers);
     if (chunksize === 0) {
       return res.end();
-    }    
+    }
     let nfsReader = new NfsReader(req, res, filePath, rootPath, start, end, sessionInfo.app);
     nfsReader.pipe(res);
   };
   log.debug('NFS - Invoking get file request');
   nfs.getFileMetadata(sessionInfo.app, filePath, rootPath)
-  .then(onFileMetadataReceived, responseHandler, console.error);
+    .then(onFileMetadataReceived, responseHandler, console.error);
 };
 
 export var getFileMetadata = function(req, res, next) {

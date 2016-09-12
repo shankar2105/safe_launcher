@@ -96,7 +96,7 @@ export default class RESTServer {
     app.use(function(err, req, res) {
       if (res.headersSent) {
         return;
-      }      
+      }
       if (typeof res === 'function') {
         return req.status(404).send({ errorCode: 404, description: 'Endpoint Not Found' });
       }
@@ -128,6 +128,10 @@ export default class RESTServer {
 
   clearAllSessions() {
     sessionManager.clear();
+  }
+
+  registerConnectedApps() {
+    return sessionManager.registerApps();
   }
 
   addEventListener(event, listener) {

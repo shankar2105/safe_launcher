@@ -2,6 +2,8 @@
 
 import ref from 'ref';
 
+import misc from '../api/misc';
+
 const computeTime = function(seconds, nanoSeconds) {
   return new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString();
 };
@@ -19,10 +21,11 @@ export const derefFileMetadataStruct = (metadataStruct) => {
   let metadata = '';
   if (metadataStruct.name_len > 0) {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
-  }
-  // TODO change to 0 when fixed in safe_core
-  if (metadataStruct.user_metadata_len > 1) {
+    misc.dropVector(metadataStruct.name, metadataStruct.name_len, metadataStruct.name_cap);
+  }  
+  if (metadataStruct.user_metadata_len > 0) {
     metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
+    misc.dropVector(metadataStruct.user_metadata, metadataStruct.user_metadata_len, metadataStruct.user_metadata_cap);
   }
   return {
     name: name,
@@ -38,11 +41,13 @@ export const derefDirectoryMetadataStruct = (metadataStruct) => {
   let metadata = '';
   if (metadataStruct.name_len > 0) {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
+    misc.dropVector(metadataStruct.name, metadataStruct.name_len, metadataStruct.name_cap);
   }
   // TODO change to 0 when fixed in safe_core
-  if (metadataStruct.user_metadata_len > 1) {
+  if (metadataStruct.user_metadata_len > 0) {
     metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
-  }  
+    misc.dropVector(metadataStruct.user_metadata, metadataStruct.user_metadata_len, metadataStruct.user_metadata_cap);
+  }
   return {
     name: name,
     metadata: metadata,

@@ -110,7 +110,7 @@ class ImmutableData extends FfiApi {
   }
 
   getReaderHandle(app, dataIdHandle) {
-    const self = this;
+    const self = this;    
     const executor = (resolve, reject) => {
       const handleRef = ref.alloc(u64);
       const onResult = (err, res) => {

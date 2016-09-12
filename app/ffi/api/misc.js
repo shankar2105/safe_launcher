@@ -2,12 +2,15 @@ import ref from 'ref';
 
 import FfiApi from '../ffi_api';
 
+const Void = ref.types.void;
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
 const u8 = ref.types.uint8;
 const bool = ref.types.bool;
+const size_t = ref.types.size_t;
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
+const size_tPointer = ref.refType(size_t);
 
 const PointerToU8Pointer = ref.refType(u8Pointer);
 
@@ -19,11 +22,12 @@ class Misc extends FfiApi {
 
   getFunctionsToRegister() {
     return {
+      'init_logging': [int32, []],
       'misc_encrypt_key_free': [int32, [u64]],
       'misc_sign_key_free': [int32, [u64]],
-      'misc_serailise_data_id': [int32, [u64, PointerToU8Pointer, u8Pointer, u8Pointer]],
+      'misc_serailise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'misc_deserailise_data_id': [int32, [u8Pointer, u64, u64Pointer]],
-      'misc_u8_ptr_free': [int32, [u8Pointer, u64, u64]]
+      'misc_u8_ptr_free': [Void, [u8Pointer, u64, u64]]
     };
   }
 
@@ -58,10 +62,7 @@ class Misc extends FfiApi {
   dropVector(dataPointer, size, capacity) {
     const self = this;
     const executor = (resolve, reject) => {
-      const onResult = (err, res) => {
-        // if (err || res !== 0) {
-        //   return reject(err || res);
-        // }
+      const onResult = (err) => {
         resolve();
       };
       self.safeCore.misc_u8_ptr_free.async(dataPointer, size, capacity, onResult);
@@ -73,8 +74,8 @@ class Misc extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const dataPointerRef = ref.alloc(PointerToU8Pointer);
-      const sizeRef = ref.alloc(u8);
-      const capacityRef = ref.alloc(u8);
+      const sizeRef = ref.alloc(size_t);
+      const capacityRef = ref.alloc(size_t);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
@@ -82,7 +83,8 @@ class Misc extends FfiApi {
         const size = sizeRef.deref();
         const capacity = capacityRef.deref();
         const dataPointer = dataPointerRef.deref();
-        const data = ref.reinterpret(dataPointer, size);
+        let data = ref.reinterpret(dataPointer, size);
+        data = Buffer.concat([data]);
         self.dropVector(dataPointer, size, capacity);
         resolve(data);
       };
@@ -95,8 +97,8 @@ class Misc extends FfiApi {
   deserialiseDataId(data) {
     const self = this;
     const executor = (resolve, reject) => {
-      const handleRef = ref.alloc(u8);
-      const onResult = (err, res) => {
+      const handleRef = ref.alloc(u64);
+      const onResult = (err, res) => {        
         if (err || res !== 0) {
           return reject(err || res);
         }

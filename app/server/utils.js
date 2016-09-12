@@ -8,7 +8,7 @@ import { MSG_CONSTANTS } from './message_constants';
 import { Activity, ActivityStatus } from './model/activity';
 
 export var getSessionIdFromRequest = function(req) {
-  let authHeader = req.get('Authorization');  
+  let authHeader = req.get('Authorization');
   if (!authHeader) {
     return;
   }
@@ -93,8 +93,18 @@ export let ResponseHandler = function(req, res) {
       return;
     }
     if (data) {
-      res.status(successStatus).send(formatResponse(data));
-      req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, data.length);
+      res.status(successStatus).send(data);
+      try {
+        let length = 0;
+        if (data.hasOwnProperty(length)) {
+          length = data.length;
+        } else {
+          length = JSON.stringify(data).length;
+        }
+        req.app.get('eventEmitter').emit(req.app.get('EVENT_TYPE').DATA_DOWNLOADED, length);
+      } catch(e) {
+        console.error(e);
+      }
     } else {
       res.sendStatus(successStatus);
     }

@@ -1,5 +1,7 @@
 import { shell } from 'electron';
 import { errorCodeLookup } from './server/error_code_lookup';
+import { cleanup } from './ffi/loader';
+import auth from './ffi/api/auth';
 
 class ProxyListener {
   constructor() {
@@ -113,7 +115,7 @@ export default class UIUtils {
   }
 
   // handle auth response
-  authResponse(payload, status) {    
+  authResponse(payload, status) {
     return status ? this.restServer.authApproved(payload) : this.restServer.authRejected(payload);
   }
 
@@ -171,44 +173,31 @@ export default class UIUtils {
   }
 
   reconnect(user) {
-    // this.api.reset();
-    // if (user) {
-    //   this.api.auth.login(user.accountSecret, user.accountPassword, (err) => {
-    //     if (!this.onNetworkStateChange) {
-    //       return;
-    //     }
-    //     let status = null;
-    //     if (err) {
-    //       status = window.NETWORK_STATE.DISCONNECTED;
-    //     } else {
-    //       status = window.NETWORK_STATE.CONNECTED;
-    //     }
-    //     this.onNetworkStateChange(status);
-    //   });
-    // } else {
-    //   this.api.connectWithUnauthorisedClient();
-    // }
+    const self = this;
+    cleanup();
+    if (!user) {
+      return auth.getUnregisteredSession();
+    }
+    const promise = auth.login(user.accountSecret, user.accountPassword);
+    promise.then(() => {
+      if (!self.onNetworkStateChange) {
+        return;
+      }
+      let status = null;
+      if (err) {
+        status = window.NETWORK_STATE.DISCONNECTED;
+      } else {
+        status = window.NETWORK_STATE.CONNECTED;
+        self.restServer.registerConnectedApps();
+      }
+      self.onNetworkStateChange(status);
+    }, () => {
+      if (!self.onNetworkStateChange) {
+        return;
+      }
+      self.onNetworkStateChange(window.NETWORK_STATE.DISCONNECTED);
+    });
   }
-
-  // fetchGetsCount(callback) {
-  //   this.api.clientStats.fetchGetsCount(callback);
-  // }
-  //
-  // fetchDeletesCount(callback) {
-  //   this.api.clientStats.fetchDeletesCount(callback);
-  // }
-  //
-  // fetchPostsCount(callback) {
-  //   this.api.clientStats.fetchPostsCount(callback);
-  // }
-  //
-  // fetchPutsCount(callback) {
-  //   this.api.clientStats.fetchPutsCount(callback);
-  // }
-  //
-  // getAccountInfo(callback) {
-  //   this.api.clientStats.getAccountInfo(callback);
-  // }
 
   onUploadEvent(callback) {
     this.restServer.addEventListener(this.restServer.EVENT_TYPE.DATA_UPLOADED, callback);
