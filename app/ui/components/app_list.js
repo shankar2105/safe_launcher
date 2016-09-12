@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import moment from 'moment';
 import { openExternal } from '../utils/app_utils';
 
 export default class AppList extends Component {
@@ -49,7 +50,7 @@ export default class AppList extends Component {
                 </h3>
                 <h4 className="sub-title">Last Active: { list.lastActive }</h4>
                 <div className="status-bar in-progress">
-                  <span className="time">{ list.status.beginTime }</span>
+                  <span className="time">{ moment(list.status.beginTime).format('HH:mm:ss') }</span>
                   <span className="msg">{ list.status.activityName }</span>
                   <span className="status">{ ACTIVITY_STATUS[list.status.activityStatus] }</span>
                 </div>

@@ -38,11 +38,15 @@ const initialState = {
 const user = (state = initialState, action) => {
   switch (action.type) {
     case ActionTypes.SHOW_APP_DETAIL_PAGE: {
+      const currentAppLogs = action.currentAppLogs.slice();
+      currentAppLogs.sort((a, b) => {
+        return b.beginTime - a.beginTime;
+      });
       const app = state.appList[action.appId];
       return {
         ...state,
         appDetailPageVisible: true,
-        currentAppLogs: action.currentAppLogs,
+        currentAppLogs,
         currentApp: {
           ...app,
           permissions: app.permissions.slice(),
@@ -89,11 +93,11 @@ const user = (state = initialState, action) => {
         vendor: action.app.info.vendor,
         permissions: action.app.info.permissions.list,
         status: {
-          beginTime: moment().format('HH:mm:ss'),
+          beginTime: (new Date()).getTime(),
           activityName: 'Authorisation',
           activityStatus: 1
         },
-        lastActive: moment().fromNow()
+        lastActive: (new Date()).getTime()
       };
       return { ...state, appList };
     }
@@ -131,7 +135,6 @@ const user = (state = initialState, action) => {
         appName: action.activityLog.appName
       };
       const appLogs = state.appLogs.slice();
-      newActivity.beginTime = moment(newActivity.beginTime).format('HH:mm:ss');
       appLogs.unshift(newActivity);
       return { ...state, appLogs };
     }
@@ -145,14 +148,16 @@ const user = (state = initialState, action) => {
         app: action.activityLog.app,
         appName: action.activityLog.appName
       };
-      activity.beginTime = moment(activity.beginTime).format('HH:mm:ss');
       appLogs.unshift(activity);
+
       const currentAppLogs = state.currentAppLogs.slice();
       if (state.appDetailPageVisible && (state.currentApp.id === action.activityLog.app)) {
         const currentAppActivityIndex = currentAppLogs.map(obj => obj.activityId)
           .indexOf(action.activityLog.activity.activityId);
-        currentAppLogs.splice(currentAppActivityIndex, 1);
-        currentAppLogs.unshift(activity);
+          if (currentAppActivityIndex !== -1) {
+            currentAppLogs.splice(currentAppActivityIndex, 1);
+          }
+          currentAppLogs.unshift(activity);
       }
 
       const appList = {};
