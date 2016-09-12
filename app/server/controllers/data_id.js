@@ -30,16 +30,10 @@ export const deserialise = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
-    if (!sessionInfo) {
-      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
-    }
-    const app = sessionInfo.app;
-    if (!app.permission.lowLevelApi) {
-      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
-    }
+    const app = sessionInfo ? sessionInfo.app : null;
     if (!req.rawBody || req.rawBody.length === 0) {
       return next(new ResponseError(400, 'Body can not be empty'));
-    }    
+    }
     const dataHandle = await misc.deserialiseDataId(req.rawBody);
     res.set('Handle-Id', dataHandle);
     res.sendStatus(200);

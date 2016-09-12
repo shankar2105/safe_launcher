@@ -350,7 +350,7 @@ class NFS extends FfiApi {
           return reject(err || res);
         }
         resolve();
-      };      
+      };
       self.safeCore.nfs_writer_write.async(self.writerHolder.get(writerKey), data, data.length, onResult);
     };
     return new Promise(executor);
@@ -378,6 +378,7 @@ class NFS extends FfiApi {
     if (!filePath || !filePath.trim()) {
       return error('Invalid parameters');
     }
+    const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -396,6 +397,7 @@ class NFS extends FfiApi {
     if (!filePath || !filePath.trim()) {
       return error('Invalid parameters');
     }
+    const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -425,6 +427,7 @@ class NFS extends FfiApi {
     if (!srcFilePath || !srcFilePath.trim() || !destPath || !destPath.trim()) {
       return error('Invalid parameters');
     }
+    const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {

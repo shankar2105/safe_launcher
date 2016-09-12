@@ -37,7 +37,7 @@ class DataId extends FfiApi {
     return new Promise(executor);
   }
 
-  getStructuredDataHandle(id, typeTag) {
+  getStructuredDataHandle(typeTag, id) {
     const self = this;
     const executor = (resolve, reject) => {
       const handleRef = ref.alloc(u64);
