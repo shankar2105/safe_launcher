@@ -91,10 +91,10 @@ export const getHandle = async (req, res, next) => {
     typeTag = parseInt(typeTag)
     if (!(typeTag === TAG_TYPE.UNVERSIONED || typeTag === TAG_TYPE.VERSIONED || typeTag >= 15000)) {
       return next(new ResponseError(400, 'Invalid tag type specified'));
-    }
+    }    
     const result = await dataId.getStructuredDataHandle(typeTag, id);
     // res.set('Is-Owner', result.isOwner);
-    res.set(HANDLE_ID_KEY, result.handleId);
+    res.set(HANDLE_ID_KEY, result);
     res.sendStatus(200);
     updateAppActivity(req, res, true);
   } catch(e) {

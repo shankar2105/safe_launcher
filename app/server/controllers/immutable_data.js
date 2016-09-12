@@ -60,24 +60,7 @@ export const read = async (req, res, next) => {
     }
     const handleId = req.params.handleId;
     const sessionInfo = sessionManager.get(req.headers.sessionId);
-    let app = sessionInfo ? sessionInfo.app : null;
-    if (!app && encryptionType !== ENCRYPTION_TYPE.PLAIN) {
-      return next(new ResponseError(400, 'Unauthorised request can only read PLAIN data'));
-    }
-    // let publicKeyHandle;
-    // let encryptionType = ENCRYPTION_TYPE.PLAIN;
-    // if (req.headers.encryption) {
-    //   encryptionType = ENCRYPTION_TYPE[req.headers.encryption.toUpperCase()] || ENCRYPTION_TYPE.PLAIN;
-    // }
-    // if (encryptionType === ENCRYPTION_TYPE.ASYMMETRIC) {
-    //   if (!res.headers['encrypt-key-handle']) {
-    //     return next(new ResponseError(400, 'Encrypt key handle is not present in the header'));
-    //   }
-    //   if (isNaN(res.headers['encrypt-key-handle'])) {
-    //     return next(new ResponseError(400, 'Encrypt key handle is not a valid number'));
-    //   }
-    //   publicKeyHandle = parseInt(res.headers['encrypt-key-handle']);
-    // }
+    let app = sessionInfo ? sessionInfo.app : null;    
     const readerId = await immutableData.getReaderHandle(app, handleId);
     const size = await immutableData.getReaderSize(readerId);
     let range = req.get('range');
