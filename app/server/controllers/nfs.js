@@ -1,6 +1,6 @@
 import mime from 'mime';
 import sessionManager from '../session_manager';
-import { formatDirectoryResponse, formatResponse, ResponseError, ResponseHandler } from '../utils';
+import { ResponseError, ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
 import nfs from '../../ffi/api/nfs';
 import { NfsWriter } from '../stream/nfs_writer';
@@ -43,14 +43,13 @@ let deleteOrGetDirectory = function(req, res, isDelete, next) {
         responseHandler();
       } else {
         log.debug('NFS  - Invoking get directory request');
-        console.log('NFS  - Invoking get directory request');
         const directory = await nfs.getDirectory(app, dirPath, rootPath);
         responseHandler(null, directory);
       }
     } catch(e) {
       console.error(e);
       responseHandler(e);
-    }
+    }    
   };
   exec();
 };

@@ -224,7 +224,6 @@ export default class EventRegistry {
     });
   }
 
-
   run() {
     this.dispatch(setProxy());
     this.handleNetworkEvents();

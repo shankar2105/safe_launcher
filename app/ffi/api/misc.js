@@ -63,9 +63,16 @@ class Misc extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err) => {
+        if (err) {
+          console.error(err);
+        }
         resolve();
       };
-      self.safeCore.misc_u8_ptr_free.async(dataPointer, size, capacity, onResult);
+      try {
+        self.safeCore.misc_u8_ptr_free.async(dataPointer, size, capacity, onResult);
+      } catch(e) {
+        console.error(e);
+      }
     };
     return new Promise(executor);
   }
@@ -98,7 +105,7 @@ class Misc extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const handleRef = ref.alloc(u64);
-      const onResult = (err, res) => {        
+      const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
