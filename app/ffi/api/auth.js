@@ -28,6 +28,7 @@ class Auth extends FfiApi {
       let sessionHandle = ref.alloc(SessionHandlePointer);
       let onResult = (err, res) => {
         if (err || res !== 0) {
+          sessionManager.sendNetworkDisconnected();
           return reject(err || res);
         }
         sessionManager.sessionHandle = sessionHandle.deref();

@@ -22,7 +22,7 @@ const DirectoryMetadata = new StructType({
   name_cap: u64,
   user_metadata: u8Pointer,
   user_metadata_len: u64,
-  user_metadata_cap: u64,  
+  user_metadata_cap: u64,
   is_private: bool,
   is_versioned: bool,
   creation_time_sec: int64,
@@ -38,7 +38,7 @@ const FileMetadata = new StructType({
   user_metadata: u8Pointer,
   user_metadata_len: u64,
   user_metadata_cap: u64,
-  size: int64,
+  size: u64,
   creation_time_sec: int64,
   creation_time_nsec: int64,
   modification_time_sec: int64,
@@ -511,17 +511,13 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  drop() {
-    const self = this;
-    const dropWriter = async (key) => {
-      try {
-        await self.closeWriter(key);
-      } catch(e) {
-        console.log('Error', e);
+  drop = async () => {
+    try {
+      for (let key in this.writerHolder.keys()) {
+        await this.closeWriter(key);
       }
-    };
-    for (let key in this.writerHolder.keys()) {
-      dropWriter(key);
+    } catch(e) {
+      console.log('Error', e);
     }
   }
 }

@@ -35,13 +35,15 @@ mods.forEach(mod => {
 });
 
 export const loadLibrary = () => {
-  let libPath = path.resolve(((process.env.NODE_ENV === 'production') ? remote.app.getAppPath() : process.cwd()), 'dist', 'ffi');
+  const isPacked = remote.app.getAppPath().indexOf('default_app.asar') === -1;
+  let libPath = path.resolve((isPacked ? (remote.app.getAppPath() + '.unpacked') : process.cwd()), 'dist', 'ffi');
   libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
-  const safeCore = ffi.Library(libPath, ffiFunctions);
   console.log('Library loaded from - ', libPath);
+  const safeCore = ffi.Library(libPath, ffiFunctions);
   safeCore.init_logging();
   mods.forEach(mod => {
     if (!(mod instanceof FfiApi)) {
+      debugger;
       return;
     }
     mod.setSafeCore(safeCore);

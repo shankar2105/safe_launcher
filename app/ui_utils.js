@@ -172,30 +172,24 @@ export default class UIUtils {
     this.onNetworkStateChange = callback;
   }
 
-  reconnect(user) {
-    const self = this;
-    cleanup();
+  reconnect = async (user) => {
+    await cleanup();
+     // reconnect Unauthorised client
     if (!user) {
       return auth.getUnregisteredSession();
     }
+    // reconnect authorised client
     const promise = auth.login(user.accountSecret, user.accountPassword);
     promise.then(() => {
-      if (!self.onNetworkStateChange) {
+      if (!this.onNetworkStateChange) {
         return;
       }
-      let status = null;
-      if (err) {
-        status = window.NETWORK_STATE.DISCONNECTED;
-      } else {
-        status = window.NETWORK_STATE.CONNECTED;
-        self.restServer.registerConnectedApps();
-      }
-      self.onNetworkStateChange(status);
+      this.restServer.registerConnectedApps();
     }, () => {
-      if (!self.onNetworkStateChange) {
+      if (!this.onNetworkStateChange) {
         return;
       }
-      self.onNetworkStateChange(window.NETWORK_STATE.DISCONNECTED);
+      this.onNetworkStateChange(window.NETWORK_STATE.DISCONNECTED);
     });
   }
 

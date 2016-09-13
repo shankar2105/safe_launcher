@@ -76,19 +76,40 @@ class AppManager extends FfiApi {
     return new Promise(executor);
   }
 
+  revokeAnonymousApp() {
+    const self = this;
+    const executor = (resolve, reject) => {
+      const onResult = (err) => {
+        if (err) {
+          return reject(err);
+        }
+        self.anonymousApp = null;
+        resolve();
+      };
+      self.safeCore.drop_app.async(self.anonymousApp, onResult);
+    };
+    return new Promise(executor);
+  }
+
   createUnregisteredApp() {
     const self = this;
-    const app = new App('Anonymous Application', 'Anonymous', '0.0.0', 'Anonymous', []);
-    const appHandle = ref.alloc(AppHandlePointer);
+
     const executor = (resolve, reject) => {
-      const onResult = (err, res) => {
+      const app = new App('Anonymous Application', 'Anonymous', '0.0.0', 'Anonymous', []);
+      const appHandle = ref.alloc(AppHandlePointer);
+      const onResult = async (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const handle = appHandle.deref();
-        self.holder.set(app, handle);
-        resolve(app);
+        try {
+          const handle = appHandle.deref();          
+          self.anonymousApp = handle;
+          resolve(app);
+        } catch(e) {
+          console.error(e);
+        }
       };
+
       self.safeCore.create_unauthorised_app.async(sessionManager.sessionHandle, appHandle, onResult);
     };
     return new Promise(executor);
@@ -96,22 +117,18 @@ class AppManager extends FfiApi {
 
   drop() {
     const self = this;
-    const dropApplicationHandle = async(app) => {
+    const exec = async (resolve, reject) => {
       try {
-        const promise = self.revokeApp(app);
-        if (promise) {
-          await promise;
+        for (let app of self.holder.keys()) {
+          await self.revokeApp(app);
         }
-      } catch (e) {
-        console.log('Error', e);
+        resolve();
+      } catch(e) {
+        console.error(e);
+        reject(e);
       }
-    };
-    for (let app of self.holder.keys()) {
-      dropApplicationHandle(app);
     }
-    if (self.anonymousApp) {
-      dropApplicationHandle(self.anonymousApp);
-    }
+    return new Promise(exec);
   }
 }
 

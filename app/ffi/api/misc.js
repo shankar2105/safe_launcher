@@ -25,8 +25,8 @@ class Misc extends FfiApi {
       'init_logging': [int32, []],
       'misc_encrypt_key_free': [int32, [u64]],
       'misc_sign_key_free': [int32, [u64]],
-      'misc_serailise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_deserailise_data_id': [int32, [u8Pointer, u64, u64Pointer]],
+      'misc_serialise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      'misc_deserialise_data_id': [int32, [u8Pointer, u64, u64Pointer]],
       'misc_u8_ptr_free': [Void, [u8Pointer, u64, u64]]
     };
   }
@@ -95,7 +95,7 @@ class Misc extends FfiApi {
         self.dropVector(dataPointer, size, capacity);
         resolve(data);
       };
-      self.safeCore.misc_serailise_data_id.async(handleId, dataPointerRef,
+      self.safeCore.misc_serialise_data_id.async(handleId, dataPointerRef,
         sizeRef, capacityRef, onResult);
     };
     return new Promise(executor);
@@ -111,7 +111,7 @@ class Misc extends FfiApi {
         }
         resolve(handleRef.deref());
       };
-      self.safeCore.misc_deserailise_data_id.async(data, data.length, handleRef, onResult);
+      self.safeCore.misc_deserialise_data_id.async(data, data.length, handleRef, onResult);
     };
     return new Promise(executor);
   }

@@ -118,32 +118,52 @@ class SessionManager extends FfiApi {
     return new Promise(executor);
   }
 
+  sendNetworkDisconnected() {
+    if (self.stateChangeListener) {
+      self.stateChangeListener(2);
+    }
+  };
+
   set sessionHandle(handle) {
     const self = this;
-    if (self.handle) {
-      // appManager.drop();
-      self.safeCore.drop_session.async(self.handle, (e) => {
+
+    const setHandle = async () => {
+      try {
+        const onStateChange = ffi.Callback(Void, [ int32 ], function(state) {
+          if (self.stateChangeListener) {
+            self.stateChangeListener(state);
+          }
+        });
+        if (self.safeCore.register_network_event_observer(handle, onStateChange) !== 0) {
+          throw new Error('Failed to set network observer');
+        }
+        self.handle = handle;
+        await appManager.createUnregisteredApp();
+        if (self.stateChangeListener) {
+          self.stateChangeListener(0);
+        }
+      } catch(e) {
         console.error(e);
-      });
-    }
-    const onStateChange = ffi.Callback(Void, [ int32 ], function(state) {
-      if (self.stateChangeListener) {
-        self.stateChangeListener(state);
       }
-    });
-    if (self.safeCore.register_network_event_observer(handle, onStateChange) !== 0) {
-      throw new Error('Failed to set network observer');
-    }
-    self.handle = handle;
-    appManager.createUnregisteredApp().then((app) => {
-      appManager.anonymousApp = app;
-      if (self.stateChangeListener) {
-        self.stateChangeListener(0);
+    };
+
+    const dropHandle = async () => {
+      try {
+        await appManager.revokeAnonymousApp();
+        await self.dropSessionHandle();
+        setHandle()
+      } catch(e) {
+        console.error(e);
       }
-    });
+    };
+    if (self.handle) {
+      dropHandle();
+    } else {
+      setHandle();
+    }
   }
 
-  drop() {
+  dropSessionHandle() {
     const self = this;
     const executor = (resolve, reject) => {
       self.safeCore.drop_session.async(self.handle, (err) => {

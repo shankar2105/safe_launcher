@@ -21,8 +21,6 @@ export default merge(baseConfig, {
   },
   externals: {
     winston: 'winston',
-    ffi: 'ffi',
-    ref: 'ref'
   },
   module: {
     loaders: [

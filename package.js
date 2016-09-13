@@ -16,7 +16,6 @@ const deps = Object.keys(pkg.dependencies);
 const devDeps = Object.keys(pkg.devDependencies);
 
 const appName = argv.name || argv.n || pkg.productName;
-const shouldUseAsar = argv.asar || argv.a || false;
 const shouldBuildAll = argv.all || false;
 const appCopyright = pkg.copyright;
 
@@ -58,17 +57,18 @@ const DEFAULT_OPTS = {
   },
   'app-copyright': appCopyright,
   ignore: [
-    // '^/app',
+    '^/app',
     '^/test($|/)',
     '^/release($|/)',
     '^/resources($|/)',
     '^/main.development.js',
     '^/build.development.js'
-  ].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
-  .concat(
-    deps.filter(name => !electronCfg.externals.includes(name))
-      .map(name => `/node_modules/${name}($|/)`)
-  )
+  ]
+  // .concat(devDeps.map(name => `/node_modules/${name}($|/)`))
+  // .concat(
+  //   deps.filter(name => !electronCfg.externals.includes(name))
+  //     .map(name => `/node_modules/${name}($|/)`)
+  //)
 };
 
 const icon = argv.icon || argv.i || optionForOs.icon;
@@ -153,6 +153,8 @@ function pack(plat, arch, cb) {
     'app-version': pkg.version || DEFAULT_OPTS.version,
     out: `release/${plat}-${arch}`
   });
+
+  console.log(opts);
 
   packager(opts, cb);
 }
