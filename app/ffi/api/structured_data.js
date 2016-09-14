@@ -9,11 +9,13 @@ import {ENCRYPTION_TYPE} from '../model/enum';
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
+const size_t = ref.types.size_t;
 const Void = ref.types.void;
 
 const VoidPointer = ref.refType(Void);
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
+const size_tPointer = ref.refType(size_t);
 const PointerToU8Pointer = ref.refType(u8Pointer);
 
 class StructuredData extends FfiApi {
@@ -24,13 +26,13 @@ class StructuredData extends FfiApi {
 
   getFunctionsToRegister() {
     return {
-      'struct_data_new': [int32, [VoidPointer, u64, u8Pointer, u64, u8Pointer, u64, u64Pointer]],
+      'struct_data_new': [int32, [VoidPointer, u64, u8Pointer, u64, u8Pointer, size_t, u64Pointer]],
       'struct_data_fetch': [int32, [VoidPointer, u64, u64Pointer]],
       'struct_data_extract_data_id': [int32, [u64, u64Pointer]],
-      'struct_data_new_data': [int32, [VoidPointer, u64, u64, u8Pointer, u64]],
-      'struct_data_extract_data': [int32, [VoidPointer, u64, PointerToU8Pointer, u64Pointer, u64Pointer]],
+      'struct_data_new_data': [int32, [VoidPointer, u64, u64, u8Pointer, size_t]],
+      'struct_data_extract_data': [int32, [VoidPointer, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'struct_data_num_of_versions': [int32, [VoidPointer, u64, u64Pointer]],
-      'struct_data_nth_version': [int32, [VoidPointer, u64, u64, PointerToU8Pointer, u64Pointer, u64Pointer]],
+      'struct_data_nth_version': [int32, [VoidPointer, u64, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'struct_data_put': [int32, [VoidPointer, u64]],
       'struct_data_post': [int32, [VoidPointer, u64]],
       'struct_data_delete': [int32, [VoidPointer, u64]],
@@ -174,8 +176,8 @@ class StructuredData extends FfiApi {
       try {
         const structuredDataHandleId = await self._asStructuredData(app, handleId);
         const dataPointerRef = ref.alloc(PointerToU8Pointer);
-        const sizeRef = ref.alloc(u8);
-        const capacityRef = ref.alloc(u8);
+        const sizeRef = ref.alloc(size_t);
+        const capacityRef = ref.alloc(size_t);
         const onResult = (err, res) => {
           if (err || res !== 0) {
             return reject(err || res);

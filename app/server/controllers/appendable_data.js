@@ -159,6 +159,23 @@ export const remove = async (req, res, next) => {
   }
 };
 
+export const clearDeletedData = async (req, res, next) => {
+  try {
+    const sessionInfo = sessionManager.get(req.headers.sessionId);
+    if (!sessionInfo) {
+      return next(new ResponseError(401, UNAUTHORISED_ACCESS));
+    }
+    if (!sessionInfo.app.permission.lowLevelApi) {
+      return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
+    }
+    await appendableData.clearAllDeletedData(sessionInfo.app, req.params.handleId);
+    res.sendStatus(200);
+    updateAppActivity(req, res, true);
+  } catch(e) {
+    new ResponseHandler(req, res)(e);
+  }
+};
+
 // DELETE /encryptKey/id
 export const dropEncryptKeyHandle = async (req, res, next) => {
   try {

@@ -84,7 +84,7 @@ class ImmutableData extends FfiApi {
             if (!privateKeyHandle) {
               return reject('Invalid private key handle');
             }
-            cipherOptHandle = await cipherOpts.getCipherOptSymmetric(privateKeyHandle);
+            cipherOptHandle = await cipherOpts.getCipherOptAsymmetric(privateKeyHandle);
             break;
         }
         const dataIdRef = ref.alloc(u64);

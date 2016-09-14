@@ -33,6 +33,7 @@ class AppendableData extends FfiApi {
       'appendable_data_remove_nth_data': [int32, [u64, u64]],
       'appendable_data_toggle_filter': [int32, [u64]],
       'appendable_data_free': [int32, [u64]],
+      'appendable_data_clear_deleted_data': [int32, [u64]],
       'appendable_data_insert_to_filter': [int32, [u64, u64]]
     };
   }
@@ -176,11 +177,10 @@ class AppendableData extends FfiApi {
     const executor = async (resolve, reject) => {
       try {
         const appendableDataHandle = await self._asAppendableDataHandle(app, appendableDataIdHandle);
-        const onResult = async (err, res) => {
+        const onResult = (err, res) => {
           if (err || res !== 0) {
             return reject(err || res);
           }
-          await self._save(app, appendableDataHandle, true);
           self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
           resolve();
         };
@@ -255,6 +255,24 @@ class AppendableData extends FfiApi {
       }
     };
     return new Promise(executor);
+  }
+
+  clearAllDeletedData(app, handleId) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, handleId);
+        const onResult = (err, res) => {
+          if (err || res != 0) {
+            reject(err);
+          }
+          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          resolve();
+        };
+        self.safeCore.appendable_data_clear_deleted_data.async(appendableDataHandle, onResult);
+      } catch(e) {
+        reject(e);
+      }
+    });
   }
 
 }

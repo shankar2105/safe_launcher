@@ -81,7 +81,6 @@ router.get('/structuredData/handle/:id', new ActivityMiddleware('Get structured 
 router.put('/structuredData/:handleId', rawBodyParser(), new ActivityMiddleware('Update structured data'), StructuredData.update);
 router.get('/structuredData/:handleId', new ActivityMiddleware('Read structured data'), StructuredData.read);
 
-
 // AppendableData - encryptKey API
 router.get('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Get encrypt key'), AppendableData.getEncryptKey);
 router.delete('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Remove from appendable data'), AppendableData.dropEncryptKeyHandle);
@@ -93,6 +92,7 @@ router.head('/appendableData/:handleId', new ActivityMiddleware('Get appendable 
 router.put('/appendableData/:handleId/:dataIdHandle', new ActivityMiddleware('Append to appendable data'), AppendableData.append);
 router.get('/appendableData/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'), AppendableData.getDataIdAt);
 router.delete('/appendableData/:handleId/:index', new ActivityMiddleware('Remove from appendable data'), AppendableData.remove);
+router.delete('/appendableData/clearDeletedData/:handleId', new ActivityMiddleware('Clear deleted data from appendable data'), AppendableData.clearDeletedData);
 
 /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
 export { router as router_0_5 };

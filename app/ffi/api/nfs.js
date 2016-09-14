@@ -1,10 +1,10 @@
 'use strict';
 
 import ref from 'ref';
-import StructType from 'ref-struct';
 import uuid from 'uuid';
 
-import {error, derefFileMetadataStruct, derefDirectoryMetadataStruct} from '../util/utils';
+import {FileMetadata, DirectoryMetadata, FileDetails,
+       error, derefFileMetadataStruct, derefDirectoryMetadataStruct} from '../util/utils';
 import FfiApi from '../ffi_api';
 import appManager from '../util/app_manager';
 
@@ -16,47 +16,11 @@ const bool = ref.types.bool;
 const u8Pointer = ref.refType(ref.types.uint8);
 const AppHandle = ref.refType(ref.types.void);
 
-const DirectoryMetadata = new StructType({
-  name: u8Pointer,
-  name_len: u64,
-  name_cap: u64,
-  user_metadata: u8Pointer,
-  user_metadata_len: u64,
-  user_metadata_cap: u64,
-  is_private: bool,
-  is_versioned: bool,
-  creation_time_sec: int64,
-  creation_time_nsec: int64,
-  modification_time_sec: int64,
-  modification_time_nsec: int64
-});
-
-const FileMetadata = new StructType({
-  name: u8Pointer,
-  name_len: u64,
-  name_cap: u64,
-  user_metadata: u8Pointer,
-  user_metadata_len: u64,
-  user_metadata_cap: u64,
-  size: u64,
-  creation_time_sec: int64,
-  creation_time_nsec: int64,
-  modification_time_sec: int64,
-  modification_time_nsec: int64
-});
-
 const DirectoryMetadataHandle = ref.refType(DirectoryMetadata);
 const VoidPointerHandle = ref.refType(Void);
 const PointerToVoidPointer = ref.refType(ref.refType(Void));
 const FileMetadataHandle = ref.refType(FileMetadata);
 const PointerToFileMetadataPointer = ref.refType(FileMetadataHandle);
-
-const FileDetails =new StructType({
-  content: u8Pointer,
-  content_len: u64,
-  metadata: FileMetadataHandle
-});
-
 const FileDetailsHandle = ref.refType(FileDetails);
 const PointerToFileDetailsPointer = ref.refType(FileDetailsHandle);
 
@@ -93,7 +57,7 @@ class NFS extends FfiApi {
     };
   }
 
-  static derefDirectoryDetailsHandle(safeCore, dirDetailsHandle) {
+  derefDirectoryDetailsHandle(dirDetailsHandle) {
     const self = this;
 
     const getSubDirectoriesLength = () => {
@@ -104,7 +68,7 @@ class NFS extends FfiApi {
           }
           resolve(len);
         };
-        safeCore.directory_details_get_sub_directories_len.async(dirDetailsHandle, onResult);
+        self.safeCore.directory_details_get_sub_directories_len.async(dirDetailsHandle, onResult);
       };
       return new Promise(executor);
     };
@@ -117,7 +81,7 @@ class NFS extends FfiApi {
           }
           resolve(len);
         };
-        safeCore.directory_details_get_files_len.async(dirDetailsHandle, onResult);
+        self.safeCore.directory_details_get_files_len.async(dirDetailsHandle, onResult);
       };
       return new Promise(executor);
     };
@@ -130,7 +94,7 @@ class NFS extends FfiApi {
           }
           resolve(derefDirectoryMetadataStruct(handle.deref()));
         };
-        safeCore.directory_details_get_sub_directory_at.async(dirDetailsHandle, index, onResult);
+        self.safeCore.directory_details_get_sub_directory_at.async(dirDetailsHandle, index, onResult);
       };
       return new Promise(executor);
     };
@@ -156,7 +120,7 @@ class NFS extends FfiApi {
           }
           resolve(derefFileMetadataStruct(handle.deref()));
         };
-        safeCore.directory_details_get_file_at.async(dirDetailsHandle, index, onResult);
+        self.safeCore.directory_details_get_file_at.async(dirDetailsHandle, index, onResult);
       };
       return new Promise(executor);
     };
@@ -175,7 +139,7 @@ class NFS extends FfiApi {
     };
 
     const executor = (resolve, reject) => {
-      safeCore.directory_details_get_metadata.async(dirDetailsHandle, (err, metadataHandle) => {
+      self.safeCore.directory_details_get_metadata.async(dirDetailsHandle, (err, metadataHandle) => {
         if (err) {
           return reject(err);
         }
@@ -183,7 +147,7 @@ class NFS extends FfiApi {
           const metadata = derefDirectoryMetadataStruct(metadataHandle.deref());
           const subDirectories = await getSubDirectories();
           const files = await getFiles();
-          safeCore.directory_details_drop.async(dirDetailsHandle, (err) => {
+          self.safeCore.directory_details_drop.async(dirDetailsHandle, (err) => {
             if (err) {
               console.log('Error in dropping directory details handle', err);
             }
@@ -233,7 +197,7 @@ class NFS extends FfiApi {
           return reject(err || res);
         }
         const dirDetails = dirDetailsHandle.deref();
-        resolve(NFS.derefDirectoryDetailsHandle(self.safeCore, dirDetails));
+        resolve(self.derefDirectoryDetailsHandle(dirDetails));
       };
       const pathBuff = new Buffer(path);
       self.safeCore.nfs_get_dir.async(appManager.getHandle(app), pathBuff, pathBuff.length,
@@ -510,5 +474,6 @@ class NFS extends FfiApi {
   }
 }
 
-var nfs = new NFS();
+
+const nfs = new NFS();
 export default nfs;
