@@ -496,7 +496,7 @@ class NFS extends FfiApi {
         const fileDetailsHandle = fileDetailsPointerHandle.deref();
         const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
         const fileDetails = handle.deref();
-        const data = ref.reinterpret(fileDetails.content, fileDetails.content_len);
+        const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
         self.safeCore.file_details_drop.async(handle, (e) => {
           if (e) {
             console.error(e);

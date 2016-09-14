@@ -42,20 +42,19 @@ class SessionManager {
     return null;
   }
 
-  registerApps() {
-    const exec = async () => {
+  registerApps = () => {
+    return new Promise(async (resolve, reject) => {
       try {
         for (let key in this.sessionPool) {
           app = this.sessionPool[key].app;
           await appManager.registerApp(app)
         }
-        return true;
+        resolve();
       } catch (e) {
         console.error(e);
+        reject(e);
       }
-      return false;
-    };
-    exec();
+    });
   }
 }
 

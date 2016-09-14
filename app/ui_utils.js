@@ -173,24 +173,22 @@ export default class UIUtils {
   }
 
   reconnect = async (user) => {
-    await cleanup();
-     // reconnect Unauthorised client
-    if (!user) {
-      return auth.getUnregisteredSession();
-    }
-    // reconnect authorised client
-    const promise = auth.login(user.accountSecret, user.accountPassword);
-    promise.then(() => {
-      if (!this.onNetworkStateChange) {
-        return;
+    try {
+      await cleanup();
+       // reconnect Unauthorised client
+      if (!user) {
+        return auth.getUnregisteredSession();
       }
-      this.restServer.registerConnectedApps();
-    }, () => {
+      // reconnect authorised client
+      await auth.login(user.accountSecret, user.accountPassword);
+      await this.restServer.registerConnectedApps();      
+    } catch(e) {
+      console.error(e);
       if (!this.onNetworkStateChange) {
         return;
       }
       this.onNetworkStateChange(window.NETWORK_STATE.DISCONNECTED);
-    });
+    }
   }
 
   onUploadEvent(callback) {

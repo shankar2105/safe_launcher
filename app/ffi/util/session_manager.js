@@ -44,8 +44,7 @@ class SessionManager extends FfiApi {
   }
 
   getAccountInfo() {
-    const self = this;
-    const executor = (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const used = ref.alloc(u64);
       const total = ref.alloc(u64);
       const onResult = (err, res) => {
@@ -57,23 +56,20 @@ class SessionManager extends FfiApi {
           available: total.deref()
         });
       };
-      self.safeCore.get_account_info.async(self.handle, used, total, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.get_account_info.async(this.handle, used, total, onResult);
+    });
   }
 
   getClientGetsCount() {
-    const self = this;
-    const executor = (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const onResult = (err, count) => {
         if (err) {
           return reject(err);
         }
         resolve(count);
       };
-      self.safeCore.client_issued_gets.async(self.handle, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.client_issued_gets.async(this.handle, onResult);
+    });
   }
 
   getClientDeletesCount() {
@@ -125,42 +121,25 @@ class SessionManager extends FfiApi {
   };
 
   set sessionHandle(handle) {
-    const self = this;
-
-    const setHandle = async () => {
-      try {
-        const onStateChange = ffi.Callback(Void, [ int32 ], function(state) {
-          if (self.stateChangeListener) {
-            self.stateChangeListener(state);
-          }
-        });
-        if (self.safeCore.register_network_event_observer(handle, onStateChange) !== 0) {
-          throw new Error('Failed to set network observer');
-        }
-        self.handle = handle;
-        await appManager.createUnregisteredApp();
-        if (self.stateChangeListener) {
-          self.stateChangeListener(0);
-        }
-      } catch(e) {
-        console.error(e);
-      }
-    };
-
-    const dropHandle = async () => {
-      try {
+    (async () => {
+      if (this.handle) {
         await appManager.revokeAnonymousApp();
-        await self.dropSessionHandle();
-        setHandle()
-      } catch(e) {
-        console.error(e);
+        await this.dropSessionHandle();
       }
-    };
-    if (self.handle) {
-      dropHandle();
-    } else {
-      setHandle();
-    }
+      const onStateChange = ffi.Callback(Void, [ int32 ], function(state) {
+        if (this.stateChangeListener) {
+          this.stateChangeListener(state);
+        }
+      });
+      if (this.safeCore.register_network_event_observer(handle, onStateChange) !== 0) {
+        throw new Error('Failed to set network observer');
+      }
+      this.handle = handle;
+      await appManager.createUnregisteredApp();
+      if (this.stateChangeListener) {
+        this.stateChangeListener(0);
+      }
+    })();
   }
 
   dropSessionHandle() {

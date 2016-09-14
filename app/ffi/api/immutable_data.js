@@ -152,7 +152,7 @@ class ImmutableData extends FfiApi {
         const dataRef = dataRefRef.deref();
         const size = sizeRef.deref();
         const capacity = capacityRef.deref();
-        const data = ref.reinterpret(dataRef, size);
+        const data = Buffer.concat([ref.reinterpret(dataRef, size)]);
         misc.dropVector(dataRef, size, capacity);
         resolve(data);
       };

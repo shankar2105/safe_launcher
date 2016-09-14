@@ -185,7 +185,7 @@ class StructuredData extends FfiApi {
           let data;
           if (size > 0) {
             const dataPointer = dataPointerRef.deref();
-            data = ref.reinterpret(dataPointer, size);
+            data = Buffer.concat([ref.reinterpret(dataPointer, size)]);
             misc.dropVector(dataPointer, size, capacity);
           }
           self.safeCore.struct_data_free.async(structuredDataHandleId, () => {});

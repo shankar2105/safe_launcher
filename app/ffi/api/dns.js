@@ -36,7 +36,6 @@ class DNS extends FfiApi {
     if (!longName || !longName.trim()) {
       return error('Invalid parameters');
     }
-    const self = this;
     const executor = (resolve, reject) => {
       const onResult = (err, res) => {
         if (err || res !== 0) {
@@ -45,7 +44,7 @@ class DNS extends FfiApi {
         resolve();
       };
       const longNameBuffer = new Buffer(longName);
-      self.safeCore.dns_register_long_name.async(appManager.getHandle(app),
+      this.safeCore.dns_register_long_name.async(appManager.getHandle(app),
         longNameBuffer, longNameBuffer.length, onResult);
     };
     return new Promise(executor);
@@ -55,19 +54,17 @@ class DNS extends FfiApi {
     if (!app) {
       return error('Application parameter is mandatory');
     }
-    const self = this;
-    const listHandlePointer = ref.alloc(PointerToVoidPointer);
-    const executor = (resolve, reject) => {
+    return new Promise((resolve, reject) => {
+      const listHandlePointer = ref.alloc(PointerToVoidPointer);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         const listHandle = listHandlePointer.deref();
-        resolve(consumeStringListHandle(self.safeCore, listHandle));
+        resolve(consumeStringListHandle(this.safeCore, listHandle));
       };
-      self.safeCore.dns_get_long_names.async(appManager.getHandle(app), listHandlePointer, onResult);
-    };
-    return new Promise(executor);
+      this.safeCore.dns_get_long_names.async(appManager.getHandle(app), listHandlePointer, onResult);
+    });
   }
 }
 

@@ -4,7 +4,7 @@ import { ResponseError, ResponseHandler } from '../utils';
 import { log } from './../../logger/log';
 import nfs from '../../ffi/api/nfs';
 import { NfsWriter } from '../stream/nfs_writer';
-import { NfsReader } from '../stream/nfs_reader';
+import NfsReader from '../stream/nfs_reader';
 import { errorCodeLookup } from './../error_code_lookup';
 import util from 'util';
 import { MSG_CONSTANTS } from './../message_constants';
@@ -49,7 +49,7 @@ let deleteOrGetDirectory = function(req, res, isDelete, next) {
     } catch(e) {
       console.error(e);
       responseHandler(e);
-    }    
+    }
   };
   exec();
 };
@@ -282,7 +282,7 @@ export var getFile = function(req, res, next) {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('NFS - Ready to stream file for range' + start + '-' + end + '/' + total);
+    log.debug('NFS - Ready to stream file for range' + start + '-' + end + '/' + total);    
     var headers = {
       'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
       'Accept-Ranges': 'bytes',
