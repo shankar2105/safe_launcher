@@ -167,7 +167,7 @@ export var modifyDirectory = function(req, res, next) {
   }
   let responseHandler = new ResponseHandler(req, res);
   log.debug('NFS - Invoking modify directory request');
-  nfs.modifyDirectory(app, dirPath, rootPath, reqBody.name, reqBody.metadata)
+  nfs.updateDirectory(sessionInfo.app, dirPath, rootPath, reqBody.name, reqBody.metadata)
     .then(responseHandler, responseHandler, responseHandler);
 };
 
@@ -244,7 +244,7 @@ export var modifyFileMeta = function(req, res, next) {
   }
   let responseHandler = new ResponseHandler(req, res);
   log.debug('NFS - Invoking modify file metadata request');
-  nfs.modifyFileMeta(sessionInfo.app, filePath, rootPath, reqBody.name, reqBody.metadata)
+  nfs.updateFileMetadata(sessionInfo.app, filePath, rootPath, reqBody.name, reqBody.metadata)
     .then(responseHandler, responseHandler, responseHandler);
 };
 
@@ -282,7 +282,7 @@ export var getFile = function(req, res, next) {
     if (chunksize < 0 || end > total) {
       return next(new ResponseError(416));
     }
-    log.debug('NFS - Ready to stream file for range' + start + '-' + end + '/' + total);    
+    log.debug('NFS - Ready to stream file for range' + start + '-' + end + '/' + total);
     var headers = {
       'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
       'Accept-Ranges': 'bytes',

@@ -90,7 +90,7 @@ class Misc extends FfiApi {
         const size = sizeRef.deref();
         const capacity = capacityRef.deref();
         const dataPointer = dataPointerRef.deref();
-        const data = Buffer.concat([ref.reinterpret(dataPointer, size)]);        
+        const data = Buffer.concat([ref.reinterpret(dataPointer, size)]);
         self.dropVector(dataPointer, size, capacity);
         resolve(data);
       };

@@ -274,14 +274,8 @@ class NFS extends FfiApi {
         resolve();
       };
       const pathBuff = new Buffer(path);
-      let nameBuff = null;
-      let metadataBuff = null;
-      if (newName) {
-        nameBuff = new Buffer(newName);
-      }
-      if (metadata) {
-        metadataBuff = new Buffer(metadata);
-      }
+      const nameBuff = new Buffer(newName || 0);
+      const metadataBuff = new Buffer(metadataBuff || 0);
       self.safeCore.nfs_modify_dir.async(appManager.getHandle(app), pathBuff, pathBuff.length,
         isShared, nameBuff, (nameBuff ? nameBuff.length : 0),
         metadataBuff, (metadataBuff ? metadataBuff.length : 0), onResult);
@@ -397,7 +391,7 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  updateFile(app, filePath, isShared = false, newName, metadata) {
+  updateFileMetadata(app, filePath, isShared = false, newName, metadata) {
     if (!filePath || !filePath.trim()) {
       return error('Invalid parameters');
     }
@@ -411,18 +405,12 @@ class NFS extends FfiApi {
       };
 
       const pathBuff = new Buffer(filePath);
-      let nameBuff = null;
-      let metadataBuff = null;
-      if (nameBuff) {
-        nameBuff = new Buffer(newName);
-      }
-      if (metadata) {
-        metadataBuff = new Buffer(metadata);
-      }
+      const nameBuff = new Buffer(newName || 0);
+      const metadataBuff = new Buffer(metadataBuff || 0);
       self.safeCore.nfs_modify_file.async(appManager.getHandle(app), pathBuff, pathBuff.length,
         isShared, nameBuff, (nameBuff ? nameBuff.length : 0),
         metadataBuff, (metadataBuff ? metadataBuff.length : 0),
-        null, 0, onResult);
+        new Buffer(0), 0, onResult);
     };
     return new Promise(executor);
   }
