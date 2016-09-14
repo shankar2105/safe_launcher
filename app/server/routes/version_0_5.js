@@ -88,11 +88,13 @@ router.delete('/appendableData/encryptKey/:handleId', new ActivityMiddleware('Re
 // Appendable Data
 router.post('/appendableData', jsonParser, new ActivityMiddleware('Create appendable data'), AppendableData.create);
 router.get('/appendableData/handle/:id', new ActivityMiddleware('Get appendable data handle'), AppendableData.getHandle);
+router.delete('/appendableData/clearDeletedData/:handleId', new ActivityMiddleware('Clear deleted data from appendable data'), AppendableData.clearDeletedData);
+router.post('/appendableData/serialise/:handleId', new ActivityMiddleware('Serialise appendable data'), AppendableData.serialise);
+
 router.head('/appendableData/:handleId', new ActivityMiddleware('Get appendable data length'), AppendableData.getMetadata);
 router.put('/appendableData/:handleId/:dataIdHandle', new ActivityMiddleware('Append to appendable data'), AppendableData.append);
 router.get('/appendableData/:handleId/:index', new ActivityMiddleware('Get DataId from appendable data'), AppendableData.getDataIdAt);
 router.delete('/appendableData/:handleId/:index', new ActivityMiddleware('Remove from appendable data'), AppendableData.remove);
-router.delete('/appendableData/clearDeletedData/:handleId', new ActivityMiddleware('Clear deleted data from appendable data'), AppendableData.clearDeletedData);
 
 /*jscs:disable requireCamelCaseOrUpperCaseIdentifiers*/
 export { router as router_0_5 };

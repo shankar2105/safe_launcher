@@ -1,13 +1,16 @@
 import ref from 'ref';
 
 import FfiApi from '../ffi_api';
+import misc from './misc';
+
 import appManager from '../util/app_manager';
 import {FILTER_TYPE} from '../model/enum';
 const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
 const Void = ref.types.void;
-
+const size_t = ref.types.size_t;
+const bool = ref.types.bool;
 const VoidPointer = ref.refType(Void);
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
@@ -25,12 +28,12 @@ class AppendableData extends FfiApi {
       'appendable_data_get': [int32, [VoidPointer, u64, u64Pointer]],
       'appendable_data_extract_data_id': [int32, [u64, u64Pointer]],
       'appendable_data_put': [int32, [VoidPointer, u64]],
-      'appendable_data_post': [int32, [VoidPointer, u64]],
+      'appendable_data_post': [int32, [VoidPointer, u64, bool]],
       'appendable_data_encrypt_key': [int32, [u64, u64Pointer]],
       'appendable_data_num_of_data': [int32, [u64, u64Pointer]],
-      'appendable_data_nth_data_id': [int32, [VoidPointer, u64, u64, u64Pointer]],
+      'appendable_data_nth_data_id': [int32, [VoidPointer, u64, size_t, u64Pointer]],
       'appendable_data_append': [int32, [VoidPointer, u64, u64]],
-      'appendable_data_remove_nth_data': [int32, [u64, u64]],
+      'appendable_data_remove_nth_data': [int32, [u64, size_t]],
       'appendable_data_toggle_filter': [int32, [u64]],
       'appendable_data_free': [int32, [u64]],
       'appendable_data_clear_deleted_data': [int32, [u64]],
@@ -48,7 +51,7 @@ class AppendableData extends FfiApi {
         resolve();
       };
       if (isPost) {
-        self.safeCore.appendable_data_post.async(appManager.getHandle(app), appendHandleId, onResult);
+        self.safeCore.appendable_data_post.async(appManager.getHandle(app), appendHandleId, false, onResult);
       } else {
         self.safeCore.appendable_data_put.async(appManager.getHandle(app), appendHandleId, onResult);
       }
@@ -260,20 +263,33 @@ class AppendableData extends FfiApi {
   clearAllDeletedData(app, handleId) {
     return new Promise(async (resolve, reject) => {
       try {
-        const appendableDataHandle = await self._asAppendableDataHandle(app, handleId);
+        const appendableDataHandle = await this._asAppendableDataHandle(app, handleId);
         const onResult = (err, res) => {
           if (err || res != 0) {
             reject(err);
           }
-          self.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+          this.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
           resolve();
         };
-        self.safeCore.appendable_data_clear_deleted_data.async(appendableDataHandle, onResult);
+        this.safeCore.appendable_data_clear_deleted_data.async(appendableDataHandle, onResult);
       } catch(e) {
         reject(e);
       }
     });
   }
+
+  serialise = (handleId) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const appendableDataHandle = await self._asAppendableDataHandle(app, handleId);
+        const serialisedData = await misc.serialiseAppendableData(appendableDataHandle);
+        this.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
+        resolve();
+      } catch(e) {
+        reject(e);
+      }
+    });
+  };
 
 }
 

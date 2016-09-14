@@ -27,6 +27,7 @@ class Misc extends FfiApi {
       'misc_sign_key_free': [int32, [u64]],
       'misc_serialise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'misc_deserialise_data_id': [int32, [u8Pointer, u64, u64Pointer]],
+      'misc_serialise_appendable_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'misc_u8_ptr_free': [Void, [u8Pointer, u64, u64]]
     };
   }
@@ -77,9 +78,8 @@ class Misc extends FfiApi {
     return new Promise(executor);
   }
 
-  serialiseDataId(handleId) {
-    const self = this;
-    const executor = (resolve, reject) => {
+  _serialise(handleId, type) {
+    return new Promise((resolve, reject) => {
       const dataPointerRef = ref.alloc(PointerToU8Pointer);
       const sizeRef = ref.alloc(size_t);
       const capacityRef = ref.alloc(size_t);
@@ -91,13 +91,29 @@ class Misc extends FfiApi {
         const capacity = capacityRef.deref();
         const dataPointer = dataPointerRef.deref();
         const data = Buffer.concat([ref.reinterpret(dataPointer, size)]);
-        self.dropVector(dataPointer, size, capacity);
+        this.dropVector(dataPointer, size, capacity);
         resolve(data);
       };
-      self.safeCore.misc_serialise_data_id.async(handleId, dataPointerRef,
-        sizeRef, capacityRef, onResult);
-    };
-    return new Promise(executor);
+      switch (type) {
+        case 0:
+          this.safeCore.misc_serialise_data_id.async(handleId, dataPointerRef,
+            sizeRef, capacityRef, onResult);
+          break;
+        case 1:
+          this.safeCore.misc_serialise_appendable_data.async(handleId, dataPointerRef,
+            sizeRef, capacityRef, onResult);
+          break;
+        default:
+      }
+    });
+  }
+
+  serialiseDataId(handleId) {
+    return this._serialise(handleId, 0);
+  }
+
+  serialiseAppendableData(handleId) {
+    return this._serialise(handleId, 1);
   }
 
   deserialiseDataId(data) {
