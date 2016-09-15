@@ -16,6 +16,10 @@ export default class LogList extends Component {
     this.handleFilter = this.handleFilter.bind(this);
   }
 
+  componentDidUpdate() {
+    const { appLogs } = this.props;
+  }
+
   handleFilter() {
     const { setLogsFilter } = this.props;
     const filter = [];
@@ -43,7 +47,7 @@ export default class LogList extends Component {
 
     const tableInnerBaseClassnames = className(
       'table-inner-b',
-      { 'three-col': forSingleApp }
+      { 'three-col': forSingleApp, 'four-col': !forSingleApp }
     );
 
     const tableFilterClassnames = className(
@@ -62,6 +66,7 @@ export default class LogList extends Component {
               type="checkbox"
               ref={c => { this.inProgress = c; }}
               onChange={this.handleFilter}
+              checked={ !filterDisabled && (logFilter.indexOf(STATUS[0].code) !== -1) }
               disabled={filterDisabled ? 'disabled' : ''}
             />
             <label htmlFor="inProgress">In Progress</label>
@@ -72,6 +77,7 @@ export default class LogList extends Component {
               type="checkbox"
               ref={c => { this.completed = c; }}
               onChange={this.handleFilter}
+              checked={ !filterDisabled && (logFilter.indexOf(STATUS[1].code) !== -1) }
               disabled={filterDisabled ? 'disabled' : ''}
             />
             <label htmlFor="completed">Completed</label>
@@ -82,6 +88,7 @@ export default class LogList extends Component {
               type="checkbox"
               ref={c => { this.error = c; }}
               onChange={this.handleFilter}
+              checked={ !filterDisabled && (logFilter.indexOf(STATUS['-1'].code) !== -1) }
               disabled={filterDisabled ? 'disabled' : ''}
             />
             <label htmlFor="error">Error</label>
@@ -100,7 +107,7 @@ export default class LogList extends Component {
             <tbody>
               {
                 appLogs.length === 0 ? <Log log={emptyLog} /> : appLogs.map((log, i) => {
-                  if ((logFilter.length !== 0) &&
+                  if ((logFilter.length === 0) ||
                     (logFilter.indexOf(STATUS[log.activityStatus].code) === -1)) {
                     return null;
                   }

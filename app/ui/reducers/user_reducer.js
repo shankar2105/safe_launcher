@@ -1,13 +1,19 @@
 import moment from 'moment';
 import ActionTypes from '../actions/action_types';
 import { CONSTANT } from '../constant';
+import { LOG_STATUS } from '../utils/app_utils';
 
 const AuthRequestQueue = [];
+const LOG_FILTER_INITIAL = [
+  LOG_STATUS[0].code,
+  LOG_STATUS[1].code,
+  LOG_STATUS['-1'].code
+];
 
 const initialState = {
   appList: {},
   appLogs: [],
-  logFilter: [],
+  logFilter: LOG_FILTER_INITIAL,
   appDetailPageVisible: false,
   revokedAppList: {},
   currentApp: null,
@@ -182,7 +188,7 @@ const user = (state = initialState, action) => {
       return { ...state, logFilter: action.fields };
     }
     case ActionTypes.RESET_LOGS_FILTER: {
-      return { ...state, logFilter: [] };
+      return { ...state, logFilter: LOG_FILTER_INITIAL.slice() };
     }
     case ActionTypes.SET_UPLOAD_DATA: {
       return {

@@ -5,7 +5,7 @@ let template;
 let mainWindow = null;
 
 const appWidth = 750 + (process.platform === 'win32' ? 20 : 0);
-const appHeight = 550 + (process.platform === 'win32' ? 30 : 0);
+const appHeight = 550 + (process.platform === 'win32' ? 30 : 10);
 
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')(); // eslint-disable-line global-require

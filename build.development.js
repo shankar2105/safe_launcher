@@ -15,7 +15,6 @@ const build = () => {
   const filesToMove = [
     'server',
     'logger',
-    'ui/images',
     'app.html',
     libPath
   ];
