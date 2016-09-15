@@ -49,7 +49,7 @@ const config = merge(baseConfig, {
     new CopyWebpackPlugin([
       { from: 'app/server', to: 'server' },
       { from: 'app/app.html' },
-      { from: 'app/ui/images', to: 'ui/images' }
+      { from: 'app//images', to: 'images' }
     ])
   ],
 

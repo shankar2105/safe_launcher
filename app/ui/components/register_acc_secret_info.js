@@ -17,7 +17,7 @@ export default class RegisterAccSecretInfo extends Component {
           Your '<b>account secret</b>' is used to locate your account information on the network.
         </div>
         <div className="auth-intro-media sm">
-          <img src="./ui/images/account_secret.svg" alt="Welcome to the Safe Launcher" />
+          <img src="./images/account_secret.svg" alt="Welcome to the Safe Launcher" />
         </div>
         <div className="opt">
           <div className="opt-i lt">

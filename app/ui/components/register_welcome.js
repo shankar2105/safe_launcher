@@ -10,7 +10,7 @@ export default class RegisterWelcome extends Component {
       <div className="auth-intro-cnt">
         <h3 className="title">Welcome to the SAFE Launcher!</h3>
         <div className="auth-intro-media">
-          <img src="./ui/images/launcher_logo.svg" alt="Welcome to the Safe Launcher" />
+          <img src="./images/launcher_logo.svg" alt="Welcome to the Safe Launcher" />
         </div>
         <div className="desc">
           Launcher will act as your gateway to the SAFE Network,
