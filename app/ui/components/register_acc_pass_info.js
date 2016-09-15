@@ -14,7 +14,7 @@ export default class RegisterAccPassInfo extends Component {
           The '<b>account password</b>' is used to unlock and access all of your data.
         </div>
         <div className="auth-intro-media">
-          <img src="./ui/images/account_password.svg" alt="Welcome to the Safe Launcher" />
+          <img src="./images/account_password.svg" alt="Welcome to the Safe Launcher" />
         </div>
         <div className="opt">
           <div className="opt-i lt">
