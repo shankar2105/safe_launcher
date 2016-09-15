@@ -29,14 +29,12 @@ export default class Toaster extends Component {
   }
 
   componentDidUpdate() {
-    const { options, retryCount } = this.props;
+    const { active, options, retryCount } = this.props;
     this.initialRetryCount *= Math.pow(2, retryCount);
     if (options) {
       if (options.autoHide) {
         this.setTimer();
-      }
-
-      if (options.type === CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY) {
+      } else if (options.type === CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY) {
         this.setNetworkRetryTimer();
       }
     }
@@ -50,10 +48,10 @@ export default class Toaster extends Component {
   setTimer(timeout) {
     const { hasNext, message, showNextToaster, hideToaster } = this.props;
     this.timer = window.setTimeout(() => {
-      if (hasNext && message) {
+      if (hasNext) {
         showNextToaster();
       } else {
-        hideToaster()
+        hideToaster();
       }
       return this.clearTimer();
     }, timeout || CONSTANT.TOSATER_TIMEOUT);
@@ -63,7 +61,7 @@ export default class Toaster extends Component {
     this.retryTimer = window.setInterval(() => {
       this.message.innerText = `${this.props.message} ${this.initialRetryCount} sec`;
       if (this.initialRetryCount === 0) {
-        this.clearNetworkRetryTimer();        
+        this.clearNetworkRetryTimer();
         return this.props.retryNetwork(this.props.user);
       }
       this.initialRetryCount--;
@@ -71,7 +69,8 @@ export default class Toaster extends Component {
   }
 
   clearNetworkRetryTimer() {
-    clearTimeout(this.retryTimer);
+    this.initialRetryCount = 10;
+    window.clearInterval(this.retryTimer);
     this.retryTimer = null;
   }
 
@@ -101,6 +100,7 @@ export default class Toaster extends Component {
   render() {
     const { active, user, message, options, retryNetwork } = this.props;
     let option = null;
+    const self = this;
 
     if (Object.keys(options).length > 0) {
       switch (options.type) {
@@ -112,8 +112,8 @@ export default class Toaster extends Component {
                 className="btn"
                 name="retry"
                 onClick={() => {
-                  clearTimeout(self.retryTimer);
-                  retryNetwork(user);
+                  self.clearNetworkRetryTimer();
+                  return retryNetwork(user);
                 }}
               >RETRY</button>
             </div>

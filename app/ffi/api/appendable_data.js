@@ -264,10 +264,11 @@ class AppendableData extends FfiApi {
     return new Promise(async (resolve, reject) => {
       try {
         const appendableDataHandle = await this._asAppendableDataHandle(app, handleId);
-        const onResult = (err, res) => {
+        const onResult = async (err, res) => {
           if (err || res != 0) {
             reject(err);
           }
+          await this._save(app, appendableDataHandle, true);
           this.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
           resolve();
         };

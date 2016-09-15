@@ -29,7 +29,7 @@ export default class Permission extends Component {
             Low Level API
           </label>
           <p className="permissions-desc">
-            Allow this app to access the data stored in your SAFE Drive.
+            Allow extended access to primitive data types.
           </p>
         </div>
       );

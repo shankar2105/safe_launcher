@@ -176,7 +176,7 @@ export default class UIUtils {
     try {
       await cleanup();
        // reconnect Unauthorised client
-      if (!user) {
+      if (!user || Object.keys(user).length === 0) {
         return auth.getUnregisteredSession();
       }
       if (!user.accountSecret || !user.accountPassword) {

@@ -38,7 +38,7 @@ const toaster = (state = initialState, action) => {
       };
     }
     case ActionTypes.HIDE_TOASTER: {
-      return { ...state, active: false, message: '', options: {} };
+      return { ...state, active: false, message: '', options: {}, hasNext: (ToasterQueue.length !== 0) };
     }
     default:
       return state;

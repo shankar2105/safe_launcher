@@ -153,7 +153,7 @@ class NFS extends FfiApi {
             }
           });
           resolve({
-            metadata: metadata,
+            info: metadata,
             subDirectories: subDirectories,
             files: files
           });
