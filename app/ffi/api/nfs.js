@@ -220,7 +220,7 @@ class NFS extends FfiApi {
       };
       const pathBuff = new Buffer(path);
       self.safeCore.nfs_delete_dir.async(appManager.getHandle(app), pathBuff, pathBuff.length,
-        isShared, dirDetailsHandle, onResult);
+        isShared, onResult);
     };
     return new Promise(executor);
   }
@@ -238,8 +238,8 @@ class NFS extends FfiApi {
         resolve();
       };
       const pathBuff = new Buffer(path);
-      const nameBuff = new Buffer(newName || 0);
-      const metadataBuff = new Buffer(metadataBuff || 0);
+      const nameBuff = newName ? new Buffer(newName) : null;
+      const metadataBuff = metadataBuff ? new Buffer(metadataBuff) : null;
       self.safeCore.nfs_modify_dir.async(appManager.getHandle(app), pathBuff, pathBuff.length,
         isShared, nameBuff, (nameBuff ? nameBuff.length : 0),
         metadataBuff, (metadataBuff ? metadataBuff.length : 0), onResult);
@@ -369,12 +369,12 @@ class NFS extends FfiApi {
       };
 
       const pathBuff = new Buffer(filePath);
-      const nameBuff = new Buffer(newName || 0);
-      const metadataBuff = new Buffer(metadataBuff || 0);
+      const nameBuff = newName ? new Buffer(newName) : null;
+      const metadataBuff = metadata ? new Buffer(metadata) : null;
       self.safeCore.nfs_modify_file.async(appManager.getHandle(app), pathBuff, pathBuff.length,
         isShared, nameBuff, (nameBuff ? nameBuff.length : 0),
         metadataBuff, (metadataBuff ? metadataBuff.length : 0),
-        new Buffer(0), 0, onResult);
+        null, 0, onResult);
     };
     return new Promise(executor);
   }
@@ -473,7 +473,6 @@ class NFS extends FfiApi {
     }
   }
 }
-
 
 const nfs = new NFS();
 export default nfs;

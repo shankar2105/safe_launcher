@@ -10,11 +10,13 @@ const int32 = ref.types.int32;
 const u8 = ref.types.uint8;
 const u64 = ref.types.uint64;
 const Void = ref.types.void;
+const size_t = ref.types.size_t;
 
 const VoidPointer = ref.refType(Void);
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 const PointerToU8Pointer = ref.refType(u8Pointer);
+const size_tPointer = ref.refType(size_t);
 
 class ImmutableData extends FfiApi {
 
@@ -29,7 +31,7 @@ class ImmutableData extends FfiApi {
       'immut_data_close_self_encryptor': [int32, [VoidPointer, u64, u64, u64Pointer]],
       'immut_data_fetch_self_encryptor': [int32, [VoidPointer, u64, u64Pointer]],
       'immut_data_size': [int32, [u64, u64Pointer]],
-      'immut_data_read_from_self_encryptor': [int32, [u64, u64, u64, PointerToU8Pointer, u64Pointer, u64Pointer]],
+      'immut_data_read_from_self_encryptor': [int32, [u64, u64, u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
       'immut_data_self_encryptor_writer_free': [int32, [u64]],
       'immut_data_self_encryptor_reader_free': [int32, [u64]]
     };
@@ -143,8 +145,8 @@ class ImmutableData extends FfiApi {
     const self = this;
     const executor = (resolve, reject) => {
       const dataRefRef = ref.alloc(PointerToU8Pointer);
-      const sizeRef = ref.alloc(u64);
-      const capacityRef = ref.alloc(u64);
+      const sizeRef = ref.alloc(size_t);
+      const capacityRef = ref.alloc(size_t);
       const onResult = (err, res) => {
         if (err || res !== 0) {
           reject(err || res);
