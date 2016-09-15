@@ -231,7 +231,7 @@ class DNS extends FfiApi {
         const handle = ref.alloc(FileDetailsHandle, fileDetailsHandle).deref();
         const fileDetails = handle.deref();
         const data = Buffer.concat([ref.reinterpret(fileDetails.content, fileDetails.content_len)]);
-        self.safeCore.file_details_drop.async(handle, (e) => {
+        this.safeCore.file_details_drop.async(handle, (e) => {
           if (e) {
             console.error(e);
           }
@@ -245,7 +245,7 @@ class DNS extends FfiApi {
         longNameBuffer, longNameBuffer.length,
         serviceNameBuffer, serviceNameBuffer.length,
         pathBuffer, pathBuffer.length,
-        offset, length, fileDetailsPointerHandle, onResult);
+        offset, length, false, fileDetailsPointerHandle, onResult);
     });
   }
 
