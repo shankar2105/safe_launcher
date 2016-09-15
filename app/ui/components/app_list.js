@@ -32,7 +32,7 @@ export default class AppList extends Component {
       );
     }
     return (
-      <div className="'app-li-cnt'">
+      <div className="app-li-cnt">
         {
           Object.keys(appList).map((key) => {
             const list = appList[key];
@@ -48,7 +48,7 @@ export default class AppList extends Component {
                 <h3 className="title">
                   { list.name } <span className="version">{ list.version }</span>
                 </h3>
-                <h4 className="sub-title">Last Active: { list.lastActive }</h4>
+                <h4 className="sub-title">Last Active: { moment(list.lastActive).fromNow() }</h4>
                 <div className="status-bar in-progress">
                   <span className="time">{ moment(list.status.beginTime).format('HH:mm:ss') }</span>
                   <span className="msg">{ list.status.activityName }</span>

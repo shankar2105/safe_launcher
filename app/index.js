@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
-import './ui/app.global.css';
+import './stylesheets/main.less';
 import routes from './ui/routes';
 import configureStore from './ui/store/configure_store';
 import './bridge';

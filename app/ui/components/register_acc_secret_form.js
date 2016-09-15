@@ -51,6 +51,7 @@ export default class RegisterAccSecretForm extends Component {
     const accountSecretVal = this.accountSecret.value.trim();
     const confirmAccountSecretVal = this.confirmAccountSecret.value.trim();
     const accountSecretMsgEle = $(this.accountSecret).siblings('.msg');
+    const parentEle = accountSecretMsgEle.parent();
     const confirmAccountSecretMsgEle = $(this.confirmAccountSecret).siblings('.msg');
     const reset = () => {
       accountSecretMsgEle.text('');
@@ -65,6 +66,7 @@ export default class RegisterAccSecretForm extends Component {
     e.preventDefault();
 
     if (!this.passwordStrengthValid) {
+      parentEle.addClass('error');
       accountSecretMsgEle.text('Account secret needs to be stronger.');
       return;
     }
@@ -82,7 +84,11 @@ export default class RegisterAccSecretForm extends Component {
     const ele = $(e.currentTarget);
     const msgEle = ele.siblings('.msg');
     msgEle.text('');
-    $('#AccountSecret').removeClass('error');
+    const parentEle = $('#AccountSecret');
+    if (parentEle.hasClass('error')) {
+      parentEle.removeClass('error');
+      parentEle.children('.msg').text('')
+    }
   }
 
   handleInputChange(e) {
@@ -108,6 +114,7 @@ export default class RegisterAccSecretForm extends Component {
     const resetField = () => {
       strengthEle.width('0');
       statusEle.removeClass('icn');
+      parentEle.removeClass('error');
       msgEle.text('');
       this.passwordStrengthValid = false;
       return;

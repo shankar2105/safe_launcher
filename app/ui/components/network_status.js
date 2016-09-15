@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import className from 'classnames';
+import { MESSAGES } from '../constant';
 
 export default class NetworkStatus extends Component {
   static propTypes = {
@@ -19,14 +20,32 @@ export default class NetworkStatus extends Component {
         'splash-screen': false
       }
     );
+    let networkStatusMessage = null;
+    switch (status) {
+      case 0:
+        networkStatusMessage = MESSAGES.NETWORK_CONNECTING;
+        break;
+      case 1:
+        networkStatusMessage = MESSAGES.NETWORK_CONNECTED;
+        break;
+      case 2:
+        networkStatusMessage = MESSAGES.NETWORK_DISCONNECTED;
+        break;
+      case -1:
+        networkStatusMessage = MESSAGES.NETWORK_RETRYING;
+        break;
+      default:
 
+    }
     return (
       <span
         className={networkStatusClasses}
         onClick={() => {
           onNetworkStatusClick(status);
         }}
-      >{' '}</span>
+      >
+        <span className="network-status-tooltip">{networkStatusMessage}</span>
+      </span>
     );
   }
 }
