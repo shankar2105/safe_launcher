@@ -63,7 +63,7 @@ export default class Toaster extends Component {
     this.retryTimer = window.setInterval(() => {
       this.message.innerText = `${this.props.message} ${this.initialRetryCount} sec`;
       if (this.initialRetryCount === 0) {
-        this.clearNetworkRetryTimer();
+        this.clearNetworkRetryTimer();        
         return this.props.retryNetwork(this.props.user);
       }
       this.initialRetryCount--;

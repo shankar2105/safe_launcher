@@ -33,8 +33,7 @@ export default class Settings extends Component {
   }
 
   componentWillMount() {
-    this.props.resetUser();
-    this.checkAuthenticated(this.props);
+    this.checkAuthenticated(this.props, true);
   }
 
   componentWillUpdate(nextProps) {
@@ -63,9 +62,11 @@ export default class Settings extends Component {
     }
   }
 
-  checkAuthenticated(props) {
+  checkAuthenticated(props, onInit) {
     if (props.authenticated) {
       return this.context.router.push('/account_app_list');
+    } else if (onInit) {
+      props.resetUser();
     }
   }
 

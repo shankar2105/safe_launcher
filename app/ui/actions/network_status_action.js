@@ -7,7 +7,7 @@ export const toastNetworkStatus = () => (
 );
 
 export const retryNetwork = (user) => {
-  window.msl.reconnet(user);
+  window.msl.reconnect(user);
   return {
     type: ActionTypes.RETRYING_NETWORK
   };

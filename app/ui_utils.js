@@ -179,9 +179,12 @@ export default class UIUtils {
       if (!user) {
         return auth.getUnregisteredSession();
       }
+      if (!user.accountSecret || !user.accountPassword) {
+        return console.error('User account is not available for retrying');
+      }
       // reconnect authorised client
       await auth.login(user.accountSecret, user.accountPassword);
-      await this.restServer.registerConnectedApps();      
+      await this.restServer.registerConnectedApps();
     } catch(e) {
       console.error(e);
       if (!this.onNetworkStateChange) {
