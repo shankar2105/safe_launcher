@@ -194,8 +194,6 @@ export const dropEncryptKeyHandle = async (req, res, next) => {
   }
 };
 
-
-// POST /serialise/id
 export const serialise = async (req, res, next) => {
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -205,7 +203,7 @@ export const serialise = async (req, res, next) => {
     if (!sessionInfo.app.permission.lowLevelApi) {
       return next(new ResponseError(403, API_ACCESS_NOT_GRANTED));
     }
-    const data = await appendableData.serialise(req.params.handleId);
+    const data = await appendableData.serialise(sessionInfo.app, req.params.handleId);
     res.send(data);
     updateAppActivity(req, res, true);
   } catch(e) {

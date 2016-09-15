@@ -26,9 +26,14 @@ class SessionManager {
     return this.sessionPool[id];
   }
 
-  remove(id) {
-    delete this.sessionPool[id];
-    return !this.sessionPool.hasOwnProperty(id);
+  remove = async (id) => {
+    try {
+      await appManager.revokeApp(this.sessionPool[id].app);
+      delete this.sessionPool[id];
+      return !this.sessionPool.hasOwnProperty(id);
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   hasSessionForApp(appData) {

@@ -176,7 +176,7 @@ export default class EventRegistry {
       const appName = this.state().user.appList[appId] ?
         this.state().user.appList[appId].name : this.state().user.revokedAppList[appId].name;
       this.dispatch(showToaster(`${MESSAGES.APP_REVOKED} ${appName}`, { autoHide: true }));
-      return console.error('Removed App Session :: ', appId);
+      return console.log('Removed App Session :: ', appId);
     });
   }
 

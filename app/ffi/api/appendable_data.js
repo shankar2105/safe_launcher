@@ -278,13 +278,13 @@ class AppendableData extends FfiApi {
     });
   }
 
-  serialise = (handleId) => {
+  serialise = (app, handleId) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const appendableDataHandle = await self._asAppendableDataHandle(app, handleId);
+        const appendableDataHandle = await this._asAppendableDataHandle(app, handleId);
         const serialisedData = await misc.serialiseAppendableData(appendableDataHandle);
         this.safeCore.appendable_data_free.async(appendableDataHandle, (e) => {});
-        resolve();
+        resolve(serialisedData);
       } catch(e) {
         reject(e);
       }
