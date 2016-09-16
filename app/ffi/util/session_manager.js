@@ -126,7 +126,7 @@ class SessionManager extends FfiApi {
         await appManager.revokeAnonymousApp();
         await this.dropSessionHandle();
       }
-      const onStateChange = ffi.Callback(Void, [ int32 ], function(state) {
+      const onStateChange = ffi.Callback(Void, [ int32 ], (state) => {
         if (this.stateChangeListener) {
           this.stateChangeListener(state);
         }

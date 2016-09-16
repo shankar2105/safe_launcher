@@ -177,7 +177,8 @@ export default class UIUtils {
       await cleanup();
        // reconnect Unauthorised client
       if (!user || Object.keys(user).length === 0) {
-        return auth.getUnregisteredSession();
+        await auth.getUnregisteredSession();
+        return;
       }
       if (!user.accountSecret || !user.accountPassword) {
         return console.error('User account is not available for retrying');

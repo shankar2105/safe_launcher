@@ -1,11 +1,16 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
-
+import kill from 'killprocess';
+import  { cleanup } from './app/ffi/loader';
 let menu;
 let template;
 let mainWindow = null;
 
 const appWidth = 750 + (process.platform === 'win32' ? 20 : 0);
 const appHeight = 560 + (process.platform === 'win32' ? 30 : 0);
+
+global.proxy = {
+  pid: null
+};
 
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')(); // eslint-disable-line global-require
@@ -33,6 +38,13 @@ const installExtensions = async () => {
     }
   }
 };
+
+app.on('before-quit', function() {
+  if (global.proxy.pid) {
+    kill(global.proxy.pid);
+  }
+  cleanup();
+});
 
 app.on('ready', async () => {
   await installExtensions();

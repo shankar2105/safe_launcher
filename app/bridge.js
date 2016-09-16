@@ -49,7 +49,20 @@ const networkStateListener = (state) => {
 try {
   loadLibrary();
   sessionManager.onNetworkStateChange(networkStateListener);
-  auth.getUnregisteredSession();
+  auth.getUnregisteredSession().then(() => {}, () => {
+    networkStateListener(1);
+  });
 } catch(e) {
   onFfiLaodFailure('FFI library load error', e.message);
 }
+
+// Disabling drag and drop
+window.document.addEventListener('drop', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+});
+
+window.document.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+});
