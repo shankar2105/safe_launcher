@@ -32,6 +32,7 @@ export default class Toaster extends Component {
   componentDidUpdate() {
     const { active, options, retryCount } = this.props;
     this.initialRetryCount = INITIAL_RETRY_COUNT * Math.pow(2, retryCount);
+    this.initialRetryCount = Math.min(CONSTANT.MAX_RETRY_COUNT_IN_SECONDS, this.initialRetryCount);
     if (options) {
       if (options.autoHide) {
         this.setTimer();
