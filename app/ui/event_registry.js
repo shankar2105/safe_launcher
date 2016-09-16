@@ -96,7 +96,9 @@ export default class EventRegistry {
           temp.PUT = self.authorisedData.PUT.newVal - self.authorisedData.PUT.oldVal;
           temp.DELETE = self.authorisedData.DELETE.newVal - self.authorisedData.DELETE.oldVal;
           self.dispatch(setAuthStateData(temp));
-          // TODO - verify is this needed?
+          self.dispatch(setDashGetCount(getsCount));
+          self.dispatch(setDashPostCount(postsCount));
+          self.dispatch(setDashDeleteCount(deletesCount));
           self.dispatch(setDashPutCount(putsCount));
         } catch(e) {
           console.error(e);
@@ -117,6 +119,15 @@ export default class EventRegistry {
   }
 
   handleNetworkEvents() {
+    const showNetworkToaster = (msg, opt) => {
+      const currentPath = window.location.hash.split('?')[0];
+      if (currentPath === '#/') {
+        return;
+      }
+      console.log('show')
+      return this.dispatch(showToaster(msg, opt));
+    };
+
     window.msl.setNetworkStateChangeListener((status) => {
       switch (status) {
         case 0:
@@ -132,13 +143,15 @@ export default class EventRegistry {
             this.fetchAccountStorage();
           }
           this.dispatch(setNetworkConnected());
-          this.dispatch(showToaster(MESSAGES.NETWORK_CONNECTED, { autoHide: true }));
+          showNetworkToaster(MESSAGES.NETWORK_CONNECTED, { autoHide: true });
           break;
         }
         case 2:
           this.dispatch(setNetworkDisconnected());
-          this.dispatch(showToaster(MESSAGES.NETWORK_DISCONNECTED,
-            { type: CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY, autoHide: false, error: true }));
+          console.log('test');
+
+          showNetworkToaster(MESSAGES.NETWORK_DISCONNECTED,
+            { type: CONSTANT.TOASTER_OPTION_TYPES.NETWORK_RETRY, autoHide: false, error: true });
           break;
         default:
       }

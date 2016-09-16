@@ -11,6 +11,11 @@ const initialState = {
 const toaster = (state = initialState, action) => {
   switch (action.type) {
     case ActionTypes.SHOW_TOASTER: {
+      const currentPath = window.location.hash.split('?')[0];
+      // Don't show toaster at splash screen
+      if (currentPath === '#/') {
+        return state;
+      }
       ToasterQueue.unshift(action);
       if (state.active) {
         return { ...state, hasNext: true };

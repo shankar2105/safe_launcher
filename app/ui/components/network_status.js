@@ -11,13 +11,14 @@ export default class NetworkStatus extends Component {
   render() {
     const { status, onNetworkStatusClick } = this.props;
 
+    const currentPath = window.location.hash.split('?')[0]; 
     const networkStatusClasses = className(
       'network-status',
       {
         error: status === -1 || status === 2,
         connecting: status === 0,
         connected: status === 1,
-        'splash-screen': false
+        'splash-screen': (currentPath === '#/')
       }
     );
     let networkStatusMessage = null;
