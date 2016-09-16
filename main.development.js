@@ -1,6 +1,7 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
 import kill from 'killprocess';
-import  { cleanup } from './app/ffi/loader';
+import pkg from './package.json';
+
 let menu;
 let template;
 let mainWindow = null;
@@ -43,7 +44,7 @@ app.on('before-quit', function() {
   if (global.proxy.pid) {
     kill(global.proxy.pid);
   }
-  cleanup();
+  // cleanup();
 });
 
 app.on('ready', async () => {
@@ -87,6 +88,38 @@ app.on('ready', async () => {
 
   if (process.platform === 'darwin') {
     template = [{
+      label: `${pkg.productName}`,
+      submenu: [{
+        label: `About ${pkg.productName}`,
+        selector: 'orderFrontStandardAboutPanel:'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Services',
+        submenu: []
+      }, {
+        type: 'separator'
+      }, {
+        label: `Hide ${pkg.productName}`,
+        accelerator: 'Command+H',
+        selector: 'hide:'
+      }, {
+        label: 'Hide Others',
+        accelerator: 'Command+Shift+H',
+        selector: 'hideOtherApplications:'
+      }, {
+        label: 'Show All',
+        selector: 'unhideAllApplications:'
+      }, {
+        type: 'separator'
+      }, {
+        label: `Quit ${pkg.productName}`,
+        accelerator: 'Command+Q',
+        click() {
+          app.quit();
+        }
+      }]
+    }, {
       label: 'Edit',
       submenu: [{
         label: 'Undo',
@@ -114,6 +147,35 @@ app.on('ready', async () => {
         label: 'Select All',
         accelerator: 'Command+A',
         selector: 'selectAll:'
+      }]
+    }, {
+      label: 'Window',
+      submenu: [{
+        label: 'Minimize',
+        accelerator: 'Command+M',
+        selector: 'performMiniaturize:'
+      }, {
+        label: 'Close',
+        accelerator: 'Command+W',
+        selector: 'performClose:'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Bring All to Front',
+        selector: 'arrangeInFront:'
+      }]
+    }, {
+      label: 'Help',
+      submenu: [{
+        label: 'Learn More',
+        click() {
+          shell.openExternal('https://maidsafe.readme.io');
+        }
+      }, {
+        label: 'Community Discussions',
+        click() {
+          shell.openExternal('https://safenetforum.org/');
+        }
       }]
     }];
 
