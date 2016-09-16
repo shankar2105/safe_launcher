@@ -42,7 +42,7 @@ export default class AccountStorageChart extends Component {
   }
 
   handleUpdateTimoutTimer(props) {
-    if ((props.accountStorage.updateTimeout !== 0) && !self.updateTimeoutTimer) {
+    if ((props.accountStorage.updateTimeout !== 0) && !this.updateTimeoutTimer) {
       this.updateTimeoutTimer = window.setInterval(_ => {
         props.decAccountUpdateTimeout();
       }, 1000);
@@ -55,8 +55,8 @@ export default class AccountStorageChart extends Component {
       const secondsLeft = props.accountStorage.updateTimeout;
       const min = Math.floor(secondsLeft / 60);
       let sec = secondsLeft - (min * 60);
-      sec = `0 ${sec}`.slice(-2);
-      const timeoutStr = `0 ${min} : ${sec}`;
+      sec = `0${sec}`.slice(-2);
+      const timeoutStr = `0${min} : ${sec}`;
       this.updateTimeLeft = timeoutStr;
     }
   }
@@ -67,6 +67,7 @@ export default class AccountStorageChart extends Component {
     let container = null;
     const progressWidth = ((accountStorage.used /
       (accountStorage.used + accountStorage.available)) * 100);
+
     if (accountStorage.fetching) {
       container = (
         <div className="dash-progress-bar-b">
@@ -103,7 +104,7 @@ export default class AccountStorageChart extends Component {
             <span
               className="progress-value"
               style={{
-                width: `${progressWidth} %`
+                width: `${progressWidth || 0}%`
               }}
             >{' '}</span>
           </div>

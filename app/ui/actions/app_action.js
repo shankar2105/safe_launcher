@@ -123,12 +123,13 @@ export const updateAccountStorage = _ => (
   dispatch => {
     dispatch(fetchingAccountStorage());
     sessionManager.getAccountInfo()
-    .then(data => {
-      dispatch(updateAccountStorageSuccess(data));
-    })
-    .catch(err => {
-      // dispatch(updateAccountStorageSuccess({}))
-    });
+      .then(data => {
+        dispatch(updateAccountStorageSuccess(data));
+      })
+      .catch(err => {
+        console.error(err);
+        // dispatch(updateAccountStorageSuccess({}))
+      });
   }
 );
 
