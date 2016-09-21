@@ -124,7 +124,6 @@ export default class EventRegistry {
       if (currentPath === '#/') {
         return;
       }
-      console.log('show')
       return this.dispatch(showToaster(msg, opt));
     };
 

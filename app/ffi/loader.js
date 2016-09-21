@@ -34,10 +34,13 @@ mods.forEach(mod => {
   ffiFunctions = Object.assign({}, ffiFunctions, functionsToRegister);
 });
 
-export const loadLibrary = () => {
-  const isPacked = remote.app.getAppPath().indexOf('default_app.asar') === -1;
-  let libPath = path.resolve((isPacked ? (remote.app.getAppPath() + '.unpacked') : process.cwd()), 'dist', 'ffi');
-  libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
+export const loadLibrary = (ffiDirPath) => {
+  var libPath = ffiDirPath;
+  if (!libPath) {
+    const isPacked = remote.app.getAppPath().indexOf('default_app.asar') === -1;
+    libPath = path.resolve((isPacked ? (remote.app.getAppPath() + '.unpacked') : process.cwd()), 'dist', 'ffi');
+  }
+  libPath = path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
   console.log('Library loaded from - ', libPath);
   const safeCore = ffi.Library(libPath, ffiFunctions);
   safeCore.init_logging();

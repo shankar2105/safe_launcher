@@ -1,4 +1,5 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
+import path from 'path';
 import kill from 'killprocess';
 import pkg from './package.json';
 
