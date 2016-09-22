@@ -39,8 +39,9 @@ app.on('ready', function () {
     mainWindow.show();
     // mainWindow.focus();
   });
-
+  // mainWindow.openDevTools();
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
 });
+

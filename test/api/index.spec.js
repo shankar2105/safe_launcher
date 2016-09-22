@@ -9,13 +9,15 @@ import * as dns from './dns.spec';
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
 describe('SAFE Launcher Test', function () {
-  this.timeout(15000);
+  this.timeout(50000);
 
   const checkNetworkConnected = async() => {
-    const { client } = this.app;
-    await client.waitUntilWindowLoaded(20000);
+    const { client, electron } = this.app;
+    console.log('application check network');
+    await client.waitUntilWindowLoaded();
     await delay(1000);
     const networkStatus = await client.getAttribute('#networkStatus', 'class');
+    console.log('application get network status :: ', networkStatus);
     if (networkStatus.indexOf('connected') === -1) {
       return await checkNetworkConnected();
     }
@@ -36,6 +38,7 @@ describe('SAFE Launcher Test', function () {
 
   const register = async() => {
     const { client } = this.app;
+    console.log('application registration');
     await client.click('.form-f-b a');
     await delay(1000);
     await client.click('button[name=continue]');
@@ -82,6 +85,7 @@ describe('SAFE Launcher Test', function () {
       startTimeout: 20000
     });
     await this.app.start();
+    console.log('application started');
     await checkNetworkConnected();
     // await login();
     await register();
