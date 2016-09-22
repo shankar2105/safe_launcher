@@ -1,11 +1,11 @@
 import should from 'should';
 import axios from 'axios';
-import utils from './utils';
+import CONSTANTS from './constants';
 import * as nfs from './nfs.spec';
 import UserData from './user_data';
 
 const userDataObj = new UserData();
-const END_POINT = `${utils.CONSTANTS.API_SERVER}/dns`;
+const END_POINT = `${CONSTANTS.API_SERVER}/dns`;
 const LONG_NAME = 'testdns';
 const SERVICE_NAME = 'testservice';
 
@@ -69,7 +69,7 @@ export const getFiles = async(longName, serviceName, filePath) => {
   return await axios.get(URL, getHeaders());
 };
 
-export const listLongNames = async() => { await axios.get(END_POINT, getHeaders()); };
+export const listLongNames = async() => (await axios.get(END_POINT, getHeaders()));
 
 export const listServices = async(longName) => {
   const dnsLongName = longName || LONG_NAME;

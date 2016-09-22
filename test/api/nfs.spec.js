@@ -1,6 +1,6 @@
 import should from 'should';
 import axios from 'axios';
-import utils from './utils';
+import CONSTANTS from './constants';
 import UserData from './user_data';
 
 const userDataObj = new UserData();
@@ -8,10 +8,10 @@ const DIR_NAME = 'testDir';
 const FILE_NAME = 'test.txt';
 const FILE_PATH = `${DIR_NAME}/${FILE_NAME}`;
 const FILE_CONTENT = 'This is test file';
-const DIR_END_POINT = `${utils.CONSTANTS.API_SERVER}/nfs/directory/APP/`;
-const DIR_MOVE_END_POINT = `${utils.CONSTANTS.API_SERVER}/nfs/movedir/`;
-const FILE_END_POINT = `${utils.CONSTANTS.API_SERVER}/nfs/file/APP/`;
-const FILE_MOVE_END_POINT = `${utils.CONSTANTS.API_SERVER}/nfs/movefile`;
+const DIR_END_POINT = `${CONSTANTS.API_SERVER}/nfs/directory/APP/`;
+const DIR_MOVE_END_POINT = `${CONSTANTS.API_SERVER}/nfs/movedir/`;
+const FILE_END_POINT = `${CONSTANTS.API_SERVER}/nfs/file/APP/`;
+const FILE_MOVE_END_POINT = `${CONSTANTS.API_SERVER}/nfs/movefile`;
 
 const getHeaders = () => ({
   headers: {

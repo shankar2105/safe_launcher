@@ -1,6 +1,6 @@
 import { Application } from 'spectron';
 import electronPath from 'electron';
-import utils from './utils';
+import CONSTANTS from './constants';
 import * as server from './server.spec';
 import * as authorise from './authorise.spec';
 import * as nfs from './nfs.spec';
@@ -8,7 +8,7 @@ import * as dns from './dns.spec';
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
-describe('SAFE Launcher Test', () => {
+describe('SAFE Launcher Test', function() {
   this.timeout(15000);
 
   const checkNetworkConnected = async() => {
@@ -23,8 +23,8 @@ describe('SAFE Launcher Test', () => {
 
   const login = async () => {
     const { client } = this.app;
-    await client.setValue('#accountSecret', utils.CONSTANTS.USER_LOCATION);
-    await client.setValue('#accountPassword', utils.CONSTANTS.USER_PASSWORD);
+    await client.setValue('#accountSecret', CONSTANTS.USER_LOCATION);
+    await client.setValue('#accountPassword', CONSTANTS.USER_PASSWORD);
     await client.click('button[name=login]');
   };
 

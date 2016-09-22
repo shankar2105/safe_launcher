@@ -1,10 +1,10 @@
 import should from 'should';
 import axios from 'axios';
-import utils from './utils';
+import CONSTANTS from './constants';
 import UserData from './user_data';
 
 const userDataObj = new UserData();
-const END_POINT = `${utils.CONSTANTS.API_SERVER}/auth`;
+const END_POINT = `${CONSTANTS.API_SERVER}/auth`;
 
 const AUTHORISE_PAYLOAD = {
   app: {
