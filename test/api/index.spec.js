@@ -1,20 +1,21 @@
 import { Application } from 'spectron';
 import electronPath from 'electron';
-import * as utils from './utils';
+import utils from './utils';
 import * as server from './server.spec';
 import * as authorise from './authorise.spec';
 import * as nfs from './nfs.spec';
+import * as dns from './dns.spec';
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
-describe('SAFE Launcher Test', function() {
+describe('SAFE Launcher Test', () => {
   this.timeout(15000);
 
-  const checkNetworkConnected = async (done) => {
+  const checkNetworkConnected = async() => {
     const { client } = this.app;
     await client.waitUntilWindowLoaded();
     await delay(1000);
-    let networkStatus = await client.getAttribute('#networkStatus', 'class');
+    const networkStatus = await client.getAttribute('#networkStatus', 'class');
     if (networkStatus.indexOf('connected') === -1) {
       return await checkNetworkConnected();
     }
@@ -30,7 +31,7 @@ describe('SAFE Launcher Test', function() {
   const checkAuthenticated = async () => {
     const { client } = this.app;
 
-    let currentRoute = (await client.getUrl()).split('#')[1].split('?')[0];
+    const currentRoute = (await client.getUrl()).split('#')[1].split('?')[0];
     if (currentRoute !== '/account_app_list') {
       return await checkAuthenticated();
     }
@@ -41,7 +42,7 @@ describe('SAFE Launcher Test', function() {
     const { client } = this.app;
     const authReqEle = (await client.element('.auth-req')).value;
     if (!authReqEle.ELEMENT) {
-      return allowApp();
+      return authoriseApp(true);
     }
     if (status) {
       return await client.click('button[name=allow]');
@@ -77,7 +78,7 @@ describe('SAFE Launcher Test', function() {
       await authorise.authoriseApp();
     });
 
-    it ('should deny authorisation', async() => {
+    it('should deny authorisation', async() => {
       authoriseApp();
       await authorise.denyAuthorisation();
     });
@@ -88,20 +89,42 @@ describe('SAFE Launcher Test', function() {
   // NFS Directory
   describe('NFS Directory', () => {
     it('should be able to create directory', nfs.createDirTest);
+    it('should not be able to create directory', nfs.createDirNegativeTest);
     it('should be able to get directory', nfs.getDirTest);
+    it('should not be able to get directory', nfs.getDirNegativeTest);
     // it('should be able to modify directory metadata', nfs.modifyDirTest);
     it('should be able to delete directory', nfs.deleteDirTest);
+    it('should not be able to delete directory', nfs.deleteDirNegativeTest);
     it('should be able to move dirctory', nfs.moveDirTest);
     it('should be able to copy dirctory', nfs.copyDirTest);
   });
 
   describe('NFS File', () => {
     it('should be able to create file', nfs.createFileTest);
+    it('should not be able to create file', nfs.createFileNegativeTest);
     it('should be able to get file', nfs.getFileTest);
+    it('should not be able to get file', nfs.getFileNegativeTest);
     // it('should be able to modify file metadata', nfs.modifyAndGetFileMetaTest);
     it('should be able to delete file', nfs.deleteFileTest);
+    it('should not be able to delete file', nfs.deleteFileNegativeTest);
     it('should be able to move file', nfs.moveFileTest);
     it('should be able to copy file', nfs.copyFileTest);
+  });
+
+  describe('DNS', () => {
+    it('should be able to register DNS', dns.registerDnsTest);
+    it('should not be able to register DNS', dns.registerDnsNegativeTest);
+    it('should be able to create longname', dns.createLongNameTest);
+    it('should not be able to create longname', dns.createLongNameNegativeTest);
+    it('should be able to create and delete service name', dns.addAndDeleteServiceTest);
+    it('should not be able to create service name', dns.addServiceNegativeTest);
+    it('should not be able to delete service name', dns.deletServiceNegativeTest);
+    it('should be able to get home directory', dns.getHomeDirectoryTest);
+    // it('should be able to get files', dns.getFilesTest);
+    it('should be able to get list of longnames', dns.getLongNamesTest);
+    it('should be able to get list of service names', dns.listServiceNamesTest);
+    it('should be able to delete longname', dns.deleteLongNameTest);
+    it('should not be able to delete longname', dns.deleteLongNameNegativeTest);
   });
 
   // Revoke application

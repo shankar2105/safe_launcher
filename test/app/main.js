@@ -1,10 +1,7 @@
 var electron = require('electron');
 var app = electron.app;
-var ipcMain = electron.ipcMain;
 var BrowserWindow = electron.BrowserWindow;
 var kill = require('killprocess');
-// import { app, BrowserWindow, Menu, shell } from 'electron';
-// import kill from 'killprocess';
 
 let mainWindow = null;
 
@@ -17,17 +14,17 @@ global.proxy = {
 
 require('electron-debug')(); // eslint-disable-line global-require
 
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
 
-app.on('before-quit', function() {
+app.on('before-quit', function () {
   if (global.proxy.pid) {
     kill(global.proxy.pid);
   }
 });
 
-app.on('ready', function() {
+app.on('ready', function () {
   mainWindow = new BrowserWindow({
     show: false,
     width: appWidth,
@@ -43,7 +40,7 @@ app.on('ready', function() {
     // mainWindow.focus();
   });
 
-  mainWindow.on('closed', function(){
+  mainWindow.on('closed', function () {
     mainWindow = null;
   });
 });

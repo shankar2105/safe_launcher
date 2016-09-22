@@ -3,7 +3,7 @@ export default class UserData {
   authToken = null;
 
   constructor() {
-    if(!instance){
+    if (!instance) {
       instance = this;
     }
     return instance;

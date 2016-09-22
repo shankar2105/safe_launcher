@@ -8,17 +8,15 @@ const u64Pointer = ref.refType(u64);
 
 class CipherOpts extends FfiApi {
 
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
+    /* eslint-disable camelcase */
     return {
-      'cipher_opt_new_plaintext': [int32, [u64Pointer]],
-      'cipher_opt_new_symmetric': [int32, [u64Pointer]],
-      'cipher_opt_new_asymmetric': [int32, [u64, u64Pointer]],
-      'cipher_opt_free': [int32, [u64]]
+      cipher_opt_new_plaintext: [int32, [u64Pointer]],
+      cipher_opt_new_symmetric: [int32, [u64Pointer]],
+      cipher_opt_new_asymmetric: [int32, [u64, u64Pointer]],
+      cipher_opt_free: [int32, [u64]]
     };
+    /* eslint-enable camelcase */
   }
 
   getCipherOptPlain() {
@@ -69,7 +67,7 @@ class CipherOpts extends FfiApi {
   dropHandle(handleId) {
     const self = this;
     const executor = async (resolve, reject) => {
-      const onResult = (err, res) => {        
+      const onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }

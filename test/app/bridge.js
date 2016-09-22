@@ -44,6 +44,8 @@ const networkStateListener = (state) => {
     case 2:
       window.msl.networkStateChange(window.NETWORK_STATE.DISCONNECTED);
       break;
+    default:
+      break;
   }
 };
 
@@ -53,17 +55,17 @@ try {
   auth.getUnregisteredSession().then(() => {}, () => {
     networkStateListener(1);
   });
-} catch(e) {
+} catch (e) {
   onFfiLaodFailure('FFI library load error', e.message);
 }
 
 // Disabling drag and drop
-window.document.addEventListener('drop', function(e) {
+window.document.addEventListener('drop', (e) => {
   e.preventDefault();
   e.stopPropagation();
 });
 
-window.document.addEventListener('dragover', function(e) {
+window.document.addEventListener('dragover', (e) => {
   e.preventDefault();
   e.stopPropagation();
 });

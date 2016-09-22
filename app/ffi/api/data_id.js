@@ -11,16 +11,14 @@ const u64Pointer = ref.refType(u64);
 
 class DataId extends FfiApi {
 
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
+    /* eslint-disable camelcase */
     return {
-      'data_id_new_struct_data': [int32, [u64, u8Pointer, u64Pointer]],
-      'data_id_new_appendable_data': [int32, [u8Pointer, bool, u64Pointer]],
-      'data_id_free': [int32, [u64]]
+      data_id_new_struct_data: [int32, [u64, u8Pointer, u64Pointer]],
+      data_id_new_appendable_data: [int32, [u8Pointer, bool, u64Pointer]],
+      data_id_free: [int32, [u64]]
     };
+    /* eslint-enable camelcase */
   }
 
   dropHandle(handleId) {
