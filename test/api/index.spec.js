@@ -13,11 +13,17 @@ describe('SAFE Launcher Test', function () {
 
   const checkNetworkConnected = async() => {
     const { client } = this.app;
-    await client.waitUntilWindowLoaded();
+    await client.waitUntilWindowLoaded(20000);
     await delay(1000);
     const networkStatus = await client.getAttribute('#networkStatus', 'class');
     if (networkStatus.indexOf('connected') === -1) {
       return await checkNetworkConnected();
+    }
+    try {
+      await delay(1000);
+      await client.click('button[name=settings_continue]');
+    } catch (e) {
+      console.error(e);
     }
   };
 
