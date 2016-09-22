@@ -7,8 +7,7 @@ import * as nfs from './nfs.spec';
 import * as dns from './dns.spec';
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
-
-describe('SAFE Launcher Test', function() {
+describe('SAFE Launcher Test', function () {
   this.timeout(15000);
 
   const checkNetworkConnected = async() => {
@@ -21,14 +20,14 @@ describe('SAFE Launcher Test', function() {
     }
   };
 
-  const login = async () => {
+  const login = async() => {
     const { client } = this.app;
     await client.setValue('#accountSecret', CONSTANTS.USER_LOCATION);
     await client.setValue('#accountPassword', CONSTANTS.USER_PASSWORD);
     await client.click('button[name=login]');
   };
 
-  const checkAuthenticated = async () => {
+  const checkAuthenticated = async() => {
     const { client } = this.app;
 
     const currentRoute = (await client.getUrl()).split('#')[1].split('?')[0];
