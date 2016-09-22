@@ -7,6 +7,7 @@ import * as nfs from './nfs.spec';
 import * as dns from './dns.spec';
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
+
 describe('SAFE Launcher Test', function () {
   this.timeout(15000);
 
