@@ -79,6 +79,7 @@ describe('SAFE Launcher Test', function () {
     this.app = new Application({
       path: electronPath,
       args: ['./test/app'],
+      startTimeout: 20000
     });
     await this.app.start();
     await checkNetworkConnected();
