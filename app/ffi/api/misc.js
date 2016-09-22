@@ -1,35 +1,35 @@
+/* eslint-disable no-underscore-dangle */
 import ref from 'ref';
-
 import FfiApi from '../ffi_api';
 
 const Void = ref.types.void;
 const int32 = ref.types.int32;
 const u64 = ref.types.uint64;
 const u8 = ref.types.uint8;
-const bool = ref.types.bool;
+/* eslint-disable camelcase */
 const size_t = ref.types.size_t;
 const u8Pointer = ref.refType(u8);
 const u64Pointer = ref.refType(u64);
 const size_tPointer = ref.refType(size_t);
+/* eslint-enable camelcase */
 
 const PointerToU8Pointer = ref.refType(u8Pointer);
 
 class Misc extends FfiApi {
 
-  constructor() {
-    super();
-  }
-
   getFunctionsToRegister() {
+    /* eslint-disable camelcase */
     return {
-      'init_logging': [int32, []],
-      'misc_encrypt_key_free': [int32, [u64]],
-      'misc_sign_key_free': [int32, [u64]],
-      'misc_serialise_data_id': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_deserialise_data_id': [int32, [u8Pointer, u64, u64Pointer]],
-      'misc_serialise_appendable_data': [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
-      'misc_u8_ptr_free': [Void, [u8Pointer, u64, u64]]
+      init_logging: [int32, []],
+      misc_encrypt_key_free: [int32, [u64]],
+      misc_sign_key_free: [int32, [u64]],
+      misc_serialise_data_id: [int32, [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      misc_deserialise_data_id: [int32, [u8Pointer, u64, u64Pointer]],
+      misc_serialise_appendable_data: [int32,
+        [u64, PointerToU8Pointer, size_tPointer, size_tPointer]],
+      misc_u8_ptr_free: [Void, [u8Pointer, u64, u64]]
     };
+    /* eslint-enable camelcase */
   }
 
   dropEncryptKeyHandle(handleId) {
@@ -62,7 +62,7 @@ class Misc extends FfiApi {
 
   dropVector(dataPointer, size, capacity) {
     const self = this;
-    const executor = (resolve, reject) => {
+    const executor = (resolve) => {
       const onResult = (err) => {
         if (err) {
           console.error(err);
@@ -71,7 +71,7 @@ class Misc extends FfiApi {
       };
       try {
         self.safeCore.misc_u8_ptr_free.async(dataPointer, size, capacity, onResult);
-      } catch(e) {
+      } catch (e) {
         console.error(e);
       }
     };

@@ -26,7 +26,7 @@ const packageForOs = {
     preferences: {
       'app-bundle-id': pkg.identifier,
       'app-category-type': 'public.app-category.utilities',
-      'helper-bundle-id': pkg.identifier + 'helper'
+      'helper-bundle-id': `${pkg.identifier}helper`
     }
   },
   linux: {
@@ -71,7 +71,7 @@ const DEFAULT_OPTS = {
   // .concat(
   //   deps.filter(name => !electronCfg.externals.includes(name))
   //     .map(name => `/node_modules/${name}($|/)`)
-  //)
+  // )
 };
 
 const icon = argv.icon || argv.i || optionForOs.icon;

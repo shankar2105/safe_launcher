@@ -1,10 +1,11 @@
-'use strict';
-
+/* eslint-disable no-restricted-syntax */
 import ref from 'ref';
 import uuid from 'uuid';
 
-import {FileMetadata, DirectoryMetadata, FileDetails,
-       error, derefFileMetadataStruct, derefDirectoryMetadataStruct} from '../util/utils';
+import {
+  FileMetadata, DirectoryMetadata, FileDetails,
+  error, derefFileMetadataStruct, derefDirectoryMetadataStruct
+} from '../util/utils';
 import FfiApi from '../ffi_api';
 import appManager from '../util/app_manager';
 
@@ -30,31 +31,36 @@ class NFS extends FfiApi {
     this.writerHolder = new Map();
   }
 
-
   getFunctionsToRegister() {
+    /* eslint-disable camelcase */
     return {
-      'directory_details_get_metadata': [DirectoryMetadataHandle, [VoidPointerHandle]],
-      'directory_details_get_sub_directories_len': [u64, [VoidPointerHandle]],
-      'directory_details_get_sub_directory_at': [DirectoryMetadataHandle, [VoidPointerHandle, u64]],
-      'directory_details_drop': [Void, [VoidPointerHandle]],
-      'directory_details_get_files_len': [u64, [VoidPointerHandle]],
-      'directory_details_get_file_at': [FileMetadataHandle, [VoidPointerHandle, u64]],
-      'nfs_create_dir': [int32, [AppHandle, u8Pointer, u64, u8Pointer, u64, bool, bool, bool]],
-      'nfs_delete_dir': [int32, [AppHandle, u8Pointer, u64, bool]],
-      'nfs_get_dir': [int32, [AppHandle, u8Pointer, u64, bool, PointerToVoidPointer]],
-      'nfs_modify_dir': [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, u8Pointer, u64]],
-      'nfs_move_dir': [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, bool, bool]],
-      'nfs_create_file': [int32, [AppHandle, u8Pointer, u64, u8Pointer, u64, bool, PointerToVoidPointer]],
-      'nfs_writer_write': [int32, [VoidPointerHandle, u8Pointer, u64]],
-      'nfs_writer_close': [int32, [VoidPointerHandle]],
-      'nfs_delete_file': [int32, [AppHandle, u8Pointer, u64, bool]],
-      'nfs_modify_file': [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, u8Pointer, u64, u8Pointer, u64]],
-      'nfs_move_file': [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, bool, bool]],
-      'nfs_get_file_metadata': [int32, [AppHandle, u8Pointer, u64, bool, PointerToFileMetadataPointer]],
-      'file_metadata_drop': [Void, [FileMetadataHandle]],
-      'nfs_get_file': [int32, [AppHandle, int64, int64, u8Pointer, u64, bool, bool, PointerToFileDetailsPointer]],
-      'file_details_drop': [Void, [FileDetailsHandle]]
+      directory_details_get_metadata: [DirectoryMetadataHandle, [VoidPointerHandle]],
+      directory_details_get_sub_directories_len: [u64, [VoidPointerHandle]],
+      directory_details_get_sub_directory_at: [DirectoryMetadataHandle, [VoidPointerHandle, u64]],
+      directory_details_drop: [Void, [VoidPointerHandle]],
+      directory_details_get_files_len: [u64, [VoidPointerHandle]],
+      directory_details_get_file_at: [FileMetadataHandle, [VoidPointerHandle, u64]],
+      nfs_create_dir: [int32, [AppHandle, u8Pointer, u64, u8Pointer, u64, bool, bool, bool]],
+      nfs_delete_dir: [int32, [AppHandle, u8Pointer, u64, bool]],
+      nfs_get_dir: [int32, [AppHandle, u8Pointer, u64, bool, PointerToVoidPointer]],
+      nfs_modify_dir: [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, u8Pointer, u64]],
+      nfs_move_dir: [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, bool, bool]],
+      nfs_create_file: [int32,
+        [AppHandle, u8Pointer, u64, u8Pointer, u64, bool, PointerToVoidPointer]],
+      nfs_writer_write: [int32, [VoidPointerHandle, u8Pointer, u64]],
+      nfs_writer_close: [int32, [VoidPointerHandle]],
+      nfs_delete_file: [int32, [AppHandle, u8Pointer, u64, bool]],
+      nfs_modify_file: [int32,
+        [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, u8Pointer, u64, u8Pointer, u64]],
+      nfs_move_file: [int32, [AppHandle, u8Pointer, u64, bool, u8Pointer, u64, bool, bool]],
+      nfs_get_file_metadata: [int32,
+        [AppHandle, u8Pointer, u64, bool, PointerToFileMetadataPointer]],
+      file_metadata_drop: [Void, [FileMetadataHandle]],
+      nfs_get_file: [int32,
+        [AppHandle, int64, int64, u8Pointer, u64, bool, bool, PointerToFileDetailsPointer]],
+      file_details_drop: [Void, [FileDetailsHandle]]
     };
+    /* eslint-enable camelcase */
   }
 
   derefDirectoryDetailsHandle(dirDetailsHandle) {
@@ -94,7 +100,8 @@ class NFS extends FfiApi {
           }
           resolve(derefDirectoryMetadataStruct(handle.deref()));
         };
-        self.safeCore.directory_details_get_sub_directory_at.async(dirDetailsHandle, index, onResult);
+        self.safeCore.directory_details_get_sub_directory_at.async(dirDetailsHandle, index,
+          onResult);
       };
       return new Promise(executor);
     };
@@ -102,7 +109,7 @@ class NFS extends FfiApi {
     const getSubDirectories = async() => {
       const subDirectoriesLength = await getSubDirectoriesLength();
       let i = 0;
-      let subDirectories = [];
+      const subDirectories = [];
       let directoryMetadata;
       while (i < subDirectoriesLength) {
         directoryMetadata = await getSubDirectoryAt(i);
@@ -128,7 +135,7 @@ class NFS extends FfiApi {
     const getFiles = async() => {
       const filesCount = await getFileCount();
       let i = 0;
-      let files = [];
+      const files = [];
       let fileMetadata;
       while (i < filesCount) {
         fileMetadata = await getFileAt(i);
@@ -139,32 +146,34 @@ class NFS extends FfiApi {
     };
 
     const executor = (resolve, reject) => {
-      self.safeCore.directory_details_get_metadata.async(dirDetailsHandle, (err, metadataHandle) => {
-        if (err) {
-          return reject(err);
-        }
-        const dereference = async() => {
-          const metadata = derefDirectoryMetadataStruct(metadataHandle.deref());
-          const subDirectories = await getSubDirectories();
-          const files = await getFiles();
-          self.safeCore.directory_details_drop.async(dirDetailsHandle, (err) => {
-            if (err) {
-              console.log('Error in dropping directory details handle', err);
-            }
-          });
-          resolve({
-            info: metadata,
-            subDirectories: subDirectories,
-            files: files
-          });
-        };
-        dereference();
-      });
+      self.safeCore.directory_details_get_metadata.async(dirDetailsHandle,
+        (err, metadataHandle) => {
+          if (err) {
+            return reject(err);
+          }
+          const dereference = async() => {
+            const metadata = derefDirectoryMetadataStruct(metadataHandle.deref());
+            const subDirectories = await getSubDirectories();
+            const files = await getFiles();
+            self.safeCore.directory_details_drop.async(dirDetailsHandle, (e) => {
+              if (e) {
+                console.warn('Error in dropping directory details handle', e);
+              }
+            });
+            resolve({
+              info: metadata,
+              subDirectories,
+              files
+            });
+          };
+          dereference();
+        });
     };
     return new Promise(executor);
   }
 
-  createDirectory(app, path, metadata = '', isPrivate = false, isVersioned = false, isShared = false) {
+  createDirectory(app, path, metadata = '', isPrivate = false, isVersioned = false,
+                  isShared = false) {
     if (!path || !path.trim()) {
       return error('Invalid parameters');
     }
@@ -225,7 +234,7 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  updateDirectory(app, path, isShared, newName, metadata) {
+  updateDirectory(app, path, isShared, newName) {
     if (!path || !path.trim()) {
       return error('Invalid parameters');
     }
@@ -247,7 +256,8 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  moveDir(app, srcPath, isSrcPathShared = false, destPath, isDestPathShared = false, isCopy = false) {
+  moveDir(app, srcPath, isSrcPathShared = false, destPath, isDestPathShared = false,
+          isCopy = false) {
     if (!srcPath || !srcPath.trim() || !destPath || !destPath.trim()) {
       return error('Invalid parameters');
     }
@@ -269,7 +279,7 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  createFile(app, filePath, metadata, isShared=false) {
+  createFile(app, filePath, metadata, isShared = false) {
     if (!filePath || !filePath.trim()) {
       return error('Invalid parameters');
     }
@@ -280,7 +290,7 @@ class NFS extends FfiApi {
         if (err || res !== 0) {
           return reject(err || res);
         }
-        const key = {writerId: uuid.v4()};
+        const key = { writerId: uuid.v4() };
         self.writerHolder.set(key, writerVoidPointer.deref());
         resolve(key);
       };
@@ -313,7 +323,8 @@ class NFS extends FfiApi {
         }
         resolve();
       };
-      self.safeCore.nfs_writer_write.async(self.writerHolder.get(writerKey), data, data.length, onResult);
+      self.safeCore.nfs_writer_write.async(self.writerHolder.get(writerKey), data, data.length,
+        onResult);
     };
     return new Promise(executor);
   }
@@ -379,7 +390,8 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  moveFile(app, srcFilePath, isSrcPathShared = false, destPath, isDestPathShared = false, isCopy = false) {
+  moveFile(app, srcFilePath, isSrcPathShared = false, destPath, isDestPathShared = false,
+           isCopy = false) {
     if (!srcFilePath || !srcFilePath.trim() || !destPath || !destPath.trim()) {
       return error('Invalid parameters');
     }
@@ -417,9 +429,9 @@ class NFS extends FfiApi {
           const fileMetadataHandle = fileMetadataPointerHandle.deref();
           const fileMetadataRef = ref.alloc(FileMetadataHandle, fileMetadataHandle).deref();
           const metadata = derefFileMetadataStruct(fileMetadataRef.deref());
-          self.safeCore.file_metadata_drop.async(fileMetadataHandle, (e) => {});
+          self.safeCore.file_metadata_drop.async(fileMetadataHandle, () => {});
           resolve(metadata);
-        } catch(e) {
+        } catch (e) {
           console.error(e);
         }
       };
@@ -431,7 +443,7 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  readFile(app, path, isShared=false, offset = 0, length = 0) {
+  readFile(app, path, isShared = false, offset = 0, length = 0) {
     if (!path || !path.trim()) {
       return error('Invalid parameters');
     }
@@ -463,13 +475,16 @@ class NFS extends FfiApi {
     return new Promise(executor);
   }
 
-  drop = async () => {
+  drop = async() => {
     try {
-      for (let key in this.writerHolder.keys()) {
-        await this.closeWriter(key);
+      let key = null;
+      for (key in this.writerHolder.keys()) {
+        if (key) {
+          await this.closeWriter(key);
+        }
       }
-    } catch(e) {
-      console.log('Error', e);
+    } catch (e) {
+      console.error('Error', e);
     }
   }
 }
