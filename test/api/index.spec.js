@@ -21,11 +21,30 @@ describe('SAFE Launcher Test', function () {
     }
   };
 
-  const login = async() => {
+  // const login = async() => {
+  //   const { client } = this.app;
+  //   await client.setValue('#accountSecret', CONSTANTS.USER_LOCATION);
+  //   await client.setValue('#accountPassword', CONSTANTS.USER_PASSWORD);
+  //   await client.click('button[name=login]');
+  // };
+
+  const register = async() => {
     const { client } = this.app;
+    await client.click('.form-f-b a');
+    await delay(1000);
+    await client.click('button[name=continue]');
+    await delay(1000);
+    await client.click('button[name=continue]');
+    await delay(1000);
     await client.setValue('#accountSecret', CONSTANTS.USER_LOCATION);
+    await client.setValue('#confirmAccountSecret', CONSTANTS.USER_LOCATION);
+    await client.click('button[name=continue]');
+    await delay(1000);
+    await client.click('button[name=continue]');
+    await delay(1000);
     await client.setValue('#accountPassword', CONSTANTS.USER_PASSWORD);
-    await client.click('button[name=login]');
+    await client.setValue('#confirmAccountPassword', CONSTANTS.USER_PASSWORD);
+    await client.click('button[name=continue]');
   };
 
   const checkAuthenticated = async() => {
@@ -57,7 +76,8 @@ describe('SAFE Launcher Test', function () {
     });
     await this.app.start();
     await checkNetworkConnected();
-    await login();
+    // await login();
+    await register();
     await checkAuthenticated();
   });
 
