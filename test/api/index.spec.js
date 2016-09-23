@@ -80,10 +80,12 @@ describe('SAFE Launcher Test', function () {
   };
 
   before(async() => {
+    console.log('application started before');
+    console.log('application started before path :: ', path.resolve(__dirname, '..', 'app'));
     this.app = new Application({
       path: electronPath,
       args: [path.resolve(__dirname, '..', 'app')],
-      startTimeout: 100000
+      startTimeout: 50000
     });
     await this.app.start();
     console.log('application started');
