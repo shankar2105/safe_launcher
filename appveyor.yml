@@ -26,6 +26,7 @@ install:
   - node --version
   - npm --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
+  - ps: Install-Product node $env:nodejs_version
   - choco install googlechrome
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
