@@ -35,12 +35,9 @@ install:
   - cargo build --release --verbose --features use-mock-routing
   - copy target\release\safe_core.dll %APPVEYOR_BUILD_FOLDER%\app\ffi
   - cd %APPVEYOR_BUILD_FOLDER%
-matrix:
-  fast_finish: true
+
 build: off
-version: '{build}'
-shallow_clone: true
-clone_depth: 1
+
 test_script:
   - npm config set msvs_version=2015
   - npm install --progress false --depth 0
