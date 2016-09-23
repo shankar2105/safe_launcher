@@ -6,7 +6,7 @@ env:
 matrix:
   include:
   - os: linux
-#  - os: osx
+  - os: osx
 
 language: generic
 
@@ -25,10 +25,12 @@ addons:
       - xvfb
 
 before_install:
-  - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-  - sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-  - sudo apt-get update
-  - sudo apt-get install google-chrome-stable
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install google-chrome-stable; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install brew-cask; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome; fi
 
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
