@@ -37,10 +37,21 @@ describe('SAFE Launcher Test', function () {
   //   await client.click('button[name=login]');
   // };
 
+  const getRoute = async() => {
+    const { client } = this.app;
+    const url = await client.getUrl();
+    console.log(url);
+    const route = url.split('#')[1].split('?')[0].slice(1);
+    console.log(route);
+    return route;
+  };
+
   const register = async() => {
     const { client } = this.app;
     console.log('application registration');
-    await client.click('.form-f-b a');
+    if (getRoute() === 'login') {
+      await client.click('.form-f-b a');
+    }
     await delay(1000);
     await client.click('button[name=continue]');
     await delay(1000);
