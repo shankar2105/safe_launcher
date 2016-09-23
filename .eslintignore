@@ -2,3 +2,4 @@ main.js
 app/server
 app/logger
 test/dist
+rebuild_native.js
