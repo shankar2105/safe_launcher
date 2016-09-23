@@ -17,6 +17,7 @@ describe('SAFE Launcher Test', function () {
     await client.waitUntilWindowLoaded();
     await delay(1000);
     const networkStatus = await client.getAttribute('#networkStatus', 'class');
+    console.warn(':: Network status :: ', networkStatus);
     if (networkStatus.indexOf('connected') === -1) {
       return await checkNetworkConnected();
     }
@@ -28,23 +29,16 @@ describe('SAFE Launcher Test', function () {
     }
   };
 
-  // const login = async() => {
-  //   const { client } = this.app;
-  //   await client.setValue('#accountSecret', CONSTANTS.USER_LOCATION);
-  //   await client.setValue('#accountPassword', CONSTANTS.USER_PASSWORD);
-  //   await client.click('button[name=login]');
-  // };
-
   const getRoute = async() => {
     const { client } = this.app;
     const url = await client.getUrl();
-    const route = url.split('#')[1].split('?')[0].slice(1);
-    return route;
+    return url.split('#')[1].split('?')[0].slice(1);
   };
 
   const register = async() => {
     const { client } = this.app;
     const route = await getRoute();
+    console.warn(':: Current route :: ', route);
     if ((route === 'account') || (route === 'login')) {
       await client.click('.form-f-b a');
     }
@@ -67,8 +61,8 @@ describe('SAFE Launcher Test', function () {
   const checkAuthenticated = async() => {
     const { client } = this.app;
 
-    const currentRoute = (await client.getUrl()).split('#')[1].split('?')[0];
-    if (currentRoute !== '/account_app_list') {
+    const currentRoute = await getRoute();
+    if (currentRoute !== 'account_app_list') {
       return await checkAuthenticated();
     }
     // TODO failed to login
@@ -93,9 +87,11 @@ describe('SAFE Launcher Test', function () {
       startTimeout: 50000
     });
     await this.app.start();
+    console.warn(':: Application started ::');
     await checkNetworkConnected();
-    // await login();
+    console.warn(':: Network connected ::');
     await register();
+    console.warn(':: Registering with network ::');
     return await checkAuthenticated();
   });
 
