@@ -49,6 +49,7 @@ script:
   - cargo build --release --verbose --features use-mock-routing
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get install libgconf-2-4; fi
   - cd $TRAVIS_BUILD_DIR
   - ls $FFIDest
   - npm install
