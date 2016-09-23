@@ -24,10 +24,10 @@ addons:
     packages:
       - xvfb
       - g++-4.8
-	  - icnsutils
-	  - graphicsmagick
-	  - xz-utils
-	  - xorriso
+      - icnsutils
+      - graphicsmagick
+      - xz-utils
+      - xorriso
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
