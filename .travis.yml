@@ -52,6 +52,8 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - set BABEL_DISABLE_CACHE=1
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
+  - git tag -l
+  - git checkout tags/0.20.0
   - cargo build --release --verbose --features use-mock-routing
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
@@ -62,4 +64,4 @@ script:
   - npm run rebuild-native
   - npm run lint
   - npm run build-test
-  - npm run test
+  - npm test
