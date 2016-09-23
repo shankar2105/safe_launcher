@@ -34,7 +34,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install google-chrome-stable; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install brew-cask; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap caskroom/cask && brew install brew-cask; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome; fi
 
 install:
