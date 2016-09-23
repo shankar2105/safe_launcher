@@ -13,7 +13,7 @@ language: generic
 python:
   - '2.7'
 
-osx_image: xcode7.2
+osx_image: xcode8
 
 sudo: required
 
@@ -23,6 +23,11 @@ addons:
   apt:
     packages:
       - xvfb
+      - g++-4.8
+	  - icnsutils
+	  - graphicsmagick
+	  - xz-utils
+	  - xorriso
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
@@ -33,6 +38,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install google-chrome; fi
 
 install:
+  - export CXX="g++-4.8"
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
   - rustc -V
   - cargo -V
@@ -41,11 +47,11 @@ install:
   - node --version
   - npm --version
   - python --version
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start &
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
   - sleep 3
 
 script:
