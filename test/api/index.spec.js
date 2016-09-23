@@ -82,7 +82,7 @@ describe('SAFE Launcher Test', function () {
   before(async() => {
     this.app = new Application({
       path: electronPath,
-      args: ['./test/app'],
+      args: [path.resolve(__dirname, '..', 'app')],
       startTimeout: 100000
     });
     await this.app.start();
@@ -90,7 +90,7 @@ describe('SAFE Launcher Test', function () {
     await checkNetworkConnected();
     // await login();
     await register();
-    await checkAuthenticated();
+    return await checkAuthenticated();
   });
 
   after(() => {
