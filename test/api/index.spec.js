@@ -1,5 +1,6 @@
 import { Application } from 'spectron';
 import electronPath from 'electron';
+import path from 'path';
 import CONSTANTS from './constants';
 import * as server from './server.spec';
 import * as authorise from './authorise.spec';
@@ -81,7 +82,7 @@ describe('SAFE Launcher Test', function () {
   before(async() => {
     this.app = new Application({
       path: electronPath,
-      args: ['./test/app'],
+      args: [path.resolve(__dirname, '..', 'app')],
       startTimeout: 20000
     });
     await this.app.start();

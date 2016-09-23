@@ -41,11 +41,13 @@ install:
 
 script:
   - cd $TRAVIS_BUILD_DIR
+  - set BABEL_DISABLE_CACHE=1
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - cargo build --release --verbose --features use-mock-routing
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - cd $TRAVIS_BUILD_DIR
+  - ls $FFIDest
   - npm install
   - npm run lint
   - npm run build-test
