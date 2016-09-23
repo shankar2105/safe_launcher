@@ -82,7 +82,7 @@ describe('SAFE Launcher Test', function () {
   before(async() => {
     this.app = new Application({
       path: electronPath,
-      args: [path.resolve(__dirname, '..', 'app')],
+      args: ['./test/app'],
       startTimeout: 20000
     });
     await this.app.start();
