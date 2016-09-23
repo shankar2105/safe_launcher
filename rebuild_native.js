@@ -22,8 +22,8 @@
 var childProcess = require('child_process');
 var path = require('path');
 var Q = require('q');
-var electron = require('electron-prebuilt');
-var electronPackage = require('electron-prebuilt/package.json');
+var electron = require('electron');
+var electronPackage = require('electron/package.json');
 var rebuild = require('electron-rebuild');
 
 var pathToElectronNativeModules = path.join(__dirname, 'node_modules');
