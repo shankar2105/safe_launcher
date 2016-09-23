@@ -43,18 +43,17 @@ install:
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start &
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
   - sleep 3
 
 script:
   - cd $TRAVIS_BUILD_DIR
-  - set BABEL_DISABLE_CACHE=1
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
   - git tag -l
   - git checkout tags/0.20.0
   - cargo build --release --verbose --features use-mock-routing
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp ./target/release/libsafe_core.dylib $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libgconf-2-4; fi
   - cd $TRAVIS_BUILD_DIR
   - ls $FFIDest
   - npm install
