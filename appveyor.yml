@@ -1,7 +1,7 @@
 platform:
   - x64
 
-image: Previous Visual Studio 2015
+image: Visual Studio 2015
 
 os: unstable
 
@@ -41,7 +41,7 @@ shallow_clone: true
 clone_depth: 1
 test_script:
   - npm config set msvs_version=2015
-  - npm install
+  - npm install --progress false --depth 0
   - npm run rebuild-native
   - npm run lint
   - npm run build-test
