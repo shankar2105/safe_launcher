@@ -14,11 +14,9 @@ describe('SAFE Launcher Test', function () {
 
   const checkNetworkConnected = async() => {
     const { client, electron } = this.app;
-    console.log('application check network');
     await client.waitUntilWindowLoaded();
     await delay(1000);
     const networkStatus = await client.getAttribute('#networkStatus', 'class');
-    console.log('application get network status :: ', networkStatus);
     if (networkStatus.indexOf('connected') === -1) {
       return await checkNetworkConnected();
     }
@@ -40,16 +38,14 @@ describe('SAFE Launcher Test', function () {
   const getRoute = async() => {
     const { client } = this.app;
     const url = await client.getUrl();
-    console.log(url);
     const route = url.split('#')[1].split('?')[0].slice(1);
-    console.log(route);
     return route;
   };
 
   const register = async() => {
     const { client } = this.app;
-    console.log('application registration');
-    if (getRoute() === 'login') {
+    const route = await getRoute();
+    if ((route === 'account') || (route === 'login')) {
       await client.click('.form-f-b a');
     }
     await delay(1000);
@@ -91,15 +87,12 @@ describe('SAFE Launcher Test', function () {
   };
 
   before(async() => {
-    console.log('application started before');
-    console.log('application started before path :: ', path.resolve(__dirname, '..', 'app'));
     this.app = new Application({
       path: electronPath,
       args: [path.resolve(__dirname, '..', 'app')],
       startTimeout: 50000
     });
     await this.app.start();
-    console.log('application started');
     await checkNetworkConnected();
     // await login();
     await register();
@@ -134,42 +127,42 @@ describe('SAFE Launcher Test', function () {
   // NFS Directory
   describe('NFS Directory', () => {
     it('should be able to create directory', nfs.createDirTest);
-    // it('should not be able to create directory', nfs.createDirNegativeTest);
-    // it('should be able to get directory', nfs.getDirTest);
-    // it('should not be able to get directory', nfs.getDirNegativeTest);
-    // // it('should be able to modify directory metadata', nfs.modifyDirTest);
+    it('should not be able to create directory', nfs.createDirNegativeTest);
+    it('should be able to get directory', nfs.getDirTest);
+    it('should not be able to get directory', nfs.getDirNegativeTest);
+    //getDirNegativeTest it('should be able to modify directory metadata', nfs.modifyDirTest);
     it('should be able to delete directory', nfs.deleteDirTest);
-    // it('should not be able to delete directory', nfs.deleteDirNegativeTest);
-    // it('should be able to move dirctory', nfs.moveDirTest);
-    // it('should be able to copy dirctory', nfs.copyDirTest);
+    it('should not be able to delete directory', nfs.deleteDirNegativeTest);
+    it('should be able to move dirctory', nfs.moveDirTest);
+    it('should be able to copy dirctory', nfs.copyDirTest);
   });
 
   describe('NFS File', () => {
-    // it('should be able to create file', nfs.createFileTest);
-    // it('should not be able to create file', nfs.createFileNegativeTest);
-    // it('should be able to get file', nfs.getFileTest);
-    // it('should not be able to get file', nfs.getFileNegativeTest);
-    // // it('should be able to modify file metadata', nfs.modifyAndGetFileMetaTest);
-    // it('should be able to delete file', nfs.deleteFileTest);
-    // it('should not be able to delete file', nfs.deleteFileNegativeTest);
-    // it('should be able to move file', nfs.moveFileTest);
-    // it('should be able to copy file', nfs.copyFileTest);
+    it('should be able to create file', nfs.createFileTest);
+    it('should not be able to create file', nfs.createFileNegativeTest);
+    it('should be able to get file', nfs.getFileTest);
+    it('should not be able to get file', nfs.getFileNegativeTest);
+    // it('should be able to modify file metadata', nfs.modifyAndGetFileMetaTest);
+    it('should be able to delete file', nfs.deleteFileTest);
+    it('should not be able to delete file', nfs.deleteFileNegativeTest);
+    it('should be able to move file', nfs.moveFileTest);
+    it('should be able to copy file', nfs.copyFileTest);
   });
 
   describe('DNS', () => {
-    // it('should be able to register DNS', dns.registerDnsTest);
-    // it('should not be able to register DNS', dns.registerDnsNegativeTest);
-    // it('should be able to create longname', dns.createLongNameTest);
-    // it('should not be able to create longname', dns.createLongNameNegativeTest);
-    // it('should be able to create and delete service name', dns.addAndDeleteServiceTest);
-    // it('should not be able to create service name', dns.addServiceNegativeTest);
-    // it('should not be able to delete service name', dns.deletServiceNegativeTest);
-    // it('should be able to get home directory', dns.getHomeDirectoryTest);
-    // // it('should be able to get files', dns.getFilesTest);
-    // it('should be able to get list of longnames', dns.getLongNamesTest);
-    // it('should be able to get list of service names', dns.listServiceNamesTest);
-    // it('should be able to delete longname', dns.deleteLongNameTest);
-    // it('should not be able to delete longname', dns.deleteLongNameNegativeTest);
+    it('should be able to register DNS', dns.registerDnsTest);
+    it('should not be able to register DNS', dns.registerDnsNegativeTest);
+    it('should be able to create longname', dns.createLongNameTest);
+    it('should not be able to create longname', dns.createLongNameNegativeTest);
+    it('should be able to create and delete service name', dns.addAndDeleteServiceTest);
+    it('should not be able to create service name', dns.addServiceNegativeTest);
+    it('should not be able to delete service name', dns.deletServiceNegativeTest);
+    it('should be able to get home directory', dns.getHomeDirectoryTest);
+    // it('should be able to get files', dns.getFilesTest);
+    it('should be able to get list of longnames', dns.getLongNamesTest);
+    it('should be able to get list of service names', dns.listServiceNamesTest);
+    it('should be able to delete longname', dns.deleteLongNameTest);
+    it('should not be able to delete longname', dns.deleteLongNameNegativeTest);
   });
 
   // Revoke application
