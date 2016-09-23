@@ -19,9 +19,6 @@ sudo: required
 
 dist: trusty
 
-cache:
-  cargo: true
-
 addons:
   apt:
     packages:
