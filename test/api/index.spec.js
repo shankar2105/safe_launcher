@@ -59,8 +59,6 @@ describe('SAFE Launcher Test', function () {
   };
 
   const checkAuthenticated = async() => {
-    const { client } = this.app;
-
     const currentRoute = await getRoute();
     if (currentRoute !== 'account_app_list') {
       return await checkAuthenticated();
