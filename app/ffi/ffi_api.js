@@ -1,3 +1,5 @@
+'use strict';
+
 export default class FfiApi {
   constructor() {
     this.safeCore = null;
@@ -6,8 +8,8 @@ export default class FfiApi {
   setSafeCore(safeCore) {
     this.safeCore = safeCore;
   }
-
   // Abstract methods
-  drop() {}
+  drop(safeCore) {}
   getFunctionsToRegister() {}
+
 }

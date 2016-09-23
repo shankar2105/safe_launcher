@@ -13,7 +13,7 @@ describe('SAFE Launcher Test', function () {
   this.timeout(50000);
 
   const checkNetworkConnected = async() => {
-    const { client, electron } = this.app;
+    const { client } = this.app;
     await client.waitUntilWindowLoaded();
     await delay(1000);
     const networkStatus = await client.getAttribute('#networkStatus', 'class');
@@ -130,7 +130,7 @@ describe('SAFE Launcher Test', function () {
     it('should not be able to create directory', nfs.createDirNegativeTest);
     it('should be able to get directory', nfs.getDirTest);
     it('should not be able to get directory', nfs.getDirNegativeTest);
-    //getDirNegativeTest it('should be able to modify directory metadata', nfs.modifyDirTest);
+    // getDirNegativeTest it('should be able to modify directory metadata', nfs.modifyDirTest);
     it('should be able to delete directory', nfs.deleteDirTest);
     it('should not be able to delete directory', nfs.deleteDirNegativeTest);
     it('should be able to move dirctory', nfs.moveDirTest);

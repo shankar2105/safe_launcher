@@ -1,4 +1,5 @@
-/* eslint-disable no-underscore-dangle */
+'use strict';
+
 export default class App {
 
   constructor(appName, appId, vendorName, version, permission) {

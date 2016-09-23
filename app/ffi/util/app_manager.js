@@ -1,3 +1,5 @@
+'use strict';
+
 import ref from 'ref';
 import FfiApi from '../ffi_api';
 import App from '../model/app';
@@ -21,14 +23,11 @@ class AppManager extends FfiApi {
   }
 
   getFunctionsToRegister() {
-    /* eslint-disable camelcase */
     return {
-      register_app: [int32,
-        [SessionHandle, CString, u64, CString, u64, CString, u64, bool, AppHandlePointer]],
-      create_unauthorised_app: [int32, [SessionHandle, AppHandlePointer]],
-      drop_app: [Void, [AppHandle]]
+      'register_app': [int32, [SessionHandle, CString, u64, CString, u64, CString, u64, bool, AppHandlePointer]],
+      'create_unauthorised_app': [int32, [SessionHandle, AppHandlePointer]],
+      'drop_app': [Void, [AppHandle]]
     };
-    /* eslint-enable camelcase */
   }
 
   getHandle(app) {
@@ -103,15 +102,15 @@ class AppManager extends FfiApi {
           return reject(err || res);
         }
         try {
-          const handle = appHandle.deref();
+          const handle = appHandle.deref();          
           self.anonymousApp = handle;
           resolve(app);
-        } catch (e) {
+        } catch(e) {
           console.error(e);
         }
       };
-      self.safeCore.create_unauthorised_app.async(sessionManager.sessionHandle, appHandle,
-        onResult);
+
+      self.safeCore.create_unauthorised_app.async(sessionManager.sessionHandle, appHandle, onResult);
     };
     return new Promise(executor);
   }
@@ -120,16 +119,15 @@ class AppManager extends FfiApi {
     const self = this;
     const exec = async (resolve, reject) => {
       try {
-        let app = null;
-        for (app of self.holder.keys()) {
+        for (let app of self.holder.keys()) {
           await self.revokeApp(app);
         }
         resolve();
-      } catch (e) {
+      } catch(e) {
         console.error(e);
         reject(e);
       }
-    };
+    }
     return new Promise(exec);
   }
 }

@@ -1,4 +1,5 @@
 main.js
+app/ffi
 app/server
 app/logger
 test/dist

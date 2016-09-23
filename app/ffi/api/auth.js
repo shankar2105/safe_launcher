@@ -1,3 +1,5 @@
+'use strict';
+
 import ref from 'ref';
 import FfiApi from '../ffi_api';
 import sessionManager from '../util/session_manager';
@@ -8,22 +10,23 @@ const CString = ref.types.CString;
 const u64 = ref.types.uint64;
 
 class Auth extends FfiApi {
+  constructor() {
+    super();
+  }
 
   getFunctionsToRegister() {
-    /* eslint-disable camelcase */
     return {
-      create_unregistered_client: [int32, [SessionHandlePointer]],
-      create_account: [int32, [CString, u64, CString, u64, SessionHandlePointer]],
-      log_in: [int32, [CString, u64, CString, u64, SessionHandlePointer]]
+      'create_unregistered_client': [int32, [SessionHandlePointer]],
+      'create_account': [int32, [CString, u64, CString, u64, SessionHandlePointer]],
+      'log_in': [int32, [CString, u64, CString, u64, SessionHandlePointer]]
     };
-    /* eslint-enable camelcase */
   }
 
   getUnregisteredSession() {
     const self = this;
     const executor = (resolve, reject) => {
-      const sessionHandle = ref.alloc(SessionHandlePointer);
-      const onResult = (err, res) => {
+      let sessionHandle = ref.alloc(SessionHandlePointer);
+      let onResult = (err, res) => {
         if (err || res !== 0) {
           sessionManager.sendNetworkDisconnected();
           return reject(err || res);
@@ -39,16 +42,15 @@ class Auth extends FfiApi {
   register(locator, password) {
     const self = this;
     const executor = (resolve, reject) => {
-      const sessionHandle = ref.alloc(SessionHandlePointer);
-      const onResult = (err, res) => {
+      let sessionHandle = ref.alloc(SessionHandlePointer);
+      let onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         sessionManager.sessionHandle = sessionHandle.deref();
         resolve();
       };
-      self.safeCore.create_account.async(locator, locator.length, password, password.length,
-        sessionHandle, onResult);
+      self.safeCore.create_account.async(locator, locator.length, password, password.length, sessionHandle, onResult);
     };
     return new Promise(executor);
   }
@@ -56,20 +58,19 @@ class Auth extends FfiApi {
   login(locator, password) {
     const self = this;
     const executor = (resolve, reject) => {
-      const sessionHandle = ref.alloc(SessionHandlePointer);
-      const onResult = (err, res) => {
+      let sessionHandle = ref.alloc(SessionHandlePointer);
+      let onResult = (err, res) => {
         if (err || res !== 0) {
           return reject(err || res);
         }
         try {
           sessionManager.sessionHandle = sessionHandle.deref();
-        } catch (e) {
-          return reject(e);
+        } catch(err) {
+          return reject(err);
         }
         resolve();
       };
-      self.safeCore.log_in.async(locator, locator.length, password, password.length,
-        sessionHandle, onResult);
+      self.safeCore.log_in.async(locator, locator.length, password, password.length, sessionHandle, onResult);
     };
     return new Promise(executor);
   }

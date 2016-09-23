@@ -1,11 +1,13 @@
+'use strict';
+
 import ref from 'ref';
 import StructType from 'ref-struct';
 
+import misc from '../api/misc';
+
 const int64 = ref.types.int64;
 const u64 = ref.types.uint64;
-/* eslint-disable camelcase */
 const size_t = ref.types.size_t;
-/* eslint-disable camelcase */
 const bool = ref.types.bool;
 const u8Pointer = ref.refType(ref.types.uint8);
 
@@ -45,8 +47,8 @@ export const FileDetails = new StructType({
   metadata: ref.refType(FileMetadata)
 });
 
-const computeTime = (seconds, nanoSeconds) => {
-  new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString();
+const computeTime = function(seconds, nanoSeconds) {
+  return new Date((seconds * 1000) + Math.floor(nanoSeconds / 1000000)).toISOString();
 };
 
 
@@ -64,16 +66,14 @@ export const derefFileMetadataStruct = (metadataStruct) => {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
   if (metadataStruct.user_metadata_len > 0) {
-    metadata = ref.reinterpret(metadataStruct.user_metadata,
-      metadataStruct.user_metadata_len).toString();
+    metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
   }
   return {
-    name,
-    metadata,
+    name: name,
+    metadata: metadata,
     size: metadataStruct.size,
     createdOn: computeTime(metadataStruct.creation_time_sec, metadataStruct.creation_time_nsec),
-    modifiedOn: computeTime(metadataStruct.modification_time_sec,
-      metadataStruct.modification_time_nsec)
+    modifiedOn: computeTime(metadataStruct.modification_time_sec, metadataStruct.modification_time_nsec)
   };
 };
 
@@ -84,33 +84,31 @@ export const derefDirectoryMetadataStruct = (metadataStruct) => {
     name = ref.reinterpret(metadataStruct.name, metadataStruct.name_len).toString();
   }
   if (metadataStruct.user_metadata_len > 0) {
-    metadata = ref.reinterpret(metadataStruct.user_metadata,
-      metadataStruct.user_metadata_len).toString();
+    metadata = ref.reinterpret(metadataStruct.user_metadata, metadataStruct.user_metadata_len).toString();
   }
   return {
-    name,
-    metadata,
+    name: name,
+    metadata: metadata,
     isPrivate: metadataStruct.is_private,
     isVersioned: metadataStruct.is_versioned,
     createdOn: computeTime(metadataStruct.creation_time_sec, metadataStruct.creation_time_nsec),
-    modifiedOn: computeTime(metadataStruct.modification_time_sec,
-      metadataStruct.modification_time_nsec)
+    modifiedOn: computeTime(metadataStruct.modification_time_sec, metadataStruct.modification_time_nsec)
   };
 };
 
 export const consumeStringListHandle = async (safeCore, handle) => {
   const executor = (resolve, reject) => {
     const getItemAt = async (index) => {
-      const exec = (res, rej) => {
+      const executor = (resolve, reject) => {
         const onResult = (err, str) => {
           if (err) {
-            return rej(err);
+            return reject(err);
           }
-          res(str);
+          resolve(str);
         };
         safeCore.string_list_at.async(handle, index, onResult);
       };
-      return new Promise(exec);
+      return new Promise(executor);
     };
     const onResult = async (err, length) => {
       if (err) {
@@ -124,7 +122,7 @@ export const consumeStringListHandle = async (safeCore, handle) => {
         list.push(temp);
         i++;
       }
-      safeCore.string_list_drop.async(handle, () => {});
+      safeCore.string_list_drop.async(handle, (e) => {});
       resolve(list);
     };
     safeCore.string_list_len.async(handle, onResult);
