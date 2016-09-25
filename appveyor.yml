@@ -24,11 +24,9 @@ install:
         cmd /c curl -fsSL -o "Run Tests.ps1" "$url/Run%20Tests.ps1"
         . ".\Install Rustup.ps1"
   - ps: Install-Product node $env:nodejs_version
-  - ps: Install-Product python $env:python_version
   - set CI=true
   - node --version
   - npm --version
-  - python --version
   - choco install googlechrome
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
@@ -41,7 +39,7 @@ install:
 build: off
 
 test_script:
-  - npm install
+  - npm install --msvs_version=2015
   - npm run rebuild-native
   - npm run lint
   - npm run build-test
