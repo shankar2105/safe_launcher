@@ -58,8 +58,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ulimit -n 10480; fi
   - cd $TRAVIS_BUILD_DIR
-  - npm install node-gyp
-  - npm install
+  - npm install --silent
   - npm run rebuild-native
   - npm run lint
   - npm run build-test
