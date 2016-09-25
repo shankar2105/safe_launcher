@@ -1,8 +1,6 @@
 platform:
   - x64
 
-image: Visual Studio 2015
-
 os: unstable
 
 environment:
@@ -39,7 +37,7 @@ install:
 build: off
 
 test_script:
-  - npm install --msvs_version=2015
+  - npm install --build-from-source --msvs_version=2015
   - npm run rebuild-native
   - npm run lint
   - npm run build-test
