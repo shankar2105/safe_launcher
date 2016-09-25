@@ -24,7 +24,6 @@ install:
         . ".\Install Rustup.ps1"
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
-  - set npm_config_arch=%PLATFORM:x86=ia32%
   - node --version
   - npm --version
   - choco install googlechrome
