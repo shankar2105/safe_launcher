@@ -12,10 +12,6 @@ environment:
     Features: "use-mock-routing"
     RUST_BACKTRACE: 1
 
-cache:
-  - node_modules
-  - '%APPDATA%\npm-cache'
-
 install:
   - ps: |
         $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
