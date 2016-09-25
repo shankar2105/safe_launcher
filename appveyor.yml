@@ -7,6 +7,7 @@ os: unstable
 
 environment:
   nodejs_version: "6.4.0"
+  python_version: "2.7.12"
   global:
     Features: "use-mock-routing"
     RUST_BACKTRACE: 1
@@ -23,9 +24,11 @@ install:
         cmd /c curl -fsSL -o "Run Tests.ps1" "$url/Run%20Tests.ps1"
         . ".\Install Rustup.ps1"
   - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product python $env:python_version
   - set CI=true
   - node --version
   - npm --version
+  - python --version
   - choco install googlechrome
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
