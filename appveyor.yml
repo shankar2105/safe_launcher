@@ -27,6 +27,7 @@ install:
   - set CI=true
   - node --version
   - npm --version
+  - python --version
   - set npm_config_arch=%PLATFORM:x86=ia32%
   - choco install googlechrome
   - cd %APPVEYOR_BUILD_FOLDER%
@@ -41,6 +42,7 @@ build: off
 
 test_script:
   - npm config set msvs_version=2015
+  - npm config set python C:/Python27/python.exe
   - npm install --build-from-source --msvs_version=2015
   - npm run rebuild-native
   - npm run lint
