@@ -11,17 +11,12 @@ environment:
     RUST_BACKTRACE: 1
     RUST_VERSION: stable
 
-cache:
-  - node_modules
-  - '%APPDATA%\npm-cache'
-
 install:
   - ps: |
         $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
         cmd /c curl -fsSL -o "Install Rustup.ps1" "$url/Install%20Rustup.ps1"
         . ".\Install Rustup.ps1"
   - ps: Install-Product node $env:nodejs_version
-  - set CI=true
   - node --version
   - npm --version
   - python --version
