@@ -9,6 +9,7 @@ environment:
   nodejs_version: "6.4.0"
   global:
     RUST_BACKTRACE: 1
+    RUST_VERSION: stable
 
 cache:
   - node_modules
