@@ -23,8 +23,6 @@ install:
   - choco install googlechrome
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/maidsafe/safe_core.git && cd safe_core
-  - git tag -l
-  - git checkout tags/0.20.0
   - cargo clean
   - cargo update
   - cargo build --release --verbose --features use-mock-routing
