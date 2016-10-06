@@ -37,8 +37,8 @@ mods.forEach(mod => {
 export const loadLibrary = (ffiDirPath) => {
   let libPath = ffiDirPath;
   if (!libPath) {
-    libPath = remote.getGlobal('args').isProduction ?
-      (remote.app.getAppPath() + '.unpacked/dist') : path.resolve(process.cwd(), 'app', 'ffi');
+    libPath = (!remote || remote.getGlobal('args').isProduction) ?
+      path.resolve(process.cwd(), 'app', 'ffi') : (remote.app.getAppPath() + '.unpacked/dist');
   }
   libPath =  path.resolve(libPath, (os.platform() === 'win32') ? 'safe_core' : 'libsafe_core');
   console.log('Library loaded from - ', libPath);
@@ -46,7 +46,6 @@ export const loadLibrary = (ffiDirPath) => {
   safeCore.init_logging();
   mods.forEach(mod => {
     if (!(mod instanceof FfiApi)) {
-      debugger;
       return;
     }
     mod.setSafeCore(safeCore);

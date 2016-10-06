@@ -83,13 +83,12 @@ export default class RESTServer {
 
     // API Error handling
     app.use(function(err, req, res, next) {
-      console.error(err);
       if (!(err instanceof ResponseError)) {
         return next();
       }
       updateAppActivity(req, res);
-      log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
-      res.status(err.status).send(err.msg);
+      // log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
+      res.status(err.status).send(err.msg );
     });
 
     // catch 404

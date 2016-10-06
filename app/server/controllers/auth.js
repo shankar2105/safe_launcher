@@ -82,7 +82,7 @@ export var authorise = function(req, res, next) {
   if (!(authReq.app && authReq.app.name && authReq.app.id && authReq.app.vendor &&
       authReq.app.version)) {
     log.debug('Authorisation request - fields missing');
-    return next(new ResponseError(400, 'Fields are missing'));
+    return next(new ResponseError(400, 'Required fields are missing'));
   }
   if (!(/[^\s]/.test(authReq.app.name) && /[^\s]/.test(authReq.app.id) && /[^\s]/.test(authReq.app.vendor) &&
     /[^\s]/.test(authReq.app.version))) {
