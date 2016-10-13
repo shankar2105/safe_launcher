@@ -1,19 +1,18 @@
-import {loadLibrary} from '../app/ffi/loader';
-import auth from '../app/ffi/api/auth';
-import RESTServer from '../app/server/boot';
 import axios from 'axios';
 import crypto from 'crypto';
-import should from 'should';
+import { loadLibrary } from '../app/ffi/loader';
+import auth from '../app/ffi/api/auth';
+import RESTServer from '../app/server/boot';
+import config from '../config/env_test.json';
 
 class MockApp {
-
   constructor() {
-    this.config = require('../config/env_test.json');
+    this.config = config;
     loadLibrary();
     this.server = new RESTServer(this.config.serverPort);
     this.server.start();
     this.axios = axios.create({
-      baseURL: 'http://localhost:' + this.config.serverPort + '/'
+      baseURL: `http://localhost:${this.config.serverPort}/`
     });
     this.authorizationToken = null;
   }

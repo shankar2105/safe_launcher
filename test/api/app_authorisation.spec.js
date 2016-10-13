@@ -1,17 +1,13 @@
-'use strict';
-
+import should from 'should';
 import mockApp from '../mock_app';
 import utils from './utils';
-import should from 'should';
 
 const FIELDS_MISSING_MSG = 'Required fields are missing';
-const EMPTY_VALUE_MSG ='Values cannot be empty';
-const INVALID_PERMISSION_REQ ='Invalid permissions requested';
-const UNAUTHORISED ='Unauthorised';
-const SESSION_HANDLE_NOT_FOUND ='Session handle not found';
+const EMPTY_VALUE_MSG = 'Values cannot be empty';
+const INVALID_PERMISSION_REQ = 'Invalid permissions requested';
+const UNAUTHORISED = 'Unauthorised';
 
 describe('Application authorisation', () => {
-
   describe('Request parameter validation', () => {
     it('Should return 400 status code on empty payload', () => {
       const payload = {};
@@ -241,7 +237,7 @@ describe('Application authorisation', () => {
           version: '0.0.1',
           vendor: 'MaidSafe'
         },
-        permissions: [ 'SAFE_DRIVE_PERMISSION' ]
+        permissions: ['SAFE_DRIVE_PERMISSION']
       };
 
       return utils.authoriseApp(payload)
@@ -274,12 +270,10 @@ describe('Application authorisation', () => {
         });
     });
   });
-  
+
   describe('Authorise app', () => {
     const authTokens = [];
-    before(() => {
-      return mockApp.registerRandomUser();
-    });
+    before(() => mockApp.registerRandomUser());
 
     after(() => {
       mockApp.removeSessionCreatedEvent();
@@ -316,7 +310,7 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      mockApp.onAppAuthorised(session => {
+      mockApp.onAppAuthorised(() => {
         done();
       });
 
@@ -343,8 +337,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      
-      mockApp.onAppAuthorised(session => {
+      mockApp.onAppAuthorised(() => {
         done();
       });
 
@@ -359,23 +352,23 @@ describe('Application authorisation', () => {
       mockApp.removeSessionCreatedEvent();
     });
 
-    it('Should return 401 status code if Session ID not found', () => {
-      return utils.revokeApp()
+    it('Should return 401 status code if Session ID not found', () => (
+      utils.revokeApp()
         .should.be.rejectedWith(Error)
         .then(err => {
-          should(401).be.equal(err.response.status); 
-          should(400).be.equal(err.response.data.errorCode); 
-          should(UNAUTHORISED).be.equal(err.response.data.description); 
-        });
-    });
+          should(401).be.equal(err.response.status);
+          should(400).be.equal(err.response.data.errorCode);
+          should(UNAUTHORISED).be.equal(err.response.data.description);
+        })
+    ));
 
-    it('Should be able to revoke application', () => {
-      return utils.revokeApp(authToken)
+    it('Should be able to revoke application', () => (
+      utils.revokeApp(authToken)
         .should.be.fulfilled()
         .then(res => {
-          should(200).be.equal(res.status); 
-        });
-    });
+          should(200).be.equal(res.status);
+        })
+    ));
   });
 
   describe('Check token valid', () => {
@@ -391,8 +384,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      
-      mockApp.onAppAuthorised(session => {
+      mockApp.onAppAuthorised(() => {
         done();
       });
 
@@ -407,22 +399,22 @@ describe('Application authorisation', () => {
       mockApp.removeSessionCreatedEvent();
     });
 
-    it('Should return 401 status code if Session ID not found', () => {
-      return mockApp.axios.get('auth')
+    it('Should return 401 status code if Session ID not found', () => (
+      mockApp.axios.get('auth')
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
           should(UNAUTHORISED).be.equal(err.response.data.description);
-        });
-    });
+        })
+    ));
 
-    it('Should be able to validate token', () => {
-      return mockApp.axios.get('auth', { headers: { Authorization: 'Bearer ' + authToken } })
+    it('Should be able to validate token', () => (
+      mockApp.axios.get('auth', { headers: { Authorization: `Bearer ${authToken}` } })
         .should.be.fulfilled()
         .then(res => {
           should(200).be.equal(res.status);
-        });
-    });
+        })
+    ));
   });
 });
