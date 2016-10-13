@@ -26,14 +26,27 @@ class MockApp {
     this.server.addEventListener(this.server.EVENT_TYPE.SESSION_CREATED, callback);
   }
 
+  removeAuthReqEvent() {
+    this.server.removeAllEventListener(this.server.EVENT_TYPE.AUTH_REQUEST);
+  }
+
+  removeSessionCreatedEvent() {
+    this.server.removeAllEventListener(this.server.EVENT_TYPE.SESSION_CREATED);
+  }
+
+  removeAuthoriseEventListener() {
+    this.server.removeAllEventListener(this.server.EVENT_TYPE.AUTH_REQUEST);
+    this.server.removeAllEventListener(this.server.EVENT_TYPE.SESSION_CREATED);
+  }
+
   getUnregisteredClient() {
     auth.getUnregisteredSession().should.be.fulfilled();
   }
 
   registerRandomUser() {
-    const locator = crypto.randomBytes(20).toString();
-    const secret = crypto.randomBytes(20).toString();
-    auth.register(locator, secret).should.be.fulfilled();
+    const locator = crypto.randomBytes(20).toString('hex');
+    const secret = crypto.randomBytes(20).toString('hex');
+    return auth.register(locator, secret);
   }
 
   approveAppAuthorisation(app) {

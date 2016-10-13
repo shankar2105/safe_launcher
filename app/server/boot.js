@@ -88,7 +88,7 @@ export default class RESTServer {
       }
       updateAppActivity(req, res);
       // log.warn('Err ' + err.status + ' - Msg :: ' + err.msg);
-      res.status(err.status).send(err.msg );
+      res.status(err.errStatus).send(err.msg);
     });
 
     // catch 404
