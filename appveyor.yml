@@ -16,7 +16,7 @@ install:
         $url = "https://github.com/maidsafe/QA/raw/master/Powershell%20Scripts/AppVeyor"
         cmd /c curl -fsSL -o "Install Rustup.ps1" "$url/Install%20Rustup.ps1"
         . ".\Install Rustup.ps1"
-  - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product node $env:nodejs_version x64
   - node --version
   - npm --version
   - python --version
