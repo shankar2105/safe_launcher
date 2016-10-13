@@ -29,8 +29,7 @@ const rebuildForWindows = () => {
   let mod = null;
   for (mod of mods) {
     console.warn('Rebuilding ', mod);
-    childProcess.execSync(`node-gyp rebuild --target=${electronVersion} 
-      --arch=${os.arch()} --dist-url=https://atom.io/download/atom-shell`, { cwd: `node_modules/${mod}` });
+    childProcess.execSync(`node-gyp rebuild --target=${electronVersion} --arch=${os.arch()} --dist-url=https://atom.io/download/atom-shell`, { cwd: `node_modules/${mod}` });
   }
   console.warn('Rebuilding complete.');
 };
