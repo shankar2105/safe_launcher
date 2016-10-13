@@ -30,7 +30,7 @@ build: off
 
 test_script:
   - npm config set msvs_version=2015
-  - npm config set python C:/Python27/python.exe
+  - npm -g install npm@next
   - npm install
   - npm run rebuild-native
   # - npm run lint
