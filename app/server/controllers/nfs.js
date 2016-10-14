@@ -94,7 +94,6 @@ let move = function(req, res, isFile, next) {
       }
       responseHandler();
     } catch(e) {
-      console.error(e);
       responseHandler(e);
     }
   };
@@ -195,6 +194,8 @@ export var createFile = function(req, res, next) {
     return next(new ResponseError(400, MSG_CONSTANTS.FAILURE.REQUIRED_PARAMS_MISSING));
   }
   log.debug('NFS - Invoking create file request');
+
+
   const responseHandler = new ResponseHandler(req, res);
   const onWriterObtained = (writerId) => {
     var writer = new NfsWriter(req, writerId, responseHandler, length);

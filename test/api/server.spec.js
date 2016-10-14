@@ -1,3 +1,4 @@
+import should from 'should';
 import mockApp from '../mock_app';
 
 describe('Server status', () => {

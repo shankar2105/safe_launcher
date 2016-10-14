@@ -1,12 +1,12 @@
 import should from 'should';
-import utils from './utils';
+import authUtils from '../utils/auth_utils';
 import { MESSAGES } from '../constants';
 
 describe('Application authorisation', () => {
   describe('Request parameter validation', () => {
     it('Should return 400 status code on empty payload', () => {
       const payload = {};
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -19,7 +19,7 @@ describe('Application authorisation', () => {
       const payload = {
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -33,7 +33,7 @@ describe('Application authorisation', () => {
         app: {},
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -49,7 +49,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -65,7 +65,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -81,7 +81,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -97,7 +97,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -115,7 +115,7 @@ describe('Application authorisation', () => {
           vendor: 'MaidSafe'
         }
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -139,7 +139,7 @@ describe('Application authorisation', () => {
           'Content-Type': 'text/plain'
         }
       };
-      return utils.authoriseApp(payload, config)
+      return authUtils.authoriseApp(payload, config)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -158,7 +158,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -177,7 +177,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -196,7 +196,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -215,7 +215,7 @@ describe('Application authorisation', () => {
         },
         permissions: []
       };
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -235,7 +235,7 @@ describe('Application authorisation', () => {
         permissions: ['SAFE_DRIVE_PERMISSION']
       };
 
-      return utils.authoriseApp(payload)
+      return authUtils.authoriseApp(payload)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(400).be.equal(err.response.status);
@@ -257,7 +257,7 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      return utils.authoriseApp(payload, {}, false)
+      return authUtils.authoriseApp(payload, {}, false)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
@@ -268,11 +268,9 @@ describe('Application authorisation', () => {
 
   describe('Authorise app', () => {
     const authTokens = [];
-    before(() => utils.registerRandomUser());
+    before(() => authUtils.registerRandomUser());
 
-    after(() => {
-      return Promise.all(authTokens.map(token => utils.revokeApp(token)));
-    });
+    after(() => Promise.all(authTokens.map(token => authUtils.revokeApp(token))));
 
     it('Should return 401 status code for rejecting application', () => {
       const payload = {
@@ -285,7 +283,7 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      return utils.authoriseApp(payload, {}, false)
+      return authUtils.authoriseApp(payload, {}, false)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
@@ -304,7 +302,7 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      return utils.authoriseApp(payload, {}, true)
+      return authUtils.authoriseApp(payload, {}, true)
         .should.be.fulfilled()
         .then(res => {
           should(200).be.equal(res.status);
@@ -317,13 +315,13 @@ describe('Application authorisation', () => {
   describe('Revoke app', () => {
     let authToken = null;
 
-    before(() => {
-      return utils.registerAndAuthorise()
-        .then(token => ( authToken = token ));
-    });
+    before(() => (
+      authUtils.registerAndAuthorise()
+        .then(token => (authToken = token))
+    ));
 
     it('Should return 401 status code if Session ID not found', () => (
-      utils.revokeApp()
+      authUtils.revokeApp()
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
@@ -333,7 +331,7 @@ describe('Application authorisation', () => {
     ));
 
     it('Should be able to revoke application', () => (
-      utils.revokeApp(authToken)
+      authUtils.revokeApp(authToken)
         .should.be.fulfilled()
         .then(res => {
           should(200).be.equal(res.status);
@@ -344,15 +342,15 @@ describe('Application authorisation', () => {
   describe('Authorisation token validation', () => {
     let authToken = null;
 
-    before(() => {
-      return utils.registerAndAuthorise()
-        .then(token => (authToken = token));
-    });
+    before(() => (
+      authUtils.registerAndAuthorise()
+        .then(token => (authToken = token))
+    ));
 
-    after(() => utils.revokeApp(authToken));
+    after(() => authUtils.revokeApp(authToken));
 
     it('Should return 401 status code if Session ID not found', () => (
-      utils.isAuthTokenValid()
+      authUtils.isAuthTokenValid()
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
@@ -362,7 +360,7 @@ describe('Application authorisation', () => {
     ));
 
     it('Should be able to validate token', () => (
-      utils.isAuthTokenValid({ headers: { Authorization: `Bearer ${authToken}` } })
+      authUtils.isAuthTokenValid({ headers: { Authorization: `Bearer ${authToken}` } })
         .should.be.fulfilled()
         .then(res => {
           should(200).be.equal(res.status);

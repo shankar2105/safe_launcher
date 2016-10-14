@@ -1,6 +1,5 @@
 import 'babel-polyfill';
 import { jsdom } from 'jsdom';
-import mockApp from './mock_app';
 
 global.document = jsdom('<!doctype html><html><body></body></html>');
 global.window = document.defaultView;
