@@ -1,11 +1,6 @@
 import should from 'should';
-import mockApp from '../mock_app';
 import utils from './utils';
-
-const FIELDS_MISSING_MSG = 'Required fields are missing';
-const EMPTY_VALUE_MSG = 'Values cannot be empty';
-const INVALID_PERMISSION_REQ = 'Invalid permissions requested';
-const UNAUTHORISED = 'Unauthorised';
+import { MESSAGES } from '../constants';
 
 describe('Application authorisation', () => {
   describe('Request parameter validation', () => {
@@ -16,7 +11,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -29,7 +24,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -43,7 +38,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -59,7 +54,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -75,7 +70,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -91,7 +86,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -107,7 +102,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -144,12 +139,12 @@ describe('Application authorisation', () => {
           'Content-Type': 'text/plain'
         }
       };
-      return mockApp.axios.post('auth', payload, config)
+      return utils.authoriseApp(payload, config)
         .should.be.rejected()
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(FIELDS_MISSING_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.FIELDS_MISSING_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -168,7 +163,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(EMPTY_VALUE_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.EMPTY_VALUE_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -187,7 +182,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(EMPTY_VALUE_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.EMPTY_VALUE_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -206,7 +201,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(EMPTY_VALUE_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.EMPTY_VALUE_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -225,7 +220,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(EMPTY_VALUE_MSG).be.equal(err.response.data.description);
+          should(MESSAGES.EMPTY_VALUE_MSG).be.equal(err.response.data.description);
         });
     });
 
@@ -245,7 +240,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(400).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(INVALID_PERMISSION_REQ).be.equal(err.response.data.description);
+          should(MESSAGES.INVALID_PERMISSION_REQ).be.equal(err.response.data.description);
         });
     });
   });
@@ -262,21 +257,20 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      return utils.authoriseApp(payload, false)
+      return utils.authoriseApp(payload, {}, false)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
-          should(UNAUTHORISED).be.equal(err.response.data);
+          should(MESSAGES.UNAUTHORISED).be.equal(err.response.data);
         });
     });
   });
 
   describe('Authorise app', () => {
     const authTokens = [];
-    before(() => mockApp.registerRandomUser());
+    before(() => utils.registerRandomUser());
 
     after(() => {
-      mockApp.removeSessionCreatedEvent();
       return Promise.all(authTokens.map(token => utils.revokeApp(token)));
     });
 
@@ -291,15 +285,15 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      return utils.authoriseApp(payload, false)
+      return utils.authoriseApp(payload, {}, false)
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
-          should(UNAUTHORISED).be.equal(err.response.data);
+          should(MESSAGES.UNAUTHORISED).be.equal(err.response.data);
         });
     });
 
-    it('Should be able to authorise application', (done) => {
+    it('Should be able to authorise application', () => {
       const payload = {
         app: {
           name: 'app name',
@@ -310,11 +304,7 @@ describe('Application authorisation', () => {
         permissions: []
       };
 
-      mockApp.onAppAuthorised(() => {
-        done();
-      });
-
-      utils.authoriseApp(payload, true)
+      return utils.authoriseApp(payload, {}, true)
         .should.be.fulfilled()
         .then(res => {
           should(200).be.equal(res.status);
@@ -327,29 +317,9 @@ describe('Application authorisation', () => {
   describe('Revoke app', () => {
     let authToken = null;
 
-    before((done) => {
-      const payload = {
-        app: {
-          name: 'app name 1',
-          id: 'test.maidsafe.net1',
-          version: '0.0.1',
-          vendor: 'MaidSafe'
-        },
-        permissions: []
-      };
-      mockApp.onAppAuthorised(() => {
-        done();
-      });
-
-      mockApp.registerRandomUser()
-        .then(() => utils.authoriseApp(payload, true))
-        .then(res => {
-          authToken = res.data.token;
-        });
-    });
-
-    after(() => {
-      mockApp.removeSessionCreatedEvent();
+    before(() => {
+      return utils.registerAndAuthorise()
+        .then(token => ( authToken = token ));
     });
 
     it('Should return 401 status code if Session ID not found', () => (
@@ -358,7 +328,7 @@ describe('Application authorisation', () => {
         .then(err => {
           should(401).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(UNAUTHORISED).be.equal(err.response.data.description);
+          should(MESSAGES.UNAUTHORISED).be.equal(err.response.data.description);
         })
     ));
 
@@ -371,46 +341,28 @@ describe('Application authorisation', () => {
     ));
   });
 
-  describe('Check token valid', () => {
+  describe('Authorisation token validation', () => {
     let authToken = null;
 
-    before((done) => {
-      const payload = {
-        app: {
-          name: 'app name 1',
-          id: 'test.maidsafe.net1',
-          version: '0.0.1',
-          vendor: 'MaidSafe'
-        },
-        permissions: []
-      };
-      mockApp.onAppAuthorised(() => {
-        done();
-      });
-
-      mockApp.registerRandomUser()
-        .then(() => utils.authoriseApp(payload, true))
-        .then(res => {
-          authToken = res.data.token;
-        });
+    before(() => {
+      return utils.registerAndAuthorise()
+        .then(token => (authToken = token));
     });
 
-    after(() => {
-      mockApp.removeSessionCreatedEvent();
-    });
+    after(() => utils.revokeApp(authToken));
 
     it('Should return 401 status code if Session ID not found', () => (
-      mockApp.axios.get('auth')
+      utils.isAuthTokenValid()
         .should.be.rejectedWith(Error)
         .then(err => {
           should(401).be.equal(err.response.status);
           should(400).be.equal(err.response.data.errorCode);
-          should(UNAUTHORISED).be.equal(err.response.data.description);
+          should(MESSAGES.UNAUTHORISED).be.equal(err.response.data.description);
         })
     ));
 
     it('Should be able to validate token', () => (
-      mockApp.axios.get('auth', { headers: { Authorization: `Bearer ${authToken}` } })
+      utils.isAuthTokenValid({ headers: { Authorization: `Bearer ${authToken}` } })
         .should.be.fulfilled()
         .then(res => {
           should(200).be.equal(res.status);

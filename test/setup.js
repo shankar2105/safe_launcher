@@ -16,5 +16,3 @@ window.localStorage = window.sessionStorage = {
     this[key] = undefined;
   },
 };
-
-mockApp.registerRandomUser();
