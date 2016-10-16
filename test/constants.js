@@ -11,7 +11,8 @@ export const CONSTANTS = {
   API: {
     AUTH: 'auth',
     NFS_DIR: 'nfs/directory/',
-    NFS_FILE: 'nfs/file/'
+    NFS_FILE: 'nfs/file/',
+    DNS: 'dns/'
   }
 };
 
