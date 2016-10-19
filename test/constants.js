@@ -23,6 +23,7 @@ export const CONSTANTS = {
     NFS_FILE: 'nfs/file/',
     DNS: 'dns/',
     IMMUT: 'immutable-data/',
+    STRUCT: 'structured-data/',
     CIPHER: 'cipher-opts/',
     DATA_ID: 'data-id/'
   },
@@ -30,6 +31,10 @@ export const CONSTANTS = {
     PLAIN: 'PLAIN',
     SYMMETRIC: 'SYMMETRIC',
     ASYMMETRIC: 'ASYMMETRIC'
+  },
+  TYPE_TAG: {
+    UNVERSIONED: 500,
+    VERSIONED: 501
   }
 };
 

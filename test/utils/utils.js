@@ -6,7 +6,8 @@ export default class Utils {
     GET: 'get',
     PUT: 'put',
     DELETE: 'delete',
-    HEAD: 'head'
+    HEAD: 'head',
+    PATCH: 'patch'
   };
 
   registerRandomUser() {
@@ -41,6 +42,11 @@ export default class Utils {
         config = Object.assign(config, arg[1] || {});
         config.headers = Object.assign(config.headers || {}, reqHeaders);
         return mockApp.axios.put(url, body, config);
+      case this.HTTP_METHOD.PATCH:
+        body = arg[0];
+        config = Object.assign(config, arg[1] || {});
+        config.headers = Object.assign(config.headers || {}, reqHeaders);
+        return mockApp.axios.patch(url, body, config);
       case this.HTTP_METHOD.HEAD:
         config = Object.assign(config, arg[0] || {});
         config.headers = Object.assign(config.headers || {}, reqHeaders);
