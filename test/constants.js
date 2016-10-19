@@ -15,7 +15,7 @@ export const CONSTANTS = {
       version: '0.0.1',
       vendor: 'MaidSafe'
     },
-    permissions: [ 'LOW_LEVEL_API' ]
+    permissions: ['LOW_LEVEL_API']
   },
   API: {
     AUTH: 'auth',
@@ -23,7 +23,13 @@ export const CONSTANTS = {
     NFS_FILE: 'nfs/file/',
     DNS: 'dns/',
     IMMUT: 'immutable-data/',
-    CIPHER: 'cipher-opts/'
+    CIPHER: 'cipher-opts/',
+    DATA_ID: 'data-id/'
+  },
+  ENCRYPTION: {
+    PLAIN: 'PLAIN',
+    SYMMETRIC: 'SYMMETRIC',
+    ASYMMETRIC: 'ASYMMETRIC'
   }
 };
 
