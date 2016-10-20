@@ -5,7 +5,7 @@ class DataIdUtils extends Utils {
   getDataIdForStructuredData(token, name, typeTag, config) {
     const url = `${CONSTANTS.API.DATA_ID}structured-data`;
     const body = {
-      name: new Buffer(name).toString('base64'),
+      name,
       typeTag
     };
     return this.sendRequest(this.HTTP_METHOD.POST, url, token, body, config);
@@ -13,7 +13,7 @@ class DataIdUtils extends Utils {
   getDataIdForAppendableData(token, name, isPrivate, config) {
     const url = `${CONSTANTS.API.DATA_ID}appendable-data`;
     const body = {
-      name: new Buffer(name).toString('base64'),
+      name,
       isPrivate
     };
     return this.sendRequest(this.HTTP_METHOD.POST, url, token, body, config);

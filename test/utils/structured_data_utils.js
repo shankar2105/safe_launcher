@@ -4,24 +4,23 @@ import { CONSTANTS } from '../constants';
 class StructUtils extends Utils {
   create(token, name, typeTag, cipherOpts, data, version, config) {
     const body = {};
-    if(name) {
+    if (name) {
       body.name = name;
     }
-    if(typeTag) {
+    if (typeTag) {
       body.typeTag = typeTag;
     }
-    if(cipherOpts) {
+    if (cipherOpts) {
       body.cipherOpts = cipherOpts;
     }
-    if(data) {
+    if (data) {
       body.data = data;
     }
-    if(version) {
+    if (version) {
       body.version = version;
     }
-    return this.sendRequest(this.HTTP_METHOD.POST, CONSTANTS.API.STRUCT, token, body, config);    
+    return this.sendRequest(this.HTTP_METHOD.POST, CONSTANTS.API.STRUCT, token, body, config);
   }
-  
   getHandle(token, dataHandleId, config) {
     const url = `${CONSTANTS.API.STRUCT}handle/${dataHandleId}`;
     return this.sendRequest(this.HTTP_METHOD.GET, url, token, config);
@@ -40,10 +39,10 @@ class StructUtils extends Utils {
   update(token, handleId, cipherOpts, data, config) {
     const url = `${CONSTANTS.API.STRUCT}${handleId}`;
     const body = {};
-    if(cipherOpts) {
+    if (cipherOpts) {
       body.cipherOpts = cipherOpts;
     }
-    if(data) {
+    if (data) {
       body.data = data;
     }
     return this.sendRequest(this.HTTP_METHOD.PATCH, url, token, body, config);
@@ -69,19 +68,19 @@ class StructUtils extends Utils {
     return this.sendRequest(this.HTTP_METHOD.POST, url, token, body, config);
   }
 
-  isSizeValid(token, config) {
+  isSizeValid(token, handleId, config) {
     const url = `${CONSTANTS.API.STRUCT}validate-size/${handleId}`;
     return this.sendRequest(this.HTTP_METHOD.GET, url, token, config);
   }
 
   put(token, handleId, config) {
     const url = `${CONSTANTS.API.STRUCT}${handleId}`;
-    return this.sendRequest(this.HTTP_METHOD.PUT, url, token, null, config); 
+    return this.sendRequest(this.HTTP_METHOD.PUT, url, token, null, config);
   }
 
   post(token, handleId, config) {
     const url = `${CONSTANTS.API.STRUCT}${handleId}`;
-    return this.sendRequest(this.HTTP_METHOD.POST, url, token, null, config); 
+    return this.sendRequest(this.HTTP_METHOD.POST, url, token, null, config);
   }
 
   dropHandle(token, handleId, config) {

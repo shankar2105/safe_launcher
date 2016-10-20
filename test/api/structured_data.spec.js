@@ -8,7 +8,21 @@ import { CONSTANTS, MESSAGES } from '../constants';
 
 describe('Structured data', () => {
 	let authToken = null;
+  let sd_handle_id = null;
   const invalidHandleId = 1234;
+  const TYPE_TAG = CONSTANTS.TYPE_TAG.UNVERSIONED;
+  const SD_CONTENT = new Buffer('test structured data').toString('base64');
+
+  const createSD = name => (
+    structUtils.create(authToken, name, TYPE_TAG, null, SD_CONTENT)
+        .then(res => (sd_handle_id = res.data.handleId))
+        .then(res => structUtils.put(authToken, sd_handle_id))
+        .then(() => structUtils.dropHandle(authToken, sd_handle_id))
+        .then(() => dataIdUtils.getDataIdForStructuredData(authToken, name, TYPE_TAG))
+        .then(res => structUtils.getHandle(authToken, res.data.handleId))
+        .then(res => (sd_handle_id = res.data.handleId))
+  );
+
   before(() => (
     authUtils.registerAndAuthorise(CONSTANTS.AUTH_PAYLOAD_LOW_LEVEL_API)
       .then(token => (authToken = token))
@@ -17,15 +31,13 @@ describe('Structured data', () => {
 
   describe('Create and read structure data', () => {
     const SD_NAME = crypto.randomBytes(32).toString('base64');
-    const SD_CONTENT = new Buffer('test structured data').toString('base64');
-    let SD_HANDLEID = null;
 
     after(() => (
-      structUtils.delete(authToken, SD_HANDLEID)
-        .then(res => structUtils.dropHandle(authToken, SD_HANDLEID))
+      structUtils.delete(authToken, sd_handle_id)
+        .then(res => structUtils.dropHandle(authToken, sd_handle_id))
     ));
 
-  	it('Should return 401 if authorisation token is not valid on creating', () => (
+  	it('Should return 401 if authorisation token is not valid on creation', () => (
       structUtils.create(null)
         .should.be.rejectedWith(Error)
         .then(err => {
@@ -34,7 +46,7 @@ describe('Structured data', () => {
         })
     ));
 
-    it('Should return 403 if low Level API Access is not provided on creating', () => {
+    it('Should return 403 if low Level API Access is not provided on creation', () => {
       let authTokenWithoutAccess = null;
       return authUtils.registerAndAuthorise()
         .then(token => (authTokenWithoutAccess = token))
@@ -67,6 +79,7 @@ describe('Structured data', () => {
           should(err.response.data.description.indexOf('Tag type')).be.not.equal(-1);
         })
     ));
+    
     it('Should return 400 if typeTag is not in specific range on creation', () => (
       structUtils.create(authToken, SD_NAME, 14999)
         .should.be.rejectedWith(Error)
@@ -78,29 +91,18 @@ describe('Structured data', () => {
     ));
 
     it('Should return 400 if data is not base64 buffer on creation', () => (
-      structUtils.create(authToken, SD_NAME, CONSTANTS.TYPE_TAG.UNVERSIONED, null, 11)
+      structUtils.create(authToken, SD_NAME, TYPE_TAG, null, 11)
         .should.be.rejectedWith(Error)
         .then(err => should(err.response.status).be.equal(400))
     ));
 
     it('Should return 400 if cipherOptsHandle is not valid on creation', () => (
-      structUtils.create(authToken, SD_NAME, CONSTANTS.TYPE_TAG.UNVERSIONED, 11, 'test string')
+      structUtils.create(authToken, SD_NAME, TYPE_TAG, 11, 'test string')
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(400)
           should(err.response.data.errorCode).be.equal(-1517)
           should(err.response.data.description).be.equal('FfiError::InvalidCipherOptHandle')
-        })
-    ));
-
-    it('Should be able to create structure data', () => (
-      structUtils.create(authToken, SD_NAME, CONSTANTS.TYPE_TAG.UNVERSIONED, null, SD_CONTENT)
-        .should.be.fulfilled()
-        .then(res => {
-          should(res.status).be.equal(200);
-          should(res.data).have.keys('handleId');
-          should(res.data.handleId).be.Number();
-          SD_HANDLEID = res.data.handleId;
         })
     ));
 
@@ -123,12 +125,6 @@ describe('Structured data', () => {
         })
     ));
 
-    it('Should be able to put structured data', () => (
-      structUtils.put(authToken, SD_HANDLEID)
-        .should.be.fulfilled()
-        .then(res => should(res.status).be.equal(200))
-    ));
-
     it('Should return 400 if invalid handleId is passed on read', () => (
       structUtils.read(authToken, invalidHandleId)
         .should.be.rejectedWith(Error)
@@ -139,8 +135,76 @@ describe('Structured data', () => {
         })
     ));
 
-    it('Should be able to read structure data', () => (
-      structUtils.read(authToken, SD_HANDLEID)
+    it('Should return 400 if invalid handleId is passed on get metadata', () => (
+      structUtils.getMetadata(authToken, invalidHandleId)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1513);
+          should(err.response.data.description).be.equal('FfiError::InvalidStructDataHandle');
+        })
+    ));
+
+    it('Should return 400 if data not found', () => (
+      structUtils.create(authToken, SD_NAME, TYPE_TAG, null, SD_CONTENT)
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('handleId');
+          should(res.data.handleId).be.Number();
+          sd_handle_id = res.data.handleId;
+        })
+        .then(() => structUtils.dropHandle(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => dataIdUtils.getDataIdForStructuredData(authToken, SD_NAME, TYPE_TAG))
+        .should.be.fulfilled()
+        .then(res => structUtils.getHandle(authToken, res.data.handleId))
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-18);
+          should(err.response.data.description.indexOf('NoSuchData')).be.not.equal(-1);
+        })
+    ));
+
+    it('Should be able to create and read structure data', () => (
+      structUtils.create(authToken, SD_NAME, TYPE_TAG, null, SD_CONTENT)
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('handleId');
+          should(res.data.handleId).be.Number();
+          sd_handle_id = res.data.handleId;
+        })
+        .then(() => structUtils.isSizeValid(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('isValid');
+          should(res.data.isValid).be.ok();
+        })
+        .then(() => structUtils.put(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(() => structUtils.dropHandle(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => dataIdUtils.getDataIdForStructuredData(authToken, SD_NAME, TYPE_TAG))
+        .should.be.fulfilled()
+        .then(res => structUtils.getHandle(authToken, res.data.handleId))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('handleId', 'isOwner', 'version')
+          sd_handle_id = res.data.handleId
+        })
+        .then(() => structUtils.getMetadata(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('isOwner', 'version')
+        })
+        .then(() => structUtils.read(authToken, sd_handle_id))
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);
@@ -148,4 +212,313 @@ describe('Structured data', () => {
         })
     ));
   });
+  
+  describe('Update structured data', () => {
+    const SD_NAME = crypto.randomBytes(32).toString('base64');
+    const SD_NEW_CONTENT = new Buffer('test updated structured data').toString('base64');
+
+    before(() => createSD(SD_NAME));
+    after(() => (
+      structUtils.delete(authToken, sd_handle_id)
+        .then(res => structUtils.dropHandle(authToken, sd_handle_id))
+    ));
+
+    it('Should return 401 if authorisation token is not valid', () => (
+      structUtils.update(null)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(401);
+          should(err.response.data.errorCode).be.equal(400);
+        })
+    ));
+
+    it('Should return 403 if low Level API Access is not provided', () => {
+      let authTokenWithoutAccess = null;
+      return authUtils.registerAndAuthorise()
+        .then(token => (authTokenWithoutAccess = token))
+        .then(() => structUtils.update(authTokenWithoutAccess))
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(403);
+          should(err.response.data.errorCode).be.equal(400);
+          should(err.response.data.description).be.equal(MESSAGES.LOW_LEVEL_API_ACCESS_NOT_GRANTED);
+        })
+        .then(() => authUtils.revokeApp(authTokenWithoutAccess));
+    });
+
+    it('Should return 400 if data is not base64 buffer', () => (
+      structUtils.update(authToken, sd_handle_id, null, 11)
+        .should.be.rejectedWith(Error)
+        .then(err => should(err.response.status).be.equal(400))
+    ));
+
+    it('Should return 400 if cipherOptsHandle is not valid', () => (
+      structUtils.update(authToken, sd_handle_id, 11, 'test string')
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400)
+          should(err.response.data.errorCode).be.equal(-1517)
+          should(err.response.data.description).be.equal('FfiError::InvalidCipherOptHandle')
+        })
+    ));
+
+    it('Should return 400 if invalid handleId is passed', () => (
+      structUtils.update(authToken, invalidHandleId, null, SD_CONTENT)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1513);
+          should(err.response.data.description).be.equal('FfiError::InvalidStructDataHandle');
+        })
+    ));
+
+    it('Should be able to update structured data', () => (
+      structUtils.update(authToken, sd_handle_id, null, SD_NEW_CONTENT)
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => structUtils.post(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(() => structUtils.getMetadata(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data.version).be.equal(1);
+          should(res.data.isOwner).be.ok();
+        })
+        .then(() => structUtils.read(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).be.equal(new Buffer(SD_NEW_CONTENT, 'base64').toString());
+        })
+        .then(() => structUtils.update(authToken, sd_handle_id, null, SD_NEW_CONTENT))
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => structUtils.post(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(() => structUtils.getMetadata(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data.version).be.equal(2);
+          should(res.data.isOwner).be.ok();
+        })
+    ));
+  });
+
+  describe('Delete structure data', () => {
+    const SD_NAME = crypto.randomBytes(32).toString('base64');
+
+    before(() => createSD(SD_NAME));
+    after(() => structUtils.dropHandle(authToken, sd_handle_id));
+
+    it('Should return 401 if authorisation token is not valid', () => (
+      structUtils.delete(null)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(401);
+          should(err.response.data.errorCode).be.equal(400);
+        })
+    ));
+
+    it('Should return 400 if invalid handleId is passed', () => (
+      structUtils.delete(authToken, invalidHandleId)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1513);
+          should(err.response.data.description).be.equal('FfiError::InvalidStructDataHandle');
+        })
+    ));
+
+    it('Should be able to delete structured data', () => (
+      structUtils.delete(authToken, sd_handle_id)
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => structUtils.read(authToken, sd_handle_id))
+        .should.be.rejectedWith(Error)
+    ));
+  });
+
+  describe('Serialise and deserialise structured data', () => {
+    const SD_NAME = crypto.randomBytes(32).toString('base64');
+
+    before(() => createSD(SD_NAME));
+    after(() => (
+      structUtils.delete(authToken, sd_handle_id)
+        .then(res => structUtils.dropHandle(authToken, sd_handle_id))
+    ));
+
+    it('Should return 400 if invalid handleId is passed on serialise', () => (
+      structUtils.serialise(authToken, invalidHandleId)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1513);
+          should(err.response.data.description).be.equal('FfiError::InvalidStructDataHandle');
+        })
+    ));
+
+    it.skip('Should be able to serialise and deserialise structured data', () => (
+      structUtils.serialise(authToken, sd_handle_id, { responseType: 'arraybuffer' })
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).be.ok();
+          return res.data;
+        })
+        .then(data => structUtils.deserialise(authToken, data, { headers: { 'content-type': 'text/plain' } }))
+        .should.be.fulfilled()
+        .then(res => {
+          console.log(res.data)
+          should(res.status).be.equal(200);
+        })
+    ));
+  });
+
+  describe('Make structured data unclaimable', () => {
+    const SD_NAME = crypto.randomBytes(32).toString('base64');
+    const SD_NEW_CONTENT = new Buffer('test updated structured data').toString('base64');
+
+    before(() => createSD(SD_NAME));
+    after(() => structUtils.dropHandle(authToken, sd_handle_id));
+
+    it('Should return 401 if authorisation token is not valid', () => (
+      structUtils.makeStructuredDataUnclaimable(null)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(401);
+          should(err.response.data.errorCode).be.equal(400);
+        })
+    ));
+
+    it('Should return 403 if low Level API Access is not provided', () => {
+      let authTokenWithoutAccess = null;
+      return authUtils.registerAndAuthorise()
+        .then(token => (authTokenWithoutAccess = token))
+        .then(() => structUtils.makeStructuredDataUnclaimable(authTokenWithoutAccess))
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(403);
+          should(err.response.data.errorCode).be.equal(400);
+          should(err.response.data.description).be.equal(MESSAGES.LOW_LEVEL_API_ACCESS_NOT_GRANTED);
+        })
+        .then(() => authUtils.revokeApp(authTokenWithoutAccess));
+    });
+
+    it('Should return 400 if invalid handleId is passed', () => (
+      structUtils.makeStructuredDataUnclaimable(authToken, invalidHandleId)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1513);
+          should(err.response.data.description).be.equal('FfiError::InvalidStructDataHandle');
+        })
+    ));
+
+    it('Should be able to make structured data unclaimable', () => (
+      structUtils.makeStructuredDataUnclaimable(authToken, sd_handle_id)
+        .should.be.fulfilled()
+        .then(res => should(res.status).be.equal(200))
+        .then(() => structUtils.dropHandle(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(() => dataIdUtils.getDataIdForStructuredData(authToken, SD_NAME, TYPE_TAG))
+        .should.be.fulfilled()
+        .then(res => structUtils.getHandle(authToken, res.data.handleId))
+        .should.be.fulfilled()
+        .then(res => structUtils.getMetadata(authToken, res.data.handleId))
+        .then(() => structUtils.create(authToken, SD_NAME, TYPE_TAG, null, SD_NEW_CONTENT))
+        .should.be.fulfilled()
+        .then(res => (sd_handle_id = res.data.handleId))
+        .then(() => structUtils.put(authToken, sd_handle_id))
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-23);
+          should(err.response.data.description.indexOf('DataExists')).be.not.equal(-1);
+        })
+    ));
+  });
+
+  describe('Get Data Id from Handle Id', () => {
+    const SD_NAME = crypto.randomBytes(32).toString('base64');
+    before(() => createSD(SD_NAME));
+    after(() => (
+      structUtils.delete(authToken, sd_handle_id)
+        .then(res => structUtils.dropHandle(authToken, sd_handle_id))
+    ));
+
+    it('Should return 400 if invalid handleId is passed', () => (
+      structUtils.asDataId(authToken, invalidHandleId)
+        .should.be.rejectedWith(Error)
+        .then(err => {
+          should(err.response.status).be.equal(400);
+          should(err.response.data.errorCode).be.equal(-1513);
+          should(err.response.data.description).be.equal('FfiError::InvalidStructDataHandle');
+        })
+    ));
+
+    it('Should be able to get data Id from \'handleId\'', () => (
+      structUtils.asDataId(authToken, sd_handle_id)
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).have.keys('handleId');
+          should(res.data.handleId).be.Number();
+          return res.data.handleId;
+        })
+        .then(handleId => dataIdUtils.dropHandle(authToken, handleId))
+        .should.be.fulfilled()
+    ));
+  });
+
+  describe('Claim Deleted structured data', () => {
+    const SD_NAME = crypto.randomBytes(32).toString('base64');
+    const SD_NEW_CONTENT = new Buffer('test updated structured data').toString('base64');
+
+    before(() => (
+      createSD(SD_NAME)
+        .then(() => structUtils.delete(authToken, sd_handle_id))
+    ));
+    
+    after(() => (
+      structUtils.delete(authToken, sd_handle_id)
+        .then(res => structUtils.dropHandle(authToken, sd_handle_id))
+    ));
+
+    it('Should be able to claim deleted structured data', () => {
+      let claimedSDVersion = null;
+
+      return dataIdUtils.getDataIdForStructuredData(authToken, SD_NAME, TYPE_TAG)
+        .should.be.fulfilled()
+        .then(res => structUtils.getHandle(authToken, res.data.handleId))
+        .should.be.fulfilled()
+        .then(res => structUtils.getMetadata(authToken, res.data.handleId))
+        .should.be.fulfilled()
+        .then(res => {
+          claimedSDVersion = res.data.version + 1;
+          return structUtils.create(authToken, SD_NAME, TYPE_TAG, null, SD_NEW_CONTENT, claimedSDVersion);
+        })
+        .should.be.fulfilled()
+        .then(res => (sd_handle_id = res.data.handleId))
+        .then(() => structUtils.put(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(() => structUtils.dropHandle(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(() => dataIdUtils.getDataIdForStructuredData(authToken, SD_NAME, TYPE_TAG))
+        .should.be.fulfilled()
+        .then(res => structUtils.getHandle(authToken, res.data.handleId))
+        .should.be.fulfilled()
+        .then(res => (sd_handle_id = res.data.handleId))
+        .then(res => structUtils.getMetadata(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => should(res.data.version).be.equal(claimedSDVersion))
+        .then(() => structUtils.read(authToken, sd_handle_id))
+        .should.be.fulfilled()
+        .then(res => {
+          should(res.status).be.equal(200);
+          should(res.data).be.equal(new Buffer(SD_NEW_CONTENT, 'base64').toString());
+        })
+    });
+  })
 });
