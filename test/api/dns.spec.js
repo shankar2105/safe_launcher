@@ -8,10 +8,10 @@ describe('DNS', () => {
   const dirPath = 'test_app';
   const rootPath = 'app';
   let longName = 'testdns-';
-  const serviceName = 'www';
-  
+  const serviceName = 'testservice';
+
   const setLongName = () => {
-    longName = longName.split('-')[0] + '-' + new Date().getTime()
+    longName = `${longName.split('-')[0]}-${new Date().getTime()}`;
   };
 
   before(() => (
@@ -405,7 +405,7 @@ describe('DNS', () => {
     before(() => {
       setLongName();
       return dnsUtils.createPublicId(authToken, longName)
-        .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath))
+        .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath));
     });
 
     after(() => dnsUtils.deleteDns(authToken, longName));
@@ -500,7 +500,7 @@ describe('DNS', () => {
     before(() => {
       setLongName();
       return dnsUtils.createPublicId(authToken, longName)
-        .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath))
+        .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath));
     });
 
     after(() => (
@@ -514,14 +514,10 @@ describe('DNS', () => {
         .then(err => should(err.response.status).be.equal(401))
     ));
 
-    it.skip('Should return 404 if longName doesn\'t exist', () => (
+    it('Should return 400 if longName doesn\'t exist', () => (
       dnsUtils.listServiceNames(authToken, 'longName', serviceName)
         .should.be.rejectedWith(Error)
-        .then(err => {
-          should(err.response.status).be.equal(404);
-          should(err.response.data.errorCode).be.equal(-1002);
-          should(err.response.data.description).be.equal('DnsError::DnsRecordNotFound');
-        })
+        .then(err => should(err.response.status).be.equal(400))
     ));
 
     it('Should be able to get list of service names', () => (
@@ -538,7 +534,7 @@ describe('DNS', () => {
     before(() => {
       setLongName();
       return dnsUtils.createPublicId(authToken, longName)
-        .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath))
+        .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath));
     });
 
     after(() => (
@@ -546,14 +542,10 @@ describe('DNS', () => {
         .then(() => dnsUtils.deleteDns(authToken, longName))
     ));
 
-    it.skip('Should return 404 if longName doesn\'t exist', () => (
+    it('Should return 400 if longName doesn\'t exist', () => (
       dnsUtils.getHomeDir(authToken, 'longName', serviceName)
         .should.be.rejectedWith(Error)
-        .then(err => {
-          should(err.response.status).be.equal(404);
-          should(err.response.data.errorCode).be.equal(-1002);
-          should(err.response.data.description).be.equal('DnsError::DnsRecordNotFound');
-        })
+        .then(err => should(err.response.status).be.equal(400))
     ));
 
     it('Should return 404 if serviceName doesn\'t exist', () => (
@@ -613,7 +605,7 @@ describe('DNS', () => {
       return dnsUtils.createPublicId(authToken, longName)
         .then(() => dnsUtils.addService(authToken, longName, serviceName, dirPath, rootPath))
         .then(() => nfsUtils.createFile(authToken, rootPath, filePath, fileContent,
-          { headers: { 'content-type': 'text/plain' } }))
+          { headers: { 'content-type': 'text/plain' } }));
     });
 
     after(() => (
@@ -623,25 +615,27 @@ describe('DNS', () => {
     ));
 
     it('Should return 400 if range is not in bytes', () => (
-      dnsUtils.getFile(authToken, longName, serviceName, filePath, { headers: { range: 'data=' } })
+      dnsUtils.getFile(authToken, longName, serviceName, fileName, { headers: { range: 'data=' } })
         .should.be.rejectedWith(Error)
         .then(err => {
-          should(err.response.status).be.equal(400);
+          should(err.response.status).be.equal(416);
           should(err.response.data.errorCode).be.equal(400);
-          // should(err.response.data.description.indexOf('range')).be.not.equal(-1);
+          should(err.response.data.description.indexOf('range')).be.not.equal(-1);
         })
     ));
 
-    it.skip('Should return 404 if file doesn\'t exist', () => (
+    it('Should return 404 if file doesn\'t exist', () => (
       dnsUtils.getFile(authToken, longName, serviceName, 'testFile.txt')
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(404);
+          should(err.response.data.errorCode).be.equal(-1503);
+          should(err.response.data.description).be.equal('FfiError::InvalidPath');
         })
     ));
 
-    it.skip('Should be able to get file', () => (
-      dnsUtils.getFile(authToken, longName, serviceName, filePath)
+    it('Should be able to get file', () => (
+      dnsUtils.getFile(authToken, longName, serviceName, fileName)
         .should.be.fulfilled()
         .then(res => {
           should(res.status).be.equal(200);

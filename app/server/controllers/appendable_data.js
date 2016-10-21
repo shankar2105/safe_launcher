@@ -29,6 +29,9 @@ export const create = async (req, res, next) => {
       return next(new ResponseError(400, 'Invalid name field'));
     }
     const isPrivate = payload.isPrivate || false;
+    if(typeof isPrivate !== 'boolean') {
+      return next(new ResponseError(400, 'Invalid isPrivate field'));
+    }
     const filterType = FILTER_TYPE[payload.filterType] || FILTER_TYPE.BLACK_LIST;
     const filterKeys = payload.filterKeys || [];
     const handleId = await appendableData.create(app, name, isPrivate, filterType, filterKeys);

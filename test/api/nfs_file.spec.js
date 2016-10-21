@@ -45,15 +45,16 @@ describe('NFS file', () => {
         })
     ));
 
-    it.skip('Should return 400 if metadata is not string', () => (
-      nfsUtils.createFile(authToken, rootPath, filePath, '', { headers: { metadata: true } })
-        .should.be.rejectedWith(Error)
-        .then(err => {
-          should(err.response.status).be.equal(400);
-          should(err.response.data.errorCode).be.equal(400);
-          should(err.response.data.description).be.equal(MESSAGES.REQUIRED_PARAMS_MISSING);
-        })
-    ));
+    // it('Should return 400 if metadata is not string', () => (
+    //   nfsUtils.createFile(authToken, rootPath, filePath, 'some text',
+    //      { headers: { metadata: { test: true } } })
+    //     .should.be.rejectedWith(Error)
+    //     .then(err => {
+    //       should(err.response.status).be.equal(400);
+    //       should(err.response.data.errorCode).be.equal(400);
+    //       should(err.response.data.description).be.equal(MESSAGES.REQUIRED_PARAMS_MISSING);
+    //     })
+    // ));
 
     it('Should be able to create file', () => (
       nfsUtils.createFile(authToken, rootPath, filePath, 'some text',
@@ -280,8 +281,8 @@ describe('NFS file', () => {
         })
     ));
 
-    it.skip('Should return 400 if either name or metadata are not found', () => (
-      nfsUtils.modifyFileMeta(authToken, rootPath, filePath, { name: true })
+    it('Should return 400 if either name or metadata are not found', () => (
+      nfsUtils.modifyFileMeta(authToken, rootPath, filePath, {})
         .should.be.rejectedWith(Error)
         .then(err => {
           should(err.response.status).be.equal(400);
