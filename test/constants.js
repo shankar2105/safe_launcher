@@ -25,7 +25,9 @@ export const CONSTANTS = {
     IMMUT: 'immutable-data/',
     STRUCT: 'structured-data/',
     CIPHER: 'cipher-opts/',
-    DATA_ID: 'data-id/'
+    DATA_ID: 'data-id/',
+    APPEND: 'appendable-data/',
+    SIGN_KEY: 'sign-key/'
   },
   ENCRYPTION: {
     PLAIN: 'PLAIN',

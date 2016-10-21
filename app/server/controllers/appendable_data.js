@@ -253,7 +253,7 @@ export const getDeletedDataIdAt = async (req, res) => {
   dataIdAt(req, res, true);
 };
 
-export const toggleFilter = async (req, res) => {
+export const toggleFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -270,7 +270,7 @@ export const toggleFilter = async (req, res) => {
   }
 };
 
-export const addToFilter = async (req, res) => {
+export const addToFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -290,7 +290,7 @@ export const addToFilter = async (req, res) => {
   }
 };
 
-export const removeFromFilter = async (req, res) => {
+export const removeFromFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -310,7 +310,7 @@ export const removeFromFilter = async (req, res) => {
   }
 };
 
-export const getSignKeyFromFilter = async (req, res) => {
+export const getSignKeyFromFilter = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);
@@ -448,7 +448,7 @@ export const deleteAppendableData = async (req, res) => {
   }
 };
 
-export const restore = async (req, res) => {
+export const restore = async (req, res, next) => {
   const responseHandler = new ResponseHandler(req, res);
   try {
     const sessionInfo = sessionManager.get(req.headers.sessionId);

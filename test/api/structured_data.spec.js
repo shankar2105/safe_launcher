@@ -520,5 +520,5 @@ describe('Structured data', () => {
           should(res.data).be.equal(new Buffer(SD_NEW_CONTENT, 'base64').toString());
         })
     });
-  })
+  });
 });

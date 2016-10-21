@@ -35,7 +35,7 @@ export default class Utils {
         return mockApp.axios.get(url, config);
       case this.HTTP_METHOD.DELETE:
         config = Object.assign(config, arg[0] || {});
-        config.headers = Object.assign(config.headers || {}, reqHeaders);
+          config.headers = Object.assign(config.headers || {}, reqHeaders);
         return mockApp.axios.delete(url, config);
       case this.HTTP_METHOD.PUT:
         body = arg[0];
