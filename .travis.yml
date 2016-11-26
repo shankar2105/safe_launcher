@@ -25,7 +25,10 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+    packages:
       - xvfb
+env:
+  - CXX=g++-4.8
 
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
