@@ -8,20 +8,13 @@ matrix:
   - os: linux
   - os: osx
 
-language: nodejs
+language: node_js
 
-nodejs:
-  6.5.0
+node_js:
+  - "6.4.x"
 
 python:
   - '2.7'
-
-rust:
-  - stable
-
-sudo: required
-
-dist: trusty
 
 addons:
   apt:
