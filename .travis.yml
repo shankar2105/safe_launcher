@@ -51,6 +51,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cp ./target/release/libsafe_core.so $FFIDest; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libgconf-2-4; fi
   - cd $TRAVIS_BUILD_DIR
+  - export CXX="g++-4.8"
   - npm install
   - npm run rebuild-native
   - npm run lint
