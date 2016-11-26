@@ -25,7 +25,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-      - libgnome-keyring-dev
       - xvfb
 
 install:
