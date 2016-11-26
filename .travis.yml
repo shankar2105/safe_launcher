@@ -28,7 +28,7 @@ addons:
       - xvfb
 
 before_script:
-   - rustc -V
+  - rustc -V
   - cargo -V
   - nvm --version
   - nvm install 6.4.0
