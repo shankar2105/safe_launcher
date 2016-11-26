@@ -15,10 +15,6 @@ node_js:
 python:
   - '2.7'
 
-cache:
-  directories:
-  - node_modules
-
 addons:
   apt:
     sources:
