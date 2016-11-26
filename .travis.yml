@@ -27,8 +27,6 @@ addons:
       - g++-4.8
       - libgnome-keyring-dev
       - xvfb
-env:
-  - CXX=g++-4.8
 
 install:
   - curl -sSf https://static.rust-lang.org/rustup.sh | sh
