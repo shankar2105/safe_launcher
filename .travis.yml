@@ -16,8 +16,6 @@ python:
 rust:
   - stable
 
-osx_image: xcode7.3
-
 sudo: required
 
 dist: trusty
@@ -26,6 +24,9 @@ addons:
   apt:
     packages:
       - xvfb
+
+install:
+  - curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
 before_script:
   - rustc -V
