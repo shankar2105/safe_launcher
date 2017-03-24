@@ -28,6 +28,7 @@ install:
 build: off
 test_script:
   - npm config set msvs_version=2015
+  - npm -g install npm@4.4.4
   - npm install
   - npm run rebuild-native
   - npm run lint
