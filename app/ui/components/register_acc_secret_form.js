@@ -19,6 +19,7 @@ export default class RegisterAccSecretForm extends Component {
     super();
     this.handleAccSecretForm = this.handleAccSecretForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleInputFocus = this.handleInputFocus.bind(this);
     this.showPassword = this.showPassword.bind(this);
     this.passwordStrengthValid = false;
   }
@@ -42,8 +43,8 @@ export default class RegisterAccSecretForm extends Component {
     };
 
     reset();
-    if (!accountSecretVal || !confirmAccountSecretVal) {
-      return;
+    if (!accountSecretVal) {
+      return this.props.setErrorMessage('Account Secret should not be empty');
     }
 
     e.preventDefault();
@@ -75,12 +76,15 @@ export default class RegisterAccSecretForm extends Component {
     }
   }
 
+  handleInputFocus() {
+    if (this.props.errorMsg) {
+      this.props.clearErrorMessage();
+    }
+  }
+
   handleInputChange(e) {
     if (e.keyCode === 13) {
       return;
-    }
-    if (this.props.errorMsg) {
-      this.props.clearErrorMessage();
     }
     const MSG = {
       PASS_VERY_WEEK: 'Very weak',
@@ -172,6 +176,7 @@ export default class RegisterAccSecretForm extends Component {
                 ref={c => { this.accountSecret = c; }}
                 required="true"
                 onKeyUp={this.handleInputChange}
+                onFocus={this.handleInputFocus}
                 autoFocus
               />
               <label htmlFor="accountSecret">Account Secret</label>
@@ -223,7 +228,7 @@ export default class RegisterAccSecretForm extends Component {
           </div>
           <div className="opt-i">
             <button
-              type="submit"
+              type="button"
               className="btn"
               name="continue"
               form="accountSecretForm"

@@ -1,15 +1,13 @@
 import React, { Component, PropTypes } from 'react';
-import $ from 'jquery';
 import className from 'classnames';
 
 export default class RegisterVerificationForm extends Component {
   constructor() {
     super();
     this.inviteToken = null;
-    this.handleAccPassForm = this.handleAccPassForm.bind(this);
+    this.handleInviteForm = this.handleInviteForm.bind(this);
     this.openVerificationWindow = this.openVerificationWindow.bind(this);
     this.clearErrorMsg = this.clearErrorMsg.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.setInvite = this.setInvite.bind(this);
   }
 
@@ -54,10 +52,11 @@ export default class RegisterVerificationForm extends Component {
     this.inviteToken.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
-  handleAccPassForm(e) {
+  handleInviteForm(e) {
     const inviteToken = this.inviteToken.value.trim();
     if (!inviteToken) {
-      return;
+      this.props.setInviteCode('');
+      return this.props.setErrorMessage('Invitation token should not be empty');
     }
     e.preventDefault();
 
@@ -70,13 +69,6 @@ export default class RegisterVerificationForm extends Component {
     if (this.props.errorMsg) {
       this.props.clearErrorMessage();
     }
-  }
-
-  handleInputChange(e) {
-    if (e.keyCode === 13) {
-      return;
-    }
-    this.clearErrorMsg();
   }
 
   openVerificationWindow() {
@@ -99,10 +91,6 @@ export default class RegisterVerificationForm extends Component {
         win = null;
       });
       win.loadURL(url);
-      // win.webContents.on('did-finish-load', () => {
-      //   win.show();
-      //   win.focus();
-      // });
       win.show();
     } catch (e) {
       console.error(e);
@@ -133,7 +121,7 @@ export default class RegisterVerificationForm extends Component {
                 className="normal-pad"
                 ref={c => { this.inviteToken = c; }}
                 required="true"
-                onChange={this.handleInputChange}
+                onFocus={() => { this.clearErrorMsg(); }}
                 autoFocus
               />
               <label htmlFor="inviteToken">Invitation Token</label>
@@ -161,11 +149,11 @@ export default class RegisterVerificationForm extends Component {
           </div>
           <div className="opt-i">
             <button
-              type="submit"
+              type="button"
               className="btn"
               name="continue"
               form="inviteTokenForm"
-              onClick={this.handleAccPassForm}
+              onClick={this.handleInviteForm}
             >Continue</button>
           </div>
         </div>

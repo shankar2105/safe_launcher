@@ -85,9 +85,6 @@ const auth = (state = initialState, action) => {
       };
     }
     case ActionTypes.SET_INVITE_CODE: {
-      if (!action.invite) {
-        return state;
-      }
       return { ...state, user: Object.assign({}, { inviteToken: action.invite }) };
     }
     case ActionTypes.LOGOUT:

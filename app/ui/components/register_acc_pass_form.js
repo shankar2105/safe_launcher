@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import $ from 'jquery';
 import zxcvbn from 'zxcvbn';
+import className from 'classnames';
 import { MESSAGES } from '../constant';
 
 export default class RegisterAccPassForm extends Component {
@@ -16,6 +17,7 @@ export default class RegisterAccPassForm extends Component {
     super();
     this.handleAccPassForm = this.handleAccPassForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleInputFocus = this.handleInputFocus.bind(this);
     this.showPassword = this.showPassword.bind(this);
     this.passwordStrengthValid = false;
   }
@@ -36,24 +38,21 @@ export default class RegisterAccPassForm extends Component {
     }
     const accountPasswordVal = this.accountPassword.value.trim();
     const confirmAccountPasswordVal = this.confirmAccountPassword.value.trim();
-    const accountPasswordMsgEle = $(this.accountPassword).siblings('.msg');
     const confirmAccountPasswordMsgEle = $(this.confirmAccountPassword).siblings('.msg');
 
     const reset = () => {
-      accountPasswordMsgEle.text('');
       confirmAccountPasswordMsgEle.text('');
     };
 
     reset();
-    if (!accountPasswordVal || !confirmAccountPasswordVal) {
-      return;
+    if (!accountPasswordVal) {
+      return this.props.setErrorMessage('Account Password should not be empty');
     }
 
     e.preventDefault();
 
     if (!this.passwordStrengthValid) {
-      accountPasswordMsgEle.text('Account password needs to be stronger.');
-      return;
+      return this.props.setErrorMessage('Account password needs to be stronger.');
     }
 
     if (accountPasswordVal !== confirmAccountPasswordVal) {
@@ -71,6 +70,12 @@ export default class RegisterAccPassForm extends Component {
     const ele = $(e.currentTarget);
     const msgEle = ele.siblings('.msg');
     msgEle.text('');
+  }
+
+  handleInputFocus() {
+    if (this.props.errorMsg) {
+      this.props.clearErrorMessage();
+    }
   }
 
   handleInputChange(e) {
@@ -138,6 +143,15 @@ export default class RegisterAccPassForm extends Component {
   }
 
   render() {
+    const { errorMsg } = this.props;
+
+    const inputGrpClassNames = className(
+      'inp-grp',
+      'validate-field',
+      'light-theme',
+      { error: errorMsg }
+    );
+
     return (
       <div className="auth-intro-cnt">
         <h3 className="title">Account Password</h3>
@@ -147,17 +161,18 @@ export default class RegisterAccPassForm extends Component {
         </div>
         <div className="form-b">
           <form id="accountPasswordForm" className="form" name="accountPasswordForm">
-            <div id="AccountPass" className="inp-grp validate-field light-theme">
+            <div id="AccountPass" className={inputGrpClassNames}>
               <input
                 id="accountPassword"
                 type="password"
                 ref={c => { this.accountPassword = c; }}
                 required="true"
                 onKeyUp={this.handleInputChange}
+                onFocus={this.handleInputFocus}
                 autoFocus
               />
               <label htmlFor="accountPassword">Account Password</label>
-              <div className="msg">{' '}</div>
+              <div className="msg">{errorMsg}</div>
               <div className="opt">
                 <div className="opt-i">
                   <span
@@ -205,7 +220,7 @@ export default class RegisterAccPassForm extends Component {
           </div>
           <div className="opt-i">
             <button
-              type="submit"
+              type="button"
               className="btn btn-box"
               name="continue"
               form="accountPasswordForm"
